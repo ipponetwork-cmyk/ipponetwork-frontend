@@ -682,6 +682,26 @@ export const EnquiryButton = styled.button`
     }
 `;
 
+export const PublishButton = styled.button`
+    width: 380px;
+    margin-top: 30px;
+    // background-color: var(--button-bg);
+    background:black;
+    color: var(--button-text);
+    border: none;
+    padding: 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 16px;
+
+    &:hover {
+        opacity: 0.9;
+    }
+`;
+
 export const PostFooter = styled.footer`
   font-family: 'Maven Pro', sans-serif;
   font-size: 14px;
@@ -895,6 +915,54 @@ export const PostMedia = styled.div`
     height: 56vh;
     overflow: hidden;
     background: var(--page-bg);
+`;
+
+export const SlideActionButton = styled.button`
+    position: absolute;
+    left: 50%;
+    width:100%;
+    bottom: 0px;
+    transform: translateX(-50%);
+    background:black;
+    color: #fff;
+    border: none;
+    padding: 16px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    text-align:start;
+    cursor: pointer;
+    z-index: 50;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.92;
+    }
+`;
+
+export const DetailSlideActionButton = styled.button`
+    position: absolute;
+    left: 50%;
+    width:100%;
+    max-width: 420px;
+    top:50%;
+    transform: translateX(-50%);
+    background: #111111;
+    color: #ffffff;
+    border: none;
+    padding: 14px 0px;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 55;
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+        opacity: 0.95;
+        transform: translateX(-50%) translateY(-2px);
+    }
 `;
 export const DetailWrapper = styled.div`
     min-height: 100vh;
@@ -1198,70 +1266,100 @@ export const DrawerFooter = styled.div`
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 0;
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
+  gap: 16px;
+  padding: 18px 16px 24px;
+  background: transparent;
   box-sizing: border-box;
-`;
-
-export const DrawerLanguageWrap = styled.div`
-  position: relative;
-  padding: 0 12px 12px;
 `;
 
 export const DrawerLanguageSection = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction:row;
   gap: 12px;
-  padding: 18px 16px;
-  border-radius: 20px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-  }
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #111318;
+  border: 1px solid #262a32;
+  justify-content: space-between;
 `;
 
-export const DrawerLanguageDropdown = styled.div`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(100% + 8px);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
-  z-index: 10;
-`;
-
-export const DrawerLanguageOption = styled.button`
-  width: 100%;
+export const DrawerLanguageHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border: none;
-  border-radius: 14px;
-  background: ${({ active }) => (active ? '#111827' : '#f8fafc')};
-  color: ${({ active }) => (active ? '#ffffff' : '#0f172a')};
-  text-align: left;
+  justify-content: space-between;
+  gap: 12px;
+`;
+
+export const DrawerLanguageLabel = styled.span`
   font-family: 'Maven Pro', sans-serif;
   font-size: 14px;
   font-weight: 600;
+  color: #ffffff;
+`;
+
+export const DrawerLanguageSubtitle = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #8a93a7;
+`;
+
+// export const DrawerLanguageButtons = styled.div`
+//   display: flex;
+//   gap: 10px;
+// `;
+
+// export const DrawerLanguageButton = styled.button`
+//   min-width: 72px;
+//   padding: 12px 16px;
+//   border-radius: 16px;
+//   border: none;
+//   background: ${({ active }) => (active ? '#1a3cff' : '#1f242e')};
+//   color: ${({ active }) => (active ? '#ffffff' : '#9aa1b9')};
+//   font-family: 'Maven Pro', sans-serif;
+//   font-size: 13px;
+//   font-weight: 600;
+//   cursor: pointer;
+//   transition: background 0.2s ease, color 0.2s ease;
+// `;
+export const DrawerLanguageButtons = styled.div`
+  display: inline-flex;
+  background: #1f242e;
+  border-radius: 20px;
+  padding: 3px;
+  gap: 0;
+`;
+
+export const DrawerLanguageButton = styled.button`
+  min-width: 56px;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: none;
+  background: ${({ active }) => (active ? '#ffffff' : 'transparent')};
+  color: ${({ active }) => (active ? '#1a1a2e' : '#9aa1b9')};
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+`;
+export const DrawerThemeSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: #111318;
+  border: 1px solid #262a32;
+  cursor: pointer;
+`;
 
-  &:hover {
-    background: ${({ active }) => (active ? '#111827' : '#e2e8f0')};
-  }
+export const DrawerThemeSubtitle = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #8a93a7;
 `;
 
 export const DrawerLanguageIcon = styled.span`
@@ -1272,24 +1370,6 @@ export const DrawerLanguageIcon = styled.span`
   height: 20px;
   color: #666666;
   font-size: 14px;
-`;
-
-export const DrawerLanguageLabel = styled.span`
-  font-family: 'Maven Pro', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333333;
-  flex: 1;
-`;
-
-export const DrawerThemeSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #000000;
-  cursor: pointer;
 `;
 
 export const DrawerThemeLabel = styled.span`
@@ -1620,8 +1700,14 @@ export const Header = styled.div`
   align-items: center;
   padding: 0px 20px;
   position: relative;
-  border-bottom: 1px solid #f0f0f0;
-  margin-top:20px;
+  border-bottom: 1px solid #e8e8e8;
+  margin-top: 20px;
+  background: transparent;
+
+  html[data-theme='dark'] & {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0b0c0d;
+  }
 `
 
 export const CreatePostBackButton = styled.button`
@@ -1633,11 +1719,15 @@ export const CreatePostBackButton = styled.button`
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  color: #000;
+  color: #111111;
   transition: background 0.15s;
 
   &:hover {
-    background: #f5f5f5;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html[data-theme='dark'] & {
+    color: #fff;
   }
 `
 
@@ -1652,7 +1742,12 @@ export const HeaderTitle = styled.span`
   line-height: 100%;
   letter-spacing: 0;
 
-  color: #000;
+  color: #111111;
+
+  html[data-theme='dark'] & {
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+  }
 `;
 
 export const CreatePostWrapper = styled.div`
@@ -1675,8 +1770,10 @@ export const PhoneFrame = styled.div`
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid #222;
-  // box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px #1a1a1a inset;
   font-family: "Sora", sans-serif;
+  html[data-theme='dark'] & {
+    box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
 `;
 
 export const ContentArea = styled.div`
@@ -1697,12 +1794,12 @@ export const TitleInput = styled.input`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: #e8e8e8;
+  color: #ffffff;
   margin-bottom: 18px;
   caret-color: #5b8dee;
 
   &::placeholder {
-    color: #3a3a3e;
+    color: #6f6f75;
   }
 `;
 
@@ -1726,13 +1823,13 @@ export const BodyInput = styled.textarea`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: #888;
+  color: #d9d9d9;
   resize: none;
   min-height: 220px;
   caret-color: #5b8dee;
 
   &::placeholder {
-    color: #3a3a3e;
+    color: #6f6f75;
   }
 `;
 
@@ -1804,6 +1901,9 @@ export const Card = styled.div`
   animation: ${fadeIn} 0.3s ease;
   border: 1px solid #1e1e22;
   margin-top:20px;
+  html[data-theme='dark'] & {
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.42);
+  }
 `
 
 export const Banner = styled.div`
@@ -1991,6 +2091,9 @@ export const InfoCard = styled.div`
   padding:20px 10px;
   text-align:left;
   width:120px;
+  html[data-theme='dark'] & {
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58), 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
 `
 export const BorderLine = styled.div`
   width: 90%;
@@ -2042,4 +2145,458 @@ export const InfoSub = styled.div`
   vertical-align: middle;
 
   color: #444;
+`;
+
+export const ChooseDomain = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: left;
+  align-items: flex-start;
+  margin-top:20px;
+`;
+
+export const DomainCard = styled.div`
+  width: 380px;
+  background: #0F1011;
+  border-radius: 20px;
+  border: 1px solid #1e1e22;
+  padding: 15px 0px;
+  margin-top: 20px;
+  font-family: 'Sora', sans-serif;
+  html[data-theme='dark'] & {
+    box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+  }
+`;
+
+export const DomainHeader = styled.h3`
+  margin: 0 0 14px;
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #f0f0f0;
+`;
+
+export const DomainSearch = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #111315;
+  border: none;
+  border-radius: 18px;
+  padding: 12px 16px;
+`;
+
+export const SearchIcon = styled.div`
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+`;
+
+export const DomainInput = styled.input`
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f0f0f0;
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  &::placeholder {
+    color: #777;
+  }
+`;
+
+export const TitleText = styled.div`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 36px;
+  letter-spacing: -1.5px;
+  vertical-align: middle;
+  color: #111111;
+
+  html[data-theme='dark'] & {
+    color: #f0f0f0;
+  }
+`;
+
+export const DomainList = styled.div`
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-top: 8px;
+`;
+
+export const DomainListItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #1a1a1e;
+  }
+
+  // background: ${({ $isSelected }) => ($isSelected ? '#1a3a5c' : 'transparent')};
+`;
+
+export const DomainItemLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+`;
+
+export const DomainIcon = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: ${({ $isSelected }) => ($isSelected ? '#2E5BFF' : '#2a2a2e')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: white;
+`;
+
+export const DomainName = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: #f0f0f0;
+`;
+
+export const DomainCheckbox = styled.div`
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid ${({ $isSelected }) => ($isSelected ? '#4a90e2' : '#555')};
+  background: ${({ $isSelected }) => ($isSelected ? '#4a90e2' : 'transparent')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: white;
+  }
+`;
+
+export const Action = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: left;
+  align-items: flex-start;
+  // margin-top:20px;
+`;
+
+export const ActionButtonSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+`;
+
+export const ActionButtonLabel = styled.h3`
+  margin: 0;
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  color: #111111;
+
+  html[data-theme='dark'] & {
+    color: #f0f0f0;
+  }
+`;
+
+export const ActionButtonDropdown = styled.button`
+  width: 380px;
+  background: #0F1011;
+  border: 1px solid #1e1e22;
+  border-radius: 12px;
+  padding: 25px 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  html[data-theme='dark'] & {
+    box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+  }
+
+  font-family: 'Gotham', sans-serif;
+  font-weight: 700; /* Bold */
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0px;
+  vertical-align: middle;
+
+  color: #f0f0f0;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    background: #151519;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: #777;
+    transition: transform 0.2s;
+    transform: ${({ $isOpen }) =>
+      $isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+  }
+`;
+
+
+export const ActionButtonList = styled.div`
+  background: #0F1011;
+  border: 1px solid #1e1e22;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: ${fadeIn} 0.2s ease;
+`;
+
+export const ActionButtonItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #1e1e22;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #151519;
+  }
+
+  // background: ${({ $isSelected }) => ($isSelected ? '#1a3a5c' : 'transparent')};
+`;
+
+export const ActionButtonItemIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #2a2a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  margin-right: 12px;
+`;
+
+export const ActionButtonItemContent = styled.div`
+  flex: 1;
+  text-align: left;
+`;
+
+export const ActionButtonItemTitle = styled.div`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #f0f0f0;
+  margin-bottom: 2px;
+`;
+
+export const ActionButtonItemDescription = styled.div`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #777;
+`;
+
+export const ActionButtonItemCheckmark = styled.div`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  // background: ${({ $isSelected }) => ($isSelected ? '#4a90e2' : 'transparent')};
+  // border: 2px solid ${({ $isSelected }) => ($isSelected ? '#4a90e2' : 'transparent')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+  }
+`;
+
+export const ActionButtonContent = styled.div`
+  background: #0F1011;
+  border: 1px solid #1e1e22;
+  border-radius: 20px;
+  padding: 20px 25px;
+  margin-top: 12px;
+  font-family: 'Sora', sans-serif;
+  width: 320px;
+  html[data-theme='dark'] & {
+    box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+  }
+`;
+
+export const ActionButtonHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #1e1e22;
+  margin-bottom: 14px;
+`;
+
+export const ActionButtonHeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+export const ActionButtonHeaderIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #2a2a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+`;
+
+export const ActionButtonHeaderInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const ActionButtonHeaderTitle = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #f0f0f0;
+`;
+
+export const ActionButtonHeaderSubtitle = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #777;
+`;
+
+export const ActionButtonHeaderChevron = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+`;
+
+export const ActionInputField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const ActionInputLabel = styled.label`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #f0f0f0;
+`;
+
+export const ActionInputContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const ActionPhonePrefix = styled.span`
+  font-family: 'Maven Pro', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: #f0f0f0;
+  background: #2a2a2e;
+  padding: 10px 12px;
+  border-radius: 10px;
+  min-width: 50px;
+  text-align: center;
+`;
+
+export const ActionInput = styled.input`
+  flex: 1;
+  background: #2a2a2e;
+  border: none;
+  outline: none;
+  color: #f0f0f0;
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 14px 12px;
+  border-radius: 10px;
+
+  &::placeholder {
+    color: #555;
+  }
+`;
+
+export const ActionTextarea = styled.textarea`
+  background: #2a2a2e;
+  border: none;
+  outline: none;
+  color: #f0f0f0;
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 10px;
+  resize: none;
+  min-height: 80px;
+
+  &::placeholder {
+    color: #555;
+  }
+`;
+
+export const ActionLinkInputContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const ActionLinkIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  background: #2a2a2e;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 16px;
 `;

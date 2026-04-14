@@ -21,6 +21,7 @@ import {
     CaptionText,
     PostTime,
     EnquiryButton,
+    SlideActionButton,
     PostFooter,
     CommentsSection,
     CommentIcon,
@@ -31,6 +32,7 @@ import {
     IconButton,
     CountText
 } from '../../css/index';
+import { IoIosArrowForward } from "react-icons/io";
 import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
 import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
@@ -145,6 +147,19 @@ const FeedItem = ({ post }) => {
                             <SliderImage key={i} src={img} alt={`slide-${i}`} />
                         ))}
                     </SliderTrack>
+                    {activeSlide === post.images.length - 1 && (
+                        <SlideActionButton
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/feed-detail', { state: { post } });
+                            }}
+                        >
+                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:"4px"}}>
+                                <span>Enquiry Now</span>
+                                <IoIosArrowForward size={18} />
+                            </div>
+                        </SlideActionButton>
+                    )}
                     <CarouselDots>
                         {post.images.map((_, i) => (
                             <Dot
@@ -214,8 +229,8 @@ const FeedItem = ({ post }) => {
                 </PostFooter>
             </PostContent>
 
-            <SharePostDialog 
-                open={shareDialogOpen} 
+            <SharePostDialog
+                open={shareDialogOpen}
                 onClose={() => setShareDialogOpen(false)}
                 postId={post.id}
             />

@@ -8,6 +8,11 @@ export function ThemeProvider({ children }) {
     return savedTheme ? JSON.parse(savedTheme) : false
   })
 
+  const [language, setLanguage] = useState(() => {
+    const savedLanguage = localStorage.getItem('language')
+    return savedLanguage || 'en'
+  })
+
   const location = useLocation()
 
   // Pages that should not apply theme
@@ -25,10 +30,16 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('theme', JSON.stringify(isDark))
   }, [isDark, shouldApplyTheme])
 
+  useEffect(() => {
+    localStorage.setItem('language', language)
+  }, [language])
+
   const toggleTheme = () => setIsDark((prev) => !prev)
 
+  const handleLanguageChange = (lang) => setLanguage(lang)
+
   return (
-    <ThemeCtx.Provider value={{ isDark, toggleTheme }}>
+    <ThemeCtx.Provider value={{ isDark, toggleTheme, language, setLanguage: handleLanguageChange }}>
       {children}
     </ThemeCtx.Provider>
   )

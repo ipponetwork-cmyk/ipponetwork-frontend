@@ -3,7 +3,6 @@ import { FiMenu } from 'react-icons/fi';
 import { IoClose } from 'react-icons/io5';
 import { GoHome } from 'react-icons/go';
 import { CiCirclePlus } from "react-icons/ci";
-import { MdLanguage } from "react-icons/md";
 import { useNavigate, useLocation } from 'react-router-dom';
 import useTheme from '../context/useTheme';
 import {
@@ -21,14 +20,15 @@ import {
   DrawerIcon,
   DrawerLabel,
   DrawerFooter,
-  DrawerLanguageWrap,
   DrawerLanguageSection,
-  DrawerLanguageDropdown,
-  DrawerLanguageOption,
-  DrawerLanguageIcon,
+  DrawerLanguageHeader,
   DrawerLanguageLabel,
+  DrawerLanguageSubtitle,
+  DrawerLanguageButtons,
+  DrawerLanguageButton,
   DrawerThemeSection,
   DrawerThemeLabel,
+  DrawerThemeSubtitle,
   ToggleSwitch,
 } from '../css/index';
 
@@ -40,11 +40,9 @@ const menuItems = [
 function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('Home');
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [language, setLanguage] = useState('English');
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, language, setLanguage } = useTheme();
 
   const handleNavigate = (item) => {
     setActive(item.label);
@@ -53,11 +51,12 @@ function Navbar() {
   };
 
   const handleSelectLanguage = (lang) => {
-    setLanguage(lang);
-    setLanguageOpen(false);
+    const langCode = lang === 'English' ? 'en' : 'ta';
+    setLanguage(langCode);
   };
 
   const languages = ['English', 'Tamil'];
+  const displayLanguage = language === 'ta' ? 'Tamil' : 'English';
 
   return (
     <>
@@ -99,37 +98,34 @@ function Navbar() {
         </DrawerMenu>
 
         <DrawerFooter>
-          <DrawerLanguageWrap>
-            {languageOpen && (
-              <DrawerLanguageDropdown>
-                {languages
-                  .filter((lang) => lang !== language)
-                  .map((lang) => (
-                    <DrawerLanguageOption
-                      key={lang}
-                      active={false}
-                      onClick={() => handleSelectLanguage(lang)}
-                    >
-                      <DrawerLanguageIcon>
-                        <MdLanguage size={20} />
-                      </DrawerLanguageIcon>
-                      {lang}
-                    </DrawerLanguageOption>
-                  ))}
-              </DrawerLanguageDropdown>
-            )}
+          <DrawerLanguageSection>
+            <DrawerLanguageHeader>
+                <div style={{display:'flex', flexDirection:'column'}}>
+                  <DrawerLanguageLabel>Language</DrawerLanguageLabel>
+                <DrawerLanguageSubtitle>{displayLanguage}</DrawerLanguageSubtitle>
+                </div>
+            </DrawerLanguageHeader>
 
-            <DrawerLanguageSection onClick={() => setLanguageOpen((prev) => !prev)}>
-              <DrawerLanguageIcon>
-                <MdLanguage size={20} />
-              </DrawerLanguageIcon>
-              <DrawerLanguageLabel>{language}</DrawerLanguageLabel>
-            </DrawerLanguageSection>
-          </DrawerLanguageWrap>
+            <DrawerLanguageButtons>
+              {languages.map((lang) => (
+                <DrawerLanguageButton
+                  key={lang}
+                  type="button"
+                  active={displayLanguage === lang}
+                  onClick={() => handleSelectLanguage(lang)}
+                >
+                  {lang === 'English' ? 'Eng' : 'Tam'}
+                </DrawerLanguageButton>
+              ))}
+            </DrawerLanguageButtons>
+          </DrawerLanguageSection>
 
           {location.pathname !== '/profilepage' && (
             <DrawerThemeSection onClick={toggleTheme}>
-              <DrawerThemeLabel>Dark Theme</DrawerThemeLabel>
+              <div>
+                <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
+                <DrawerThemeSubtitle>Invert Theme</DrawerThemeSubtitle>
+              </div>
               <ToggleSwitch isEnabled={isDark} />
             </DrawerThemeSection>
           )}

@@ -140,13 +140,13 @@ import {
     PostMedia, SliderTrack, SliderImage, CarouselDots, Dot,
     TextContentTitle, TextContentBody,
     DetailFooter, ActionBar, EnquiryBadge, EnquiryText, IconButton, CountText,
-    LastSlideBar, LastSlideButton, LastSlideLabel, LastSlideIcon,
+    DetailSlideActionButton,
     VideoWrapper, PostVideo,
 } from '../../css/index';
 import { IoArrowBack } from 'react-icons/io5';
 import { useState, useRef } from 'react';
 import { RiSearchEyeLine } from "react-icons/ri";
-import { IoIosShareAlt } from "react-icons/io";
+import { IoIosArrowForward, IoIosShareAlt } from "react-icons/io";
 
 const FooterBar = () => (
     <DetailFooter>
@@ -228,12 +228,11 @@ const FeedDetail = () => {
                     <FooterBar />
                 </OverlayContent>
                 {isLastImage && (
-                    <LastSlideBar>
-                        <LastSlideButton onClick={handleLastImageEnquiry}>
-                            <LastSlideLabel>Enquiry Now</LastSlideLabel>
-                            <LastSlideIcon>›</LastSlideIcon>
-                        </LastSlideButton>
-                    </LastSlideBar>
+                    <DetailSlideActionButton onClick={handleLastImageEnquiry}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:"4px"}}>
+                                <span>Enquiry Now</span>
+                                <IoIosArrowForward size={18} />
+                            </div>                    </DetailSlideActionButton>
                 )}
             </DetailWrapper>
         );

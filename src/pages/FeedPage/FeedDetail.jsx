@@ -167,6 +167,7 @@ const FeedDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const post = location.state?.post;
+    console.log(post,"POST7834")
     const [activeSlide, setActiveSlide] = useState(0);
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
@@ -221,7 +222,7 @@ const FeedDetail = () => {
                             <DetailUserLocation>{post.location}</DetailUserLocation>
                         </DetailUserInfo>
                     </UserRow>
-                    {post.title && <TextContentTitle>{post.title}</TextContentTitle>}
+                    {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
                     <DetailCaption>{post.caption}</DetailCaption>
                     <DetailTime>{post.time}</DetailTime>
                     <DetailEnquiryButton>Enquiry Now</DetailEnquiryButton>
@@ -275,14 +276,14 @@ const FeedDetail = () => {
                     <IoArrowBack size={20} color="currentColor" />
                 </BackButton>
                 <OverlayContent>
-                    <UserRow>
+                    {/* <UserRow>
                         <DetailAvatar src={post.avatar} alt={post.username} />
                         <DetailUserInfo>
                             <DetailUserName>{post.username}</DetailUserName>
                             <DetailUserLocation>{post.location}</DetailUserLocation>
                         </DetailUserInfo>
-                    </UserRow>
-                    {post.title && <TextContentTitle>{post.title}</TextContentTitle>}
+                    </UserRow> */}
+                    {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
                     <TextContentBody>{post.caption}</TextContentBody>
                     <DetailTime>{post.time}</DetailTime>
                     <DetailEnquiryButton>Enquiry Now</DetailEnquiryButton>

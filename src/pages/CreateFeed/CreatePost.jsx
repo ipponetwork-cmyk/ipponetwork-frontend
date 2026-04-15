@@ -10,15 +10,18 @@ import {
     DomainList, DomainListItem, DomainItemLeft, DomainIcon, DomainName, DomainCheckbox,
     ActionButtonSection, ActionButtonLabel, ActionButtonDropdown, ActionButtonList, ActionButtonItem, ActionButtonItemIcon, ActionButtonItemContent, ActionButtonItemTitle, ActionButtonItemDescription, ActionButtonItemCheckmark,
     ActionButtonContent, ActionButtonHeader, ActionButtonHeaderLeft, ActionButtonHeaderIcon, ActionButtonHeaderInfo, ActionButtonHeaderTitle, ActionButtonHeaderSubtitle, ActionButtonHeaderChevron,
-    ActionInputField, ActionInputLabel, ActionInputContainer, ActionPhonePrefix, ActionInput, ActionTextarea, ActionLinkInputContainer, ActionLinkIcon, Action,PublishButton
+    ActionInputField, ActionInputLabel, ActionInputContainer, ActionPhonePrefix, ActionInput, ActionTextarea, ActionLinkInputContainer, ActionLinkIcon, Action, PublishButton
 } from '../../css/index';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { MdInsertPhoto } from "react-icons/md";
 import { IoMdAttach } from "react-icons/io";
 import { useTranslation } from '../../hooks/useTranslation';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { createPost } from '../../redux/createPostActions';
+import { authAPI } from '../../services/api';
 import { CiCalendar } from "react-icons/ci";
 import { BsWhatsapp } from "react-icons/bs";
 import { MdOutlineOpenInNew } from "react-icons/md";
@@ -39,38 +42,246 @@ const CreditIcon = () => (
     </svg>
 )
 
-const ChevronIcon = () => (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-        stroke="#777" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 9l6 6 6-6" />
-    </svg>
-)
+const getNow = () => Date.now();
+
 const CreatePost = () => {
     const { t } = useTranslation();
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [on, setOn] = useState(false)
-    const [count, setCount] = useState(60)
+    const [count, setCount] = useState('1')
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [selected, setSelected] = useState('Minutes')
     const [showDomainDropdown, setShowDomainDropdown] = useState(false)
-    const [selectedDomains, setSelectedDomains] = useState(new Set(['ippoChennai', 'ippoVirudhunagar']))
+    const [selectedDomains, setSelectedDomains] = useState(new Set())
+    const [domains, setDomains] = useState([])
+    const [freeTtl, setFreeTtl] = useState(null)
+    const [costTtl, setCostTtl] = useState(null)
+    const [uploadedImages, setUploadedImages] = useState([]);
+    const [uploadedPdf, setUploadedPdf] = useState(null);
+    const [submitError, setSubmitError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const domains = [
-        {
-            id: "ippoChennai",
-            name: "ippoChennai",
-            icon: <IoGlobeOutline fontSize={18} color="#777" />,
-        },
-        {
-            id: "ippoMadurai",
-            name: "ippoMadurai",
-            icon: <IoTerminalOutline fontSize={18} color="#777" />,
-        },
-        {
-            id: "ippoVirudhunagar",
-            name: "ippoVirudhunagar",
-            icon: <IoSettingsOutline fontSize={18} color="#777" />,
-        },
-    ];
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const createduserid = currentUser?._id || currentUser?.id || '';
+    const createdusername = currentUser?.username || currentUser?.name || '';
+    const FREE_TYPE = import.meta.env.FREE_TYPE;
+    const COST_TYPE = import.meta.env.COST_TYPE;
+    const handleImageUpload = (e) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const newImages = Array.from(files).map(file => ({
+                file,
+                url: URL.createObjectURL(file),
+                name: file.name
+            }));
+            setUploadedImages([...uploadedImages, ...newImages]);
+        }
+        // Reset input so same file can be selected again
+        e.target.value = '';
+    };
+
+    const removeImage = (index) => {
+        setUploadedImages(uploadedImages.filter((_, i) => i !== index));
+    };
+
+    const handlePdfUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) setUploadedPdf({ file, url: URL.createObjectURL(file), name: file.name });
+    };
+    const unitSeconds = {
+        Minutes: 60,
+        Hours: 3600,
+        Days: 86400,
+    };
+
+    const formatCount = (value) => {
+        if (value === undefined || value === null || Number.isNaN(value)) return '0';
+        const formatted = Number(value).toFixed(2).replace(/\.?0+$/, '');
+        return formatted === '' ? '0' : formatted;
+    };
+
+    const calculateCountFromSeconds = (seconds, unit) => {
+        if (!seconds || !unit) return '0';
+        return formatCount(seconds / unitSeconds[unit]);
+    };
+
+    const calculateSeconds = (value, unit) => {
+        const num = Number(value) || 0;
+        return num * unitSeconds[unit];
+    };
+
+    const calculateCredits = (seconds, costPerSecond) => {
+        if (!seconds || !costPerSecond) return 0;
+        return Number((seconds * costPerSecond).toFixed(2));
+    };
+
+    const loadTimeToLive = async (domain = 'ippochennai') => {
+        try {
+            const response = await authAPI.getTimeToLive(domain);
+            const items = Array.isArray(response) ? response : response.data || [];
+            // Find items by type only to capture the dynamic posttype and seconds from API
+            
+            const freeItem = items.find(item => item.type === FREE_TYPE);
+            const costItem = items.find(item => item.type === COST_TYPE);
+            setFreeTtl(freeItem || null);
+            setCostTtl(costItem || null);
+
+            if (!on && freeItem) {
+                setCount(calculateCountFromSeconds(freeItem.seconds, selected));
+            }
+            if (on && costItem && !count) {
+                setCount('1');
+            }
+        } catch (error) {
+            console.error('Failed to load time to live', error);
+        }
+    };
+
+    useEffect(() => {
+        let active = true;
+        // const initialUnit = 'Minutes';
+        // const initialOn = false;
+        // const initialCount = '1';
+
+        authAPI.getListOfValuesByType('domain')
+            .then((response) => {
+                if (!active) return;
+                const items = Array.isArray(response) ? response : response.data || [];
+                const mapped = Array.isArray(items)
+                    ? items.map(item => ({
+                        id: item._id,
+                        name: item.value || item.name,
+                        value: item.value || item.name,
+                        icon: <IoGlobeOutline fontSize={18} color="#777" />,
+                    }))
+                    : [];
+                setDomains(mapped);
+            })
+            .catch((error) => {
+                console.error('Failed to load domain list', error);
+            });
+
+        loadTimeToLive('ippochennai')
+            .catch((error) => {
+                console.error('Failed to load time to live', error);
+            });
+
+        return () => {
+            active = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleUnitChange = (nextUnit) => {
+        setSelected(nextUnit);
+        if (!on && freeTtl) {
+            setCount(calculateCountFromSeconds(freeTtl.seconds, nextUnit));
+        }
+    };
+
+    const handleToggle = () => {
+        const nextOn = !on;
+        setOn(nextOn);
+        if (nextOn) {
+            loadTimeToLive();
+            if (!count) setCount('1');
+        } else if (freeTtl) {
+            setCount(calculateCountFromSeconds(freeTtl.seconds, selected));
+        }
+    };
+
+    const handleCountChange = (e) => {
+        const value = e.target.value;
+        if (/^\d*\.?\d*$/.test(value)) {
+            setCount(value);
+        }
+    };
+
+    const selectedDomainValues = domains
+        .filter(domain => selectedDomains.has(domain.id))
+        .map(domain => domain.value);
+
+    const handleCreatePost = async () => {
+        setSubmitError('');
+
+        if (!title.trim() || !description.trim()) {
+            setSubmitError('Title and description are required');
+            return;
+        }
+
+        if (selectedDomainValues.length === 0) {
+            setSubmitError('Please select at least one domain');
+            return;
+        }
+
+        const createdbydomain = selectedDomainValues; // Array of selected domains
+        const isfreeornot = !on;
+        // const currentTtl = isfreeornot ? freeTtl : costTtl;
+        const posttype = import.meta.env.VITE_POST_TYPE;
+        const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
+
+        const status = 'submitted';
+
+        const formData = new FormData();
+        formData.append('title', title.trim());
+        formData.append('description', description.trim());
+        selectedDomainValues.forEach(domain => formData.append('listofdomain', domain));
+        formData.append('isfreeornot', String(isfreeornot));
+        formData.append('createdbydomain', JSON.stringify(createdbydomain));
+        formData.append('totalseconds', String(totalseconds));
+        formData.append('calltoaction', selectedAction);
+        formData.append('status', status);
+        formData.append('posttype', posttype);
+        formData.append('createduserid', createduserid);
+        formData.append('createdusername', createdusername);
+
+        // Handle different action types
+        if (selectedAction === 'whatsapp') {
+            formData.append('whatsappnumber', whatsappPhone);
+            formData.append('whatsappmessage', whatsappMessage);
+        } else if (selectedAction === 'link') {
+            formData.append('calltoactiontype', 'externallink');
+            formData.append('calltoactionexternallinkurl', externalLink);
+        } else if (selectedAction === 'call') {
+            formData.append('callnumber', callPhone);
+        }
+
+        uploadedImages.forEach(image => {
+            formData.append('attachment', image.file);
+        });
+        if (uploadedPdf?.file) {
+            formData.append('attachment', uploadedPdf.file);
+        }
+
+        try {
+            setIsSubmitting(true);
+            await dispatch(createPost(formData));
+            setSubmitError('');
+            navigate(-1);
+        } catch (error) {
+            setSubmitError(error?.message || 'Failed to create post');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const isFreeMode = !on && Boolean(freeTtl);
+    const isCostMode = on && Boolean(costTtl);
+    const derivedSeconds = calculateSeconds(count, selected);
+    const derivedCredits = isCostMode ? calculateCredits(derivedSeconds, costTtl.unit) : 0;
+
+
+    const getEndTimeLabel = (seconds) => {
+        if (!seconds) return t('todayTime');
+        const endDate = new Date(getNow() + seconds * 1000);
+        return endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    };
+
+    const endsInValue = isFreeMode && freeTtl
+        ? getEndTimeLabel(freeTtl.seconds)
+        : getEndTimeLabel(derivedSeconds);
 
     const toggleDomainSelection = (domainId) => {
         const newSelected = new Set(selectedDomains)
@@ -98,7 +309,6 @@ const CreatePost = () => {
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
     return (
         <>
-
             <Header>
                 <CreatePostBackButton onClick={() => navigate(-1)}>
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,7 +318,7 @@ const CreatePost = () => {
                 <HeaderTitle>{t('createPost')}</HeaderTitle>
             </Header>
             <CreatePostWrapper>
-                <PhoneFrame>
+                {/* <PhoneFrame>
                     <ContentArea>
                         <TitleInput type="text" placeholder={t('title')} />
                         <Divider />
@@ -127,8 +337,133 @@ const CreatePost = () => {
                             <PulseDot />
                         </DraftStatus>
                     </Toolbar>
-                </PhoneFrame>
+                </PhoneFrame> */}
+                <PhoneFrame>
+                    <ContentArea>
+                        <TitleInput
+                            type="text"
+                            placeholder={t('title')}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                        <Divider />
+                        <BodyInput
+                            placeholder={t('provideContent')}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
 
+                        {/* Images Preview */}
+                        {uploadedImages.length > 0 && (
+                            <div style={{ marginTop: '10px' }}>
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                                    gap: '8px',
+                                    marginBottom: '8px'
+                                }}>
+                                    {uploadedImages.map((image, index) => (
+                                        <div
+                                            key={index}
+                                            style={{
+                                                position: 'relative',
+                                                borderRadius: '8px',
+                                                overflow: 'hidden',
+                                                aspectRatio: '1'
+                                            }}
+                                        >
+                                            <img
+                                                src={image.url}
+                                                alt={`uploaded-${index}`}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover'
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => removeImage(index)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    background: 'rgba(0,0,0,0.7)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    color: '#fff',
+                                                    width: 24,
+                                                    height: 24,
+                                                    cursor: 'pointer',
+                                                    fontSize: '14px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    padding: 0
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <span style={{ fontSize: '12px', color: '#999' }}>
+                                    {uploadedImages.length} {uploadedImages.length === 1 ? 'image' : 'images'} selected
+                                </span>
+                            </div>
+                        )}
+
+                        {/* PDF Preview */}
+                        {uploadedPdf && (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                marginTop: '10px', padding: '10px 12px',
+                                background: '#2a2a2e', borderRadius: '8px'
+                            }}>
+                                <span style={{ fontSize: '20px' }}>📄</span>
+                                <span style={{ color: '#f0f0f0', fontSize: '13px', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {uploadedPdf.name}
+                                </span>
+                                <button
+                                    onClick={() => setUploadedPdf(null)}
+                                    style={{
+                                        background: 'none', border: 'none', color: '#777',
+                                        cursor: 'pointer', fontSize: '16px', lineHeight: 1
+                                    }}
+                                >✕</button>
+                            </div>
+                        )}
+                    </ContentArea>
+
+                    <Toolbar>
+                        {/* Hidden file inputs */}
+                        <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            style={{ display: 'none' }}
+                            onChange={handleImageUpload}
+                        />
+                        <input
+                            id="pdf-upload"
+                            type="file"
+                            accept=".pdf"
+                            style={{ display: 'none' }}
+                            onChange={handlePdfUpload}
+                        />
+
+                        <ToolButton title={t('addImage')} as="label" htmlFor="image-upload" style={{ cursor: 'pointer' }}>
+                            <MdInsertPhoto fontSize={30} color="white" />
+                        </ToolButton>
+                        <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
+                            <IoMdAttach fontSize={30} />
+                        </ToolButton>
+                        <DraftStatus>
+                            {t('draftSaved')}
+                            <PulseDot />
+                        </DraftStatus>
+                    </Toolbar>
+                </PhoneFrame>
                 <Card>
                     <Banner>
                         <BannerLeft>
@@ -138,7 +473,7 @@ const CreatePost = () => {
                                 <BannerSub>{t('boostVisibility')}</BannerSub>
                             </BannerInfo>
                         </BannerLeft>
-                        <ToggleTrack $on={on} onClick={() => setOn(v => !v)}>
+                        <ToggleTrack $on={on} onClick={handleToggle}>
                             <ToggleThumb $on={on} />
                         </ToggleTrack>
                     </Banner>
@@ -146,18 +481,28 @@ const CreatePost = () => {
                     <PeriodSection>
                         <PeriodLabel>{t('selectPeriod')}</PeriodLabel>
                         <CounterRow>
-                            <CountBtn onClick={() => setCount(v => Math.max(1, v - 1))}>−</CountBtn>
-                            <CountValue>{count}</CountValue>
-                            <CountAddBtn onClick={() => setCount(v => v + 1)}>+</CountAddBtn>
+                            <CountBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Math.max(0, Number(v || '0') - 1)))}>−</CountBtn>
+                            <CountValue
+                                type="number"
+                                value={count}
+                                min="0"
+                                disabled={isFreeMode}
+                                onChange={handleCountChange}
+                            />
+                            <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
-                        {/* <UnitRow>
-                            <UnitText>Minutes</UnitText>
-                            <ChevronIcon />
-                        </UnitRow> */}
+                        {/* <div style={{ marginTop: 10, color: '#999', fontSize: '12px' }}>
+                            {isFreeMode && freeTtl && (
+                                `${formatCount(freeTtl.seconds / unitSeconds[selected])} ${selected} = ${freeTtl.seconds} sec (free)`
+                            )}
+                            {isCostMode && costTtl && (
+                                `${count || '0'} ${selected} = ${formatCount(derivedSeconds)} sec · ${formatCount(derivedCredits)} credits`
+                            )}
+                        </div> */}
                         <UnitRow>
                             <Select
                                 value={selected}
-                                onChange={(e) => setSelected(e.target.value)}
+                                onChange={(e) => handleUnitChange(e.target.value)}
                                 variant="standard"
                                 disableUnderline
                                 sx={{
@@ -206,7 +551,7 @@ const CreatePost = () => {
                                 <CiCalendar fontSize={20} color="white" />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
-                            <InfoValue>{t('todayTime')}</InfoValue>
+                            <InfoValue>{isFreeMode ? '-' : endsInValue}</InfoValue>
                             <InfoSub>{t('startsFromPublished')}</InfoSub>
                         </InfoCard>
 
@@ -215,7 +560,7 @@ const CreatePost = () => {
                                 <CreditIcon />
                                 <InfoLabel>{t('credits')}</InfoLabel>
                             </InfoHeader>
-                            <InfoValue>120.00</InfoValue>
+                            <InfoValue>{isFreeMode ? '-' : derivedCredits}</InfoValue>
                             <InfoSub>{t('totalCredits')}</InfoSub>
                         </InfoCard>
                     </Grid>
@@ -399,7 +744,14 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
-                <PublishButton>{t('publish')}</PublishButton>
+                {submitError && (
+                    <div style={{ color: '#ff4d4f', marginTop: 16, textAlign: 'center' }}>
+                        {submitError}
+                    </div>
+                )}
+                <PublishButton onClick={handleCreatePost} disabled={isSubmitting}>
+                    {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
+                </PublishButton>
             </CreatePostWrapper>
         </>
     );

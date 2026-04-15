@@ -654,6 +654,8 @@ export const CaptionText = styled.span`
   line-height: 20px;
   letter-spacing: 0px;
   color: var(--text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 `;
 
 
@@ -2049,12 +2051,24 @@ export const CountAddBtn = styled.button`
   // &:active { transform: scale(0.93); }
 `
 
-export const CountValue = styled.span`
+export const CountValue = styled.input`
+  width: 90px;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
   font-size: 52px;
   font-weight: 700;
   color: #f0f0f0;
   letter-spacing: -0.03em;
   line-height: 1;
+  appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `
 
 export const UnitRow = styled.div`

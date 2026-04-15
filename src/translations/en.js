@@ -13,7 +13,7 @@ const en = {
   boostVisibility: 'Boost your post visibility',
   selectPeriod: 'Select Period',
   endsIn: 'Ends In',
-  todayTime: 'Today, 5:00 PM',
+  todayTime: 'Today',
   startsFromPublished: 'Starts from published time',
   credits: 'Credits',
   totalCredits: 'Total credits for this post',

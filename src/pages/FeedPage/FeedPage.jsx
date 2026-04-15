@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FeedPageWrapper,
@@ -37,75 +37,16 @@ import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
 import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
-const feedData = [
-    {
-        id: 1,
-        type: 'image',
-        username: 'Chennai_Creator',
-        location: 'A Branded Tea Shop',
-        avatar: '/src/assets/homelander1.jpg',
-        images: [
-            '/src/assets/pexel.jpg',
-            '/src/assets/swiz3.jpg',
-            '/src/assets/uk1.jpg',
-        ],
-        captionUser: 'chennai_curator',
-        caption: 'Finding the perfect brew in the heart of Besant Nagar. This new spot has the best aesthetic for morning curators.',
-        time: '2 Hours Ago',
-        comments: 0,
-    },
-    {
-        id: 2,
-        type: 'video',
-        username: 'Marina_Eats',
-        location: 'Seafood Corner, ECR',
-        avatar: '/src/assets/hero.png',
-        video: '/src/assets/background2.mp4',
-        captionUser: 'marina_foodie',
-        caption: 'Fresh catch of the day at this hidden gem on ECR. The prawn fry is absolutely unreal!',
-        time: '5 Hours Ago',
-        comments: 3,
-    },
-    {
-        id: 3,
-        type: 'image',
-        username: 'T_Nagar_Trends',
-        location: 'Fashion Street, T.Nagar',
-        avatar: '/src/assets/homelander.jpg',
-        images: [
-            '/src/assets/uk1.jpg',
-            '/src/assets/homelander1.jpg',
-            '/src/assets/pexel.jpg',
-            '/src/assets/swiz3.jpg',
-        ],
-        captionUser: 't_nagar_style',
-        caption: 'New collection just dropped at the most iconic shopping street in Chennai. Must visit this weekend!',
-        time: '1 Day Ago',
-        comments: 12,
-    },
-    {
-        id: 4,
-        type: 'text',
-        username: 'Marina_Eats',
-        location: 'Seafood Corner, ECR',
-        avatar: '/src/assets/hero.png',
-        title: 'The Architecture of Silence',
-        captionUser: 'marina_foodie',
-        caption: 'Fresh catch of the day at this hidden gem on ECR.Fresh catch of the day at this hidden gem on ECR Fresh catch of the day at this hidden gem on ECR.Fresh catch of the day at this hidden gem on ECR Fresh catch of the day at this hidden gem on ECR.Fresh catch of the day at this hidden gem on ECR Fresh catch of the day at this hidden gem on ECR.Fresh catch of the day at this hidden gem on ECR Fresh catch of the day at this hidden gem on ECR.Fresh catch of the day at this hidden gem on ECR',
-        time: '5 Hours Ago',
-        comments: 3,
-    }
+import { postAPI } from '../../services/postAPI';
 
-];
-
-const FeedItem = ({ post }) => {
+const FeedItem = ({ post,profile }) => {
+    console.log(post, "post in feed item")
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const navigate = useNavigate();
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
-
     const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
     const handleTouchMove = (e) => { touchEndX.current = e.touches[0].clientX; };
     const handleTouchEnd = () => {
@@ -117,11 +58,28 @@ const FeedItem = ({ post }) => {
         touchEndX.current = null;
     };
 
-    const words = post.caption.split(' ');
+    // const handleEnquiryClick = () => {
+    //     const actionType = post.calltoaction || post.calltoactiontype;
+    //     if (actionType === 'whatsapp' && post.whatsappnumber) {
+    //         const message = post.whatsappmessage || 'Hi, I am interested in your post';
+    //         const encodedMessage = encodeURIComponent(message);
+    //         const whatsappUrl = `https://wa.me/${post.whatsappnumber}?text=${encodedMessage}`;
+    //         window.open(whatsappUrl, '_blank');
+    //     } else if (actionType === 'call' && post.callnumber) {
+    //         window.location.href = `tel:${post.callnumber}`;
+    //     } else if (actionType === 'link' && post.calltoactionexternallinkurl) {
+    //         window.open(post.calltoactionexternallinkurl, '_blank');
+    //     } else {
+    //         alert('Action not configured for this post');
+    //     }
+    // };
+
+    const safeCaption = typeof post.caption === 'string' ? post.caption : String(post.caption || '');
+    const words = safeCaption.split(' ');
     const maxWords = 8 * 6;
     const isLong = words.length > maxWords;
     const shortCaption = words.slice(0, maxWords).join(' ');
-
+    console.log(post, "POSTPOST")
     const renderMedia = () => {
         if (post.type === 'video') {
             return (
@@ -151,10 +109,10 @@ const FeedItem = ({ post }) => {
                         <SlideActionButton
                             onClick={(e) => {
                                 e.stopPropagation();
-                                navigate('/feed-detail', { state: { post } });
+                                // handleEnquiryClick();
                             }}
                         >
-                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:"4px"}}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
                                 <span>Enquiry Now</span>
                                 <IoIosArrowForward size={18} />
                             </div>
@@ -199,8 +157,8 @@ const FeedItem = ({ post }) => {
             <PostHeader>
                 <UserAvatar src={post.avatar} alt={post.username} />
                 <UserInfo>
-                    <UserName>{post.username}</UserName>
-                    <UserLocation>{post.location}</UserLocation>
+                    <UserName>{profile.name}</UserName>
+                    <UserLocation>{profile.username}</UserLocation>
                 </UserInfo>
                 {/* <MoreOptions /> */}
             </PostHeader>
@@ -213,7 +171,9 @@ const FeedItem = ({ post }) => {
                     {post.type !== 'text' && <CaptionText>{post.caption}</CaptionText>}
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
+                {/* <EnquiryButton onClick={handleEnquiryClick}>Enquiry Now</EnquiryButton> */}
                 <EnquiryButton>Enquiry Now</EnquiryButton>
+
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
@@ -238,12 +198,91 @@ const FeedItem = ({ post }) => {
     );
 };
 const FeedPage = () => {
+    const [posts, setPosts] = useState([]);
+    const [response, setResponse] = useState(null);
+    console.log(response, "response in feed page")
+    console.log(posts, "postPage1232")
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const getLangString = (field, defaultStr = '') => {
+            if (!field) return defaultStr;
+            if (typeof field === 'string') return field;
+            if (field.en) return field.en;
+            if (field.ta) return field.ta;
+            const extract = Object.values(field)[0];
+            return typeof extract === 'string' ? extract : defaultStr;
+        };
+
+        // Transform API response to FeedItem format
+        const transformPost = (apiPost) => {
+            return {
+                id: apiPost._id,
+                _id: apiPost._id,
+                type: apiPost.attachment?.length > 0 ? 'image' : 'text',
+                username: apiPost.createdusername || 'User',
+                location: apiPost.listofdomain?.[0] || 'Location',
+                avatar: '/src/assets/homelander.jpg',
+                images: apiPost.attachment || [],
+                video: null,
+                title: getLangString(apiPost.title, 'Post Title'),
+                captionUser: apiPost.createdusername || 'user',
+                caption: getLangString(apiPost.description, ''),
+                time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
+                comments: apiPost.enquirycount || 0,
+                // Call-to-action details
+                calltoaction: apiPost.calltoaction,
+                calltoactiontype: apiPost.calltoactiontype,
+                whatsappnumber: apiPost.whatsappnumber,
+                whatsappmessage: apiPost.whatsappmessage,
+                callnumber: apiPost.callnumber,
+                calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
+            };
+        };
+
+        const fetchPosts = async () => {
+            try {
+                setLoading(true);
+
+                const rawDomain = window.location.hostname;
+                console.log(rawDomain, "raw domain")
+                const domain = rawDomain === 'localhost' ? 'ippomadurai' : rawDomain.split('.')[0];
+
+                const response = await postAPI.getPostsByDomain(domain);
+                console.log(response, "response9090")
+                setResponse(response.data[0].createduserid);
+                if (response.success && response.data) {
+                    const transformedPosts = response.data.map(transformPost);
+                    setPosts(transformedPosts);
+                } else {
+                    setError(response.message || 'Failed to fetch posts');
+                }
+            } catch (err) {
+                setError(err.message || 'Error fetching posts');
+                console.error('Error fetching posts:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPosts();
+    }, []);
+
     return (
         <FeedPageWrapper>
             <FeedContainer>
-                {feedData.map((post) => (
-                    <FeedItem key={post.id} post={post} />
-                ))}
+                {loading ? (
+                    <div style={{ padding: '20px', textAlign: 'center' }}>Loading posts...</div>
+                ) : error ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
+                ) : posts.length > 0 ? (
+                    posts.map((post) => (
+                        <FeedItem key={post._id} post={post} profile={response}/>
+                    ))
+                ) : (
+                    <div style={{ padding: '20px', textAlign: 'center' }}>No posts available</div>
+                )}
             </FeedContainer>
         </FeedPageWrapper>
     );

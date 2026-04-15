@@ -33,7 +33,7 @@ import {
 } from '../css/index';
 
 const menuItems = [
-  { label: 'Home', icon: <GoHome size={20} />, path: '/home' },
+  { label: 'Home', icon: <GoHome size={20} />, path: '/feed' },
   { label: 'Create', icon: <CiCirclePlus size={20} />, path: '/createfeed' },
 ];
 

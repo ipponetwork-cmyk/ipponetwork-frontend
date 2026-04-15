@@ -18,68 +18,60 @@ import {
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { useState } from 'react';
-
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { auth } from "../../firebase.js";
+import { authAPI } from '../../services/api';
+// import { useDispatch } from 'react-redux';
 
 function Login() {
     const navigate = useNavigate();
+    // const dispatch = useDispatch();
     const { t } = useTranslation();
 
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
-
-   const setupRecaptcha = () => {
-    if (window.recaptchaVerifier) {
-        return;
-    }
-
-    window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-            size: "invisible",
-            callback: (response) => {
-                console.log("Recaptcha verified",response);
-            },
-        }
-    );
-
-    window.recaptchaVerifier.render();
-};
-
+    const [error, setError] = useState('');
 
     const handleNext = async () => {
-        console.log(phone,"PPMknds")
+        console.log(phone, "Phone Number Entered");
+        
         if (phone.length < 10) {
-            return alert("Enter valid phone number");
+            setError("Enter valid phone number");
+            return;
         }
 
         setLoading(true);
+        setError('');
 
         try {
-            setupRecaptcha();
+            // Call backend API with phone number (without +91 prefix, API expects just the number)
+            const response = await authAPI.getUserProfileByMobileNo(phone);
 
-            const fullPhone = `+91${phone}`;
-            const appVerifier = window.recaptchaVerifier;
+            if (response.success) {
+                // Store token and user data
+                localStorage.setItem('authToken', response.token);
+                localStorage.setItem('user', JSON.stringify(response.data));
+                localStorage.setItem('isNewUser', response.isNewUser);
+                
+                // Dispatch to Redux if needed (optional)
+                // dispatch(setUser(response.data));
+                
+                console.log(response.message);
+                const userId = response.data?._id || response.data?.id || '69ddcf8f64e56fb6b236da54';
 
-            const confirmationResult = await signInWithPhoneNumber(
-                auth,
-                fullPhone,
-                appVerifier
-            );
-
-            // store globally
-            window.confirmationResult = confirmationResult;
-
-            // Store phone for later use
-            localStorage.setItem('phone', phone);
-
-            navigate('/verifyotp');
-
+                // Navigate based on whether it's a new user
+                if (response.isNewUser) {
+                    // For new users, redirect to profile page with id
+                    navigate(`/profilepage/${userId}`);
+                } else {
+                    // Existing users go to feed/home
+                    navigate('/');
+                }
+            } else {
+                setError(response.message || "Failed to authenticate");
+            }
         } catch (error) {
-             console.error("OTP error:", error.code, error.message); 
-            alert("Failed to send OTP");
+            console.error("Authentication error:", error);
+            const errorMessage = error.message ;
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -117,12 +109,11 @@ function Login() {
                     />
                 </PhoneInputGroup>
 
-                <Button onClick={handleNext}>
-                    {loading ? "Sending..." : "Next"}
-                </Button>
+                {error && <div style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>{error}</div>}
 
-                {/* Firebase Recaptcha */}
-                <div id="recaptcha-container"></div>
+                <Button onClick={handleNext} disabled={loading}>
+                    {loading ? "Signing in..." : "Next"}
+                </Button>
             </LoginCard>
         </PageWrapper>
     );

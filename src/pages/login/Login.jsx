@@ -17,23 +17,42 @@ import {
 } from '../../css';
 
 import { useTranslation } from '../../hooks/useTranslation';
-import { useState } from 'react';
-import { authAPI } from '../../services/api';
-// import { useDispatch } from 'react-redux';
+import { useState, useRef } from 'react';
+
+import { auth } from '../../firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 function Login() {
     const navigate = useNavigate();
-    // const dispatch = useDispatch();
     const { t } = useTranslation();
-
     const [phone, setPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const recaptchaRef = useRef(null);
+    const recaptchaVerifier = useRef(null);
+
+    // Setup Recaptcha
+    const setupRecaptcha = () => {
+        if (recaptchaVerifier.current) return;
+
+        recaptchaVerifier.current = new RecaptchaVerifier(
+            auth,
+            recaptchaRef.current,
+            {
+                size: 'normal',
+                callback: () => {
+                    console.log('reCAPTCHA verified');
+                },
+                'expired-callback': () => {
+                    console.log('reCAPTCHA expired');
+                },
+            }
+        );
+    };
+
     const handleNext = async () => {
-        console.log(phone, "Phone Number Entered");
-        
-        if (phone.length < 10) {
+        if (phone.length !== 10) {
             setError("Enter valid phone number");
             return;
         }
@@ -42,35 +61,34 @@ function Login() {
         setError('');
 
         try {
-            const response = await authAPI.getUserProfileByMobileNo(phone);
+            setupRecaptcha();
 
-            if (response.success) {
-                // Store token and user data
-                localStorage.setItem('authToken', response.token);
-                localStorage.setItem('user', JSON.stringify(response.data));
-                localStorage.setItem('isNewUser', response.isNewUser);
-                
-                // Dispatch to Redux if needed (optional)
-                // dispatch(setUser(response.data));
-                
-                console.log(response.message);
-                const userId = response.data?._id || response.data?.id || '69ddcf8f64e56fb6b236da54';
+            const fullPhone = `+91${phone}`;
+            const appVerifier = recaptchaVerifier.current;
 
-                // Navigate based on whether it's a new user
-                if (response.isNewUser) {
-                    // For new users, redirect to profile page with id
-                    navigate(`/profilepage/${userId}`);
-                } else {
-                    // Existing users go to feed/home
-                    navigate('/');
-                }
-            } else {
-                setError(response.message || "Failed to authenticate");
+            const confirmationResult = await signInWithPhoneNumber(
+                auth,
+                fullPhone,
+                appVerifier
+            );
+
+            // Store globally for OTP page
+            window.confirmationResult = confirmationResult;
+
+            // Store phone
+            localStorage.setItem('phone', phone);
+
+            navigate('/verifyotp');
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message || "Failed to send OTP");
+
+            // Reset reCAPTCHA on error
+            if (recaptchaVerifier.current) {
+                recaptchaVerifier.current.clear();
+                recaptchaVerifier.current = null;
             }
-        } catch (error) {
-            console.error("Authentication error:", error);
-            const errorMessage = error.message ;
-            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -93,25 +111,38 @@ function Login() {
                     <CountryCode>
                         <Code>+91</Code>
                         <DropdownIcon>
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                <path d="M2 4L6 8L10 4" stroke="#888888" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg width="12" height="12" viewBox="0 0 12 12">
+                                <path d="M2 4L6 8L10 4" stroke="#888" strokeWidth="1.5" />
                             </svg>
                         </DropdownIcon>
                     </CountryCode>
 
                     <PhoneInput
-                        type="number"
+                        type="tel"
                         placeholder="00000 00000"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        maxLength={10}
+                        onChange={(e) =>
+                            setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
+                        }
                     />
                 </PhoneInputGroup>
 
-                {error && <div style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>{error}</div>}
+                {/* reCAPTCHA */}
+      
+    <div
+        ref={recaptchaRef}
+        style={{
+            marginTop: '16px',
+            display: 'flex',
+            justifyContent: 'center'
+        }}
+    />
+
+
+                {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
 
                 <Button onClick={handleNext} disabled={loading}>
-                    {loading ? "Signing in..." : "Next"}
+                    {loading ? "Sending OTP..." : "Next"}
                 </Button>
             </LoginCard>
         </PageWrapper>

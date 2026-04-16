@@ -64,6 +64,7 @@ const CreatePost = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    console.log(currentUser,"currentUser123")
     const createduserid = currentUser?._id || currentUser?.id || '';
     const createdusername = currentUser?.username || currentUser?.name || '';
     const FREE_TYPE = import.meta.env.FREE_TYPE;
@@ -219,7 +220,7 @@ const CreatePost = () => {
         const createdbydomain = selectedDomainValues; // Array of selected domains
         const isfreeornot = !on;
         // const currentTtl = isfreeornot ? freeTtl : costTtl;
-        const posttype = import.meta.env.VITE_POST_TYPE;
+        const posttype = import.meta.env.POST_TYPE;
         const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
 
         const status = 'submitted';

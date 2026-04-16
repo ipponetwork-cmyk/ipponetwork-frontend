@@ -33,12 +33,12 @@ function ProfilePage() {
 
     const [avatar, setAvatar] = useState(null);
     const [files, setFiles] = useState({});
-    const [photoError, setPhotoError] = useState('');
+    // const [photoError, setPhotoError] = useState('');
 
     const {
         register,
         handleSubmit,
-        trigger,
+        // trigger,
         watch,
         setError,
         clearErrors,
@@ -50,7 +50,7 @@ function ProfilePage() {
         if (file) {
             setAvatar(URL.createObjectURL(file));
             setFiles(prev => ({ ...prev, photo: file }));
-            setPhotoError('');
+            // setPhotoError('');
         }
     };
 
@@ -93,14 +93,14 @@ function ProfilePage() {
     }, [usernameValue, clearErrors, setError]);
 
     const onSubmit = async (data) => {
-        const isFormValid = await trigger();
+        // const isFormValid = await trigger();
         
-        if (!isFormValid || !files.photo) {
-            if (!files.photo) {
-                setPhotoError('Photo is required');
-            }
-            return;
-        }
+        // if (!isFormValid || !files.photo) {
+        //     if (!files.photo) {
+        //         setPhotoError('Photo is required');
+        //     }
+        //     return;
+        // }
         
         console.log(data, 'Datata from form');
         const userId = id;
@@ -158,7 +158,7 @@ function ProfilePage() {
                             onChange={handleImageChange}
                         />
                     </AvatarWrapper>
-                    {photoError && <ErrorText>{photoError}</ErrorText>}
+                    {/* {photoError && <ErrorText>{photoError}</ErrorText>} */}
                     <ProfileImageTitle>Profile Image</ProfileImageTitle>
                     <ProfileImageSubtitle>
                         Recommended size 400×400px. JPG or PNG.
@@ -214,7 +214,7 @@ function ProfilePage() {
                     {errors.emailid && <ErrorText>{errors.emailid.message}</ErrorText>}
 
                     <FieldLabel>DATE OF BIRTH</FieldLabel>
-                    <DateWrapper>
+                    {/* <DateWrapper>
                         <DateInput
                             type="date"
                             placeholder="dd/mm/yyyy"
@@ -223,7 +223,36 @@ function ProfilePage() {
                         <CalendarIcon>
                             <MdOutlineCalendarToday size={18} color="#ffff" />
                         </CalendarIcon>
-                    </DateWrapper>
+                    </DateWrapper> */}
+                    <DateWrapper>
+    <DateInput
+        type="date"
+        {...register('dob', {
+            required: 'Date of birth is required',
+            validate: (value) => {
+                const today = new Date();
+                const dob = new Date(value);
+
+                let age = today.getFullYear() - dob.getFullYear();
+                const monthDiff = today.getMonth() - dob.getMonth();
+
+                if (
+                    monthDiff < 0 ||
+                    (monthDiff === 0 && today.getDate() < dob.getDate())
+                ) {
+                    age--;
+                }
+
+                return age >= 18 || 'You must be at least 18 years old';
+            }
+        })}
+    />
+
+    <CalendarIcon>
+        <MdOutlineCalendarToday size={18} color="#ffff" />
+    </CalendarIcon>
+</DateWrapper>
+
                     {errors.dob && <ErrorText>{errors.dob.message}</ErrorText>}
                 </FormSection>
             </PageWrappers>

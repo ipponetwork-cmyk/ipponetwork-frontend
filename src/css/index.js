@@ -281,9 +281,10 @@ export const Button = styled.button`
     opacity: 0.7;
   }
 `;
+
 export const OtpWrapper = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 6px;
   justify-content: center;
   margin: 8px 0;
 `;
@@ -946,13 +947,13 @@ export const DetailSlideActionButton = styled.button`
     position: absolute;
     left: 50%;
     width:100%;
-    max-width: 420px;
+    // max-width: 420px;
     top:50%;
     transform: translateX(-50%);
     background: #111111;
     color: #ffffff;
     border: none;
-    padding: 14px 0px;
+    padding: 14px 14px;
     font-weight: 700;
     font-size: 15px;
     text-align: center;

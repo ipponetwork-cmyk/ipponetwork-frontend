@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FeedPageWrapper,
@@ -39,12 +39,57 @@ import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';
 
-const FeedItem = ({ post,profile }) => {
+const getLangString = (field, defaultStr = '') => {
+    if (!field) return defaultStr;
+    if (typeof field === 'string') return field;
+    
+    if (field.en) {
+        const enVal = field.en;
+        if (typeof enVal === 'string') return enVal;
+        return Object.values(enVal)[0] || defaultStr;
+    }
+    if (field.ta) {
+        const taVal = field.ta;
+        if (typeof taVal === 'string') return taVal;
+        return Object.values(taVal)[0] || defaultStr;
+    }
+    
+    const extract = Object.values(field)[0];
+    return typeof extract === 'string' ? extract : defaultStr;
+};
+
+// Transform API response to FeedItem format
+const transformPost = (apiPost) => {
+    console.log(apiPost, "API POST TRANSFORM")
+    return {
+        id: apiPost._id,
+        _id: apiPost._id,
+        type: apiPost.attachment?.length > 0 ? 'image' : 'text',
+        username: apiPost.createdusername || 'User',
+        location: apiPost.listofdomain?.[0] || 'Location',
+        attachment:apiPost.attachment,
+        images: apiPost.attachment || [],
+        video: null,
+        title: getLangString(apiPost.title, 'Post Title'),
+        captionUser: apiPost.createdusername || 'user',
+        caption: getLangString(apiPost.description, ''),
+        time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
+        enquirycount: apiPost.enquirycount || 0,
+        // Call-to-action details
+        calltoaction: apiPost.calltoaction,
+        calltoactiontype: apiPost.calltoactiontype,
+        whatsappnumber: apiPost.whatsappnumber,
+        whatsappmessage: apiPost.whatsappmessage,
+        callnumber: apiPost.callnumber,
+        calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
+        createduserid:apiPost.createduserid
+    };
+};
+
+const FeedItem = ({ post, onEnquiryUpdate }) => {
     console.log(post, "post in feed item")
-    console.log(profile, "profile in feed item")
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
-    const [entriesCount,setEntiresCount] = useState(0);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const navigate = useNavigate();
     const touchStartX = useRef(null);
@@ -62,8 +107,11 @@ const FeedItem = ({ post,profile }) => {
 
 const handleEnquiryClick = async () => {
     try {
-        const res = await postAPI.increaseEnquiryCount(post._id);
-        setEntiresCount(res?.data?.enquirycount);
+        await postAPI.increaseEnquiryCount(post._id);
+        // Refetch posts to update enquiry count
+        if (onEnquiryUpdate) {
+            onEnquiryUpdate();
+        }
         const actionType = post.calltoaction?.type || '';
 
         console.log('actionType:', actionType);
@@ -169,10 +217,10 @@ const handleEnquiryClick = async () => {
     return (
         <FeedPost>
             <PostHeader>
-                <UserAvatar src={profile?.photo} alt={profile?.photo} />
+                <UserAvatar src={post.attachment} alt={post.attachment} />
                 <UserInfo>
-                    <UserName>{profile.name}</UserName>
-                    <UserLocation>{profile.username}</UserLocation>
+                    <UserName>{post.createduserid ? post.createduserid?.name : post.username}</UserName>
+                    <UserLocation>{post.createduserid ? post.createduserid?.username : post.username}</UserLocation>
                 </UserInfo>
                 {/* <MoreOptions /> */}
             </PostHeader>
@@ -186,13 +234,12 @@ const handleEnquiryClick = async () => {
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
                 <EnquiryButton onClick={handleEnquiryClick}>Enquiry Now</EnquiryButton>
-                {/* <EnquiryButton>Enquiry Now</EnquiryButton> */}
 
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
                             <RiSearchEyeLine size={16} color="#444" />
-                            <EnquiryText>{entriesCount}</EnquiryText>
+                            <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 
                         <IconButton onClick={() => setShareDialogOpen(true)}>
@@ -213,86 +260,61 @@ const handleEnquiryClick = async () => {
 };
 const FeedPage = () => {
     const [posts, setPosts] = useState([]);
-    const [response, setResponse] = useState([]);
-    console.log(response, "response in feed page")
-    console.log(posts, "postPage1232")
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    console.log(posts, "postPage1232")
+
+    // const fetchPosts = async () => {
+    //     try {
+    //         setLoading(true);
+
+    //         const rawDomain = window.location.hostname;
+    //         console.log(rawDomain, "raw domain")
+    //         const domain = rawDomain === 'localhost' ? 'ippomadurai' : rawDomain.split('.')[0];
+
+    //         const response = await postAPI.getPostsByDomain(domain);
+    //         console.log(response, "response9090")
+    //         if (response.success && response.data) {
+    //             const transformedPosts = response.data.map(transformPost);
+    //             console.log(transformedPosts, "transformed posts")
+    //             setPosts(transformedPosts);
+    //         } else {
+    //             setError(response.message || 'Failed to fetch posts');
+    //         }
+    //     } catch (err) {
+    //         setError(err.message || 'Error fetching posts');
+    //         console.error('Error fetching posts:', err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+    const fetchPosts = useCallback(async () => {
+    try {
+        setLoading(true);
+
+        const rawDomain = window.location.hostname;
+        const domain = rawDomain === 'localhost'
+            ? 'ippomadurai'
+            : rawDomain.split('.')[0];
+
+        const response = await postAPI.getPostsByDomain(domain);
+
+        if (response.success && response.data) {
+            const transformedPosts = response.data.map(transformPost);
+            setPosts(transformedPosts);
+        } else {
+            setError(response.message || 'Failed to fetch posts');
+        }
+    } catch (err) {
+        setError(err.message || 'Error fetching posts');
+    } finally {
+        setLoading(false);
+    }
+}, []);
 
     useEffect(() => {
-        const getLangString = (field, defaultStr = '') => {
-    if (!field) return defaultStr;
-    if (typeof field === 'string') return field;
-    
-    if (field.en) {
-        const enVal = field.en;
-        if (typeof enVal === 'string') return enVal;
-        return Object.values(enVal)[0] || defaultStr;
-    }
-    if (field.ta) {
-        const taVal = field.ta;
-        if (typeof taVal === 'string') return taVal;
-        return Object.values(taVal)[0] || defaultStr;
-    }
-    
-    const extract = Object.values(field)[0];
-    return typeof extract === 'string' ? extract : defaultStr;
-};
-
-        // Transform API response to FeedItem format
-        const transformPost = (apiPost) => {
-            console.log(apiPost, "API POST TRANSFORM")
-            return {
-                id: apiPost._id,
-                _id: apiPost._id,
-                type: apiPost.attachment?.length > 0 ? 'image' : 'text',
-                username: apiPost.createdusername || 'User',
-                location: apiPost.listofdomain?.[0] || 'Location',
-                avatar: '/src/assets/homelander.jpg',
-                images: apiPost.attachment || [],
-                video: null,
-                title: getLangString(apiPost.title, 'Post Title'),
-                captionUser: apiPost.createdusername || 'user',
-                caption: getLangString(apiPost.description, ''),
-                time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
-                comments: apiPost.enquirycount || 0,
-                // Call-to-action details
-                calltoaction: apiPost.calltoaction,
-                calltoactiontype: apiPost.calltoactiontype,
-                whatsappnumber: apiPost.whatsappnumber,
-                whatsappmessage: apiPost.whatsappmessage,
-                callnumber: apiPost.callnumber,
-                calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
-            };
-        };
-
-        const fetchPosts = async () => {
-            try {
-                setLoading(true);
-
-                const rawDomain = window.location.hostname;
-                console.log(rawDomain, "raw domain")
-                const domain = rawDomain === 'localhost' ? 'ippomadurai' : rawDomain.split('.')[0];
-
-                const response = await postAPI.getPostsByDomain(domain);
-                console.log(response, "response9090")
-                setResponse(response?.data);
-                if (response.success && response.data) {
-                    const transformedPosts = response.data.map(transformPost);
-                    setPosts(transformedPosts);
-                } else {
-                    setError(response.message || 'Failed to fetch posts');
-                }
-            } catch (err) {
-                setError(err.message || 'Error fetching posts');
-                console.error('Error fetching posts:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchPosts();
-    }, []);
+    }, [fetchPosts]);
 
     return (
         <FeedPageWrapper>
@@ -303,7 +325,7 @@ const FeedPage = () => {
                     <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
                 ) : posts.length > 0 ? (
                     posts.map((post) => (
-                        <FeedItem key={post._id} post={post} profile={response}/>
+                        <FeedItem key={post._id} post={post} onEnquiryUpdate={fetchPosts} />
                     ))
                 ) : (
                     <div style={{ padding: '20px', textAlign: 'center' }}>No posts available</div>

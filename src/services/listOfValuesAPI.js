@@ -10,4 +10,13 @@ export const listOfValuesAPI = {
       throw error.response?.data || error.message;
     }
   },
+    getThemes: async () => {
+    try {
+      const response = await apiClient.get('/theme/getthemes');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
 };
+

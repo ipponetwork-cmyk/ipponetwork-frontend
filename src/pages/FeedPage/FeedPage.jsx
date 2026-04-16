@@ -41,8 +41,10 @@ import { postAPI } from '../../services/postAPI';
 
 const FeedItem = ({ post,profile }) => {
     console.log(post, "post in feed item")
+    console.log(profile, "profile in feed item")
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
+    const [entriesCount,setEntiresCount] = useState(0);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const navigate = useNavigate();
     const touchStartX = useRef(null);
@@ -58,21 +60,33 @@ const FeedItem = ({ post,profile }) => {
         touchEndX.current = null;
     };
 
-    // const handleEnquiryClick = () => {
-    //     const actionType = post.calltoaction || post.calltoactiontype;
-    //     if (actionType === 'whatsapp' && post.whatsappnumber) {
-    //         const message = post.whatsappmessage || 'Hi, I am interested in your post';
-    //         const encodedMessage = encodeURIComponent(message);
-    //         const whatsappUrl = `https://wa.me/${post.whatsappnumber}?text=${encodedMessage}`;
-    //         window.open(whatsappUrl, '_blank');
-    //     } else if (actionType === 'call' && post.callnumber) {
-    //         window.location.href = `tel:${post.callnumber}`;
-    //     } else if (actionType === 'link' && post.calltoactionexternallinkurl) {
-    //         window.open(post.calltoactionexternallinkurl, '_blank');
-    //     } else {
-    //         alert('Action not configured for this post');
-    //     }
-    // };
+const handleEnquiryClick = async () => {
+    try {
+        const res = await postAPI.increaseEnquiryCount(post._id);
+        setEntiresCount(res?.data?.enquirycount);
+        const actionType = post.calltoaction?.type || '';
+
+        console.log('actionType:', actionType);
+        console.log('post:', post);
+
+        if (actionType === 'whatsapp' && post.whatsappnumber) {
+            const message = post.whatsappmessage || 'Hi, I am interested in your post';
+            window.open(`https://wa.me/${post.whatsappnumber}?text=${encodeURIComponent(message)}`, '_blank');
+
+        } else if (actionType === 'call' && post.callnumber) {
+            window.location.href = `tel:${post.callnumber}`;
+
+        } else if (actionType === 'externallink' && post.calltoaction?.externallinkurl) {
+            window.open(post.calltoaction.externallinkurl, '_blank');
+
+        } else {
+            alert('Action not configured for this post');
+        }
+
+    } catch (err) {
+        console.error('Enquiry error:', err);
+    }
+};
 
     const safeCaption = typeof post.caption === 'string' ? post.caption : String(post.caption || '');
     const words = safeCaption.split(' ');
@@ -109,7 +123,7 @@ const FeedItem = ({ post,profile }) => {
                         <SlideActionButton
                             onClick={(e) => {
                                 e.stopPropagation();
-                                // handleEnquiryClick();
+                                handleEnquiryClick();
                             }}
                         >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
@@ -155,7 +169,7 @@ const FeedItem = ({ post,profile }) => {
     return (
         <FeedPost>
             <PostHeader>
-                <UserAvatar src={post.avatar} alt={post.username} />
+                <UserAvatar src={profile?.photo} alt={profile?.photo} />
                 <UserInfo>
                     <UserName>{profile.name}</UserName>
                     <UserLocation>{profile.username}</UserLocation>
@@ -171,14 +185,14 @@ const FeedItem = ({ post,profile }) => {
                     {post.type !== 'text' && <CaptionText>{post.caption}</CaptionText>}
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
-                {/* <EnquiryButton onClick={handleEnquiryClick}>Enquiry Now</EnquiryButton> */}
-                <EnquiryButton>Enquiry Now</EnquiryButton>
+                <EnquiryButton onClick={handleEnquiryClick}>Enquiry Now</EnquiryButton>
+                {/* <EnquiryButton>Enquiry Now</EnquiryButton> */}
 
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
                             <RiSearchEyeLine size={16} color="#444" />
-                            <EnquiryText>5</EnquiryText>
+                            <EnquiryText>{entriesCount}</EnquiryText>
                         </EnquiryBadge>
 
                         <IconButton onClick={() => setShareDialogOpen(true)}>
@@ -199,7 +213,7 @@ const FeedItem = ({ post,profile }) => {
 };
 const FeedPage = () => {
     const [posts, setPosts] = useState([]);
-    const [response, setResponse] = useState(null);
+    const [response, setResponse] = useState([]);
     console.log(response, "response in feed page")
     console.log(posts, "postPage1232")
     const [loading, setLoading] = useState(true);
@@ -207,16 +221,27 @@ const FeedPage = () => {
 
     useEffect(() => {
         const getLangString = (field, defaultStr = '') => {
-            if (!field) return defaultStr;
-            if (typeof field === 'string') return field;
-            if (field.en) return field.en;
-            if (field.ta) return field.ta;
-            const extract = Object.values(field)[0];
-            return typeof extract === 'string' ? extract : defaultStr;
-        };
+    if (!field) return defaultStr;
+    if (typeof field === 'string') return field;
+    
+    if (field.en) {
+        const enVal = field.en;
+        if (typeof enVal === 'string') return enVal;
+        return Object.values(enVal)[0] || defaultStr;
+    }
+    if (field.ta) {
+        const taVal = field.ta;
+        if (typeof taVal === 'string') return taVal;
+        return Object.values(taVal)[0] || defaultStr;
+    }
+    
+    const extract = Object.values(field)[0];
+    return typeof extract === 'string' ? extract : defaultStr;
+};
 
         // Transform API response to FeedItem format
         const transformPost = (apiPost) => {
+            console.log(apiPost, "API POST TRANSFORM")
             return {
                 id: apiPost._id,
                 _id: apiPost._id,
@@ -251,7 +276,7 @@ const FeedPage = () => {
 
                 const response = await postAPI.getPostsByDomain(domain);
                 console.log(response, "response9090")
-                setResponse(response.data[0].createduserid);
+                setResponse(response?.data);
                 if (response.success && response.data) {
                     const transformedPosts = response.data.map(transformPost);
                     setPosts(transformedPosts);

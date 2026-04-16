@@ -42,7 +42,6 @@ function Login() {
         setError('');
 
         try {
-            // Call backend API with phone number (without +91 prefix, API expects just the number)
             const response = await authAPI.getUserProfileByMobileNo(phone);
 
             if (response.success) {

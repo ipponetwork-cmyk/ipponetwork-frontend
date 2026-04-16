@@ -30,4 +30,14 @@ export const postAPI = {
       throw error.response?.data || error.message;
     }
   },
+   increaseEnquiryCount: async (postId) => {
+    try {
+        const response = await apiClient.post(`/post/increaseenquirycount/${postId}`);
+        console.log("Response from increaseEnquiryCount:", response);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+},
 };
+

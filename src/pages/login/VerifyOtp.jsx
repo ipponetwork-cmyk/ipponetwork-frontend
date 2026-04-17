@@ -52,7 +52,7 @@ function VerifyOtp() {
 
         try {
             const confirmationResult = window.confirmationResult;
-            
+            console.log(console,"confirmationResult123")
             if (!confirmationResult) {
                 alert("Session expired. Please login again.");
                 return navigate('/');

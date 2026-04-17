@@ -235,9 +235,7 @@ const CreatePost = () => {
         const posttype = import.meta.env.POST_TYPE;
         const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
 
-        const status = statusType;
-
-        const formData = new FormData();
+        const status = statusType; const formData = new FormData();
         formData.append('title', title.trim());
         formData.append('description', description.trim());
         selectedDomainValues.forEach(domain => formData.append('listofdomain', domain));
@@ -487,7 +485,7 @@ const CreatePost = () => {
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
-                        <DraftStatus onClick={()=>handleCreatePost("DRAFT")}>
+                        <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
                             {t('draftSaved')}
                             <PulseDot />
                         </DraftStatus>
@@ -778,7 +776,7 @@ const CreatePost = () => {
                         {submitError}
                     </div>
                 )}
-                <PublishButton onClick={()=>handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
+                <PublishButton onClick={() => handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
                     {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
                 </PublishButton>
             </CreatePostWrapper>

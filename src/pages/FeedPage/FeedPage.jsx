@@ -73,9 +73,11 @@ const transformPost = (apiPost) => {
         attachment: apiPost.attachment,
         images: apiPost.attachment || [],
         video: null,
-        title: getLangString(apiPost.title, 'Post Title'),
+        titleEn: getLangString(apiPost.title.en, 'Post Title'),
+        titleTa: getLangString(apiPost.title.ta, 'Post Title'),
         captionUser: apiPost.createdusername || 'user',
-        caption: getLangString(apiPost.description, ''),
+        captionEn: getLangString(apiPost.description.en, ''),
+        captionTa: getLangString(apiPost.description.ta, ''),
         time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
         enquirycount: apiPost.enquirycount || 0,
         // Call-to-action details
@@ -89,7 +91,7 @@ const transformPost = (apiPost) => {
     };
 };
 
-const FeedItem = ({ post, onEnquiryUpdate }) => {
+const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     console.log(post, "post in feed item")
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
@@ -107,7 +109,8 @@ const FeedItem = ({ post, onEnquiryUpdate }) => {
         touchStartX.current = null;
         touchEndX.current = null;
     };
-
+    const captionText = dynamicLanguage === 'ta' ? post.captionTa : post.captionEn;
+    const titleText = dynamicLanguage === 'ta' ? post.titleTa : post.titleEn;
     const handleEnquiryClick = async () => {
         try {
             await postAPI.increaseEnquiryCount(post._id);
@@ -156,7 +159,7 @@ const FeedItem = ({ post, onEnquiryUpdate }) => {
         }
     };
 
-    const safeCaption = typeof post.caption === 'string' ? post.caption : String(post.caption || '');
+    const safeCaption = typeof captionText === 'string' ? captionText : String(captionText || '');
     const words = safeCaption.split(' ');
     const maxWords = 8 * 6;
     const isLong = words.length > maxWords;
@@ -219,10 +222,10 @@ const FeedItem = ({ post, onEnquiryUpdate }) => {
                     onClick={() => navigate('/feed-detail', { state: { post } })}
                     style={{ cursor: 'pointer' }}
                 >
-                    <TextContentTitle>{post.title}</TextContentTitle>
+                    <TextContentTitle>{titleText}</TextContentTitle>
 
                     <TextContentBody>
-                        {expanded || !isLong ? post.caption : `${shortCaption}...`}
+                        {expanded || !isLong ? captionText : `${shortCaption}...`}
                     </TextContentBody>
                     {isLong && (
                         <ReadMoreButton onClick={(e) => { e.stopPropagation(); setExpanded((p) => !p); }}>
@@ -258,8 +261,8 @@ const FeedItem = ({ post, onEnquiryUpdate }) => {
 
             <PostContent>
                 <PostCaption>
-                    {post.type !== 'text' && <CaptionUser>{post.title} </CaptionUser>}
-                    {post.type !== 'text' && <CaptionText>{post.caption}</CaptionText>}
+                    {post.type !== 'text' && <CaptionUser>{titleText} </CaptionUser>}
+                    {post.type !== 'text' && <CaptionText>{captionText}</CaptionText>}
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
                 <EnquiryButton onClick={handleEnquiryClick}>Enquiry Now</EnquiryButton>
@@ -292,7 +295,7 @@ const FeedPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     console.log(posts, "postPage1232")
-
+    const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
     const fetchPosts = useCallback(async () => {
         try {
             setLoading(true);
@@ -306,6 +309,7 @@ const FeedPage = () => {
 
             if (response.success && response.data) {
                 const transformedPosts = response.data.map(transformPost);
+                console.log(transformedPosts, "transformedPosts")
                 setPosts(transformedPosts);
             } else {
                 setError(response.message || 'Failed to fetch posts');
@@ -319,7 +323,24 @@ const FeedPage = () => {
 
     useEffect(() => {
         fetchPosts();
-    }, [fetchPosts]);
+    }, [fetchPosts, dynamicLanguage]);
+
+        useEffect(() => {
+            const handleStorage = () => {
+                const storedLanguage = localStorage.getItem('language') || 'en';
+                if (storedLanguage !== dynamicLanguage) {
+                    setDynamicLanguage(storedLanguage);
+                }
+            };
+
+            window.addEventListener('storage', handleStorage);
+            const interval = setInterval(handleStorage, 500);
+
+            return () => {
+                window.removeEventListener('storage', handleStorage);
+                clearInterval(interval);
+            };
+        }, [dynamicLanguage]);
 
     return (
         <FeedPageWrapper>
@@ -330,7 +351,7 @@ const FeedPage = () => {
                     <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
                 ) : posts.length > 0 ? (
                     posts.map((post) => (
-                        <FeedItem key={post._id} post={post} onEnquiryUpdate={fetchPosts} />
+                        <FeedItem key={post._id} post={post} onEnquiryUpdate={fetchPosts} dynamicLanguage={dynamicLanguage} />
                     ))
                 ) : (
                     <div style={{ padding: '20px', textAlign: 'center' }}>No posts available</div>

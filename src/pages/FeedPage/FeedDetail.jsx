@@ -1,137 +1,4 @@
-// import React from 'react';
-// import { useNavigate, useLocation } from 'react-router-dom';
-// import {
-//     DetailWrapper,
-//     HeroImage,
-//     BackButton,
-//     OverlayContent,
-//     UserRow,
-//     DetailAvatar,
-//     DetailUserInfo,
-//     DetailUserName,
-//     DetailUserLocation,
-//     DetailCaption,
-//     DetailTime,
-//     DetailEnquiryButton,
-//     PostMedia,
-//     SliderTrack,
-//     SliderImage,
-//     CarouselDots,
-//     Dot,
-//     TextContentTitle,
-//     PostFooter,
-//     ActionBar,
-//     EnquiryBadge,
-//     EnquiryText,
-//     IconButton,
-//     CountText,
-// } from '../../css/index';
-// import { IoArrowBack } from 'react-icons/io5';
-// import { useState, useRef } from 'react';
-// import { RiSearchEyeLine } from "react-icons/ri"
-// import { IoIosShareAlt } from "react-icons/io";
-// const FeedDetail = () => {
-//     const navigate = useNavigate();
-//     const location = useLocation();
-//     const post = location.state?.post;
-//     const [activeSlide, setActiveSlide] = useState(0);
-//     const touchStartX = useRef(null);
-//     const touchEndX = useRef(null);
-
-//     if (!post) {
-//         navigate('/home');
-//         return null;
-//     }
-//     const handleTouchStart = (e) => {
-//         touchStartX.current = e.touches[0].clientX;
-//     };
-
-//     const handleTouchMove = (e) => {
-//         touchEndX.current = e.touches[0].clientX;
-//     };
-
-//     const handleTouchEnd = () => {
-//         if (!touchStartX.current || !touchEndX.current) return;
-
-//         const diff = touchStartX.current - touchEndX.current;
-
-//         if (diff > 50 && activeSlide < post.images.length - 1) {
-//             setActiveSlide((prev) => prev + 1);
-//         } else if (diff < -50 && activeSlide > 0) {
-//             setActiveSlide((prev) => prev - 1);
-//         }
-
-//         touchStartX.current = null;
-//         touchEndX.current = null;
-//     };
-
-
-//     return (
-//         <DetailWrapper>
-//             {post.type === 'image' && post.images?.length > 0 && (
-//                 <PostMedia
-//                     onTouchStart={handleTouchStart}
-//                     onTouchMove={handleTouchMove}
-//                     onTouchEnd={handleTouchEnd}
-//                 >
-//                     <SliderTrack activeSlide={activeSlide}>
-//                         {post.images.map((img, i) => (
-//                             <SliderImage key={i} src={img} alt={`slide-${i}`} />
-//                         ))}
-//                     </SliderTrack>
-
-//                     <CarouselDots>
-//                         {post.images.map((_, i) => (
-//                             <Dot
-//                                 key={i}
-//                                 active={i === activeSlide}
-//                                 onClick={() => setActiveSlide(i)}
-//                             />
-//                         ))}
-//                     </CarouselDots>
-
-//                     <OverlayContent>
-//                         <UserRow>
-//                             <DetailAvatar src={post.avatar} alt={post.username} />
-//                             <DetailUserInfo>
-//                                 <DetailUserName>{post.username}</DetailUserName>
-//                                 <DetailUserLocation>{post.location}</DetailUserLocation>
-//                             </DetailUserInfo>
-//                         </UserRow>
-
-//                         {post.title && <TextContentTitle>{post.title}</TextContentTitle>}
-//                         <DetailCaption>{post.caption}</DetailCaption>
-//                         <DetailTime>{post.time}</DetailTime>
-
-//                         <DetailEnquiryButton>Enquiry Now</DetailEnquiryButton>
-
-//                         <PostFooter>
-//                             <ActionBar>
-//                                 <EnquiryBadge>
-//                                     <RiSearchEyeLine size={16} color="#fff" />
-//                                     <EnquiryText style={{ color: '#fff' }}>5 People clicked Enquiry</EnquiryText>
-//                                 </EnquiryBadge>
-
-//                                 <IconButton>
-//                                     <IoIosShareAlt size={20} color="#fff" />
-//                                     <CountText style={{ color: '#fff' }}>Share</CountText>
-//                                 </IconButton>
-//                             </ActionBar>
-//                         </PostFooter>
-//                     </OverlayContent>
-//                 </PostMedia>
-//             )}
-
-//             <BackButton onClick={() => navigate(-1)}>
-//                 <IoArrowBack size={20} color="#ffffff" />
-//             </BackButton>
-//         </DetailWrapper>
-//     );
-// };
-
-// export default FeedDetail;
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     DetailWrapper, HeroImage, BackButton, OverlayContent, UserRow,
@@ -142,7 +9,9 @@ import {
     DetailFooter, ActionBar, EnquiryBadge, EnquiryText, IconButton, CountText,
     DetailSlideActionButton,
     VideoWrapper, PostVideo,
+    UserAvatarFallback,
 } from '../../css/index';
+import { FaUser } from "react-icons/fa";
 import { IoArrowBack } from 'react-icons/io5';
 import { useState, useRef } from 'react';
 import { RiSearchEyeLine } from "react-icons/ri";
@@ -175,8 +44,26 @@ const FeedDetail = () => {
     const [enquiryCount, setEnquiryCount] = useState(post?.enquirycount || 0);
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
+    const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
+    const captionText = dynamicLanguage === 'ta' ? post.captionTa : post.captionEn;
+    const titleText = dynamicLanguage === 'ta' ? post.titleTa : post.titleEn;
+        useEffect(() => {
+            const handleStorage = () => {
+                const storedLanguage = localStorage.getItem('language') || 'en';
+                if (storedLanguage !== dynamicLanguage) {
+                    setDynamicLanguage(storedLanguage);
+                }
+            };
+    
+            window.addEventListener('storage', handleStorage);
+            const interval = setInterval(handleStorage, 500);
+    
+            return () => {
+                window.removeEventListener('storage', handleStorage);
+                clearInterval(interval);
+            };
+        }, [dynamicLanguage]);
     if (!post) { navigate('/home'); return null; }
-
     const handleEnquiryClick = async () => {
         try {
             await postAPI.increaseEnquiryCount(post._id);
@@ -248,15 +135,26 @@ const FeedDetail = () => {
                     </PostMedia>
                     <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
                         <UserRow>
-                            <DetailAvatar src={post.attachment} alt={post.attachment} />
+                            {/* <DetailAvatar src={post.attachment} alt={post.attachment} /> */}
+                            {/* {post?.attachment ? (
+                                <DetailAvatar
+                                    src={post.attachment}
+                                    alt="attachment"
+                                />
+                            ) : (
+                                <UserAvatarFallback>
+                                    <FaUser />
+                                </UserAvatarFallback>
+                            )} */}
+                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
                             <DetailUserInfo>
                                 <DetailUserName>{post.createduserid ? post.createduserid?.name : post.username}</DetailUserName>
                                 <DetailUserLocation>{post.createduserid ? post.createduserid?.username : post.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
                         {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
-                        <DetailCaption>{post.caption}</DetailCaption>
-                        <DetailTime>{post.time}</DetailTime>
+                        <DetailCaption>{captionText}</DetailCaption>
+                        <DetailTime>{titleText}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
@@ -292,7 +190,7 @@ const FeedDetail = () => {
                     </VideoWrapper>
                     <OverlayContent>
                         <UserRow>
-                            <DetailAvatar src={post.attachment} alt={post.attachment} />
+                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
                             <DetailUserInfo>
                                 <DetailUserName>{post.createduserid ? post.createduserid?.name : post.username}</DetailUserName>
                                 <DetailUserLocation>{post.createduserid ? post.createduserid?.username : post.username}</DetailUserLocation>
@@ -319,18 +217,18 @@ const FeedDetail = () => {
             <>
                 <DetailWrapper>
                     <BackButton onClick={() => navigate(-1)}>
-                        <IoArrowBack size={20} color="currentColor" />
+                        <IoArrowBack size={20} color="#ffffff" />
                     </BackButton>
                     <OverlayContent>
-                        {/* <UserRow>
-                            <DetailAvatar src={post.avatar} alt={post.username} />
+                        {titleText && <TextContentTitle style={{ marginTop: "40px" }}>{titleText}</TextContentTitle>}
+                        <TextContentBody>{captionText}</TextContentBody>
+                        <UserRow>
+                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
                             <DetailUserInfo>
                                 <DetailUserName>{post.username}</DetailUserName>
                                 <DetailUserLocation>{post.location}</DetailUserLocation>
                             </DetailUserInfo>
-                        </UserRow> */}
-                        {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
-                        <TextContentBody>{post.caption}</TextContentBody>
+                        </UserRow>
                         <DetailTime>{post.time}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />

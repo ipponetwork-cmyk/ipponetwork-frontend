@@ -26,6 +26,7 @@ export const authAPI = {
       const response = await apiClient.post('/user/getuserprofilebymobileno', {
         mobileno,
       });
+      console.log(response,"response12223")
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

@@ -52,7 +52,7 @@ function VerifyOtp() {
 
         try {
             const confirmationResult = window.confirmationResult;
-
+            
             if (!confirmationResult) {
                 alert("Session expired. Please login again.");
                 return navigate('/');
@@ -67,7 +67,7 @@ function VerifyOtp() {
 
             // 🔹 Call your backend
             const response = await authAPI.getUserProfileByMobileNo(phone);
-
+            console.log(response,"response123")
             if (response.success) {
                 localStorage.setItem('authToken', idToken);
                 localStorage.setItem('user', JSON.stringify(response.data));

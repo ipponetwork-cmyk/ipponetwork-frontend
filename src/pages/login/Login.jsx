@@ -20,6 +20,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useState, useRef } from 'react';
 
 import { auth } from '../../firebase';
+import PwaInstallPrompt from '../../components/PwaInstallPrompt';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 function Login() {
@@ -96,6 +97,7 @@ function Login() {
 
     return (
         <PageWrapper>
+            <PwaInstallPrompt message="Install the app for faster access and offline support." />
             <BackgroundPanel>
                 <Logo>{t('appName')}</Logo>
                 <Headline>{t('headline')}</Headline>
@@ -128,15 +130,15 @@ function Login() {
                 </PhoneInputGroup>
 
                 {/* reCAPTCHA */}
-      
-    <div
-        ref={recaptchaRef}
-        style={{
-            marginTop: '16px',
-            display: 'flex',
-            justifyContent: 'center'
-        }}
-    />
+
+                <div
+                    ref={recaptchaRef}
+                    style={{
+                        marginTop: '16px',
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}
+                />
 
 
                 {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}

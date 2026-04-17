@@ -159,7 +159,7 @@ const FooterBar = ({ enquirycount, onShare }) => (
             </EnquiryBadge>
             <IconButton onClick={onShare}>
                 <IoIosShareAlt size={20} color="currentColor" />
-                <CountText>Share</CountText>
+                {/* <CountText>Share</CountText> */}
             </IconButton>
         </ActionBar>
     </DetailFooter>
@@ -169,7 +169,7 @@ const FeedDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const post = location.state?.post;
-    console.log(post,"POST7834")
+    console.log(post, "POST7834")
     const [activeSlide, setActiveSlide] = useState(0);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [enquiryCount, setEnquiryCount] = useState(post?.enquirycount || 0);
@@ -262,7 +262,7 @@ const FeedDetail = () => {
                     </OverlayContent>
                     {isLastImage && (
                         <DetailSlideActionButton onClick={handleEnquiryClick}>
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:"4px"}}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
                                 <span>Enquiry Now</span>
                                 <IoIosArrowForward size={18} />
                             </div>                    </DetailSlideActionButton>
@@ -292,7 +292,7 @@ const FeedDetail = () => {
                     </VideoWrapper>
                     <OverlayContent>
                         <UserRow>
-                            <DetailAvatar  src={post.attachment} alt={post.attachment} />
+                            <DetailAvatar src={post.attachment} alt={post.attachment} />
                             <DetailUserInfo>
                                 <DetailUserName>{post.createduserid ? post.createduserid?.name : post.username}</DetailUserName>
                                 <DetailUserLocation>{post.createduserid ? post.createduserid?.username : post.username}</DetailUserLocation>

@@ -62,9 +62,19 @@ export function ThemeProvider({ children }) {
       try {
         const response = await listOfValuesAPI.getThemes()
         console.log(response,"themesResponse12563")
-        const themeList = Array.isArray(response) ? response : [response]
-        if (themeList.length > 0) {
-          const filteredThemes = themeList.filter((theme) => theme && typeof theme.themename === 'string')
+        
+        // Handle API response format { data: [...] }
+        let fetchedThemes = []
+        if (response && Array.isArray(response.data)) {
+          fetchedThemes = response.data
+        } else if (Array.isArray(response)) {
+          fetchedThemes = response
+        } else if (response && typeof response === 'object') {
+          fetchedThemes = [response]
+        }
+
+        if (fetchedThemes.length > 0) {
+          const filteredThemes = fetchedThemes.filter((theme) => theme && typeof theme.themename === 'string')
           setThemes(filteredThemes)
           const selected = filteredThemes.find((theme) => theme.themename === selectedThemeName) || filteredThemes[0]
           if (selected) {

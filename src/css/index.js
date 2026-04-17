@@ -544,6 +544,7 @@ export const PostHeader = styled.header`
     align-items: center;
     padding: 12px 16px;
     position: relative;
+    gap:12px;
 `;
 
 export const UserAvatar = styled.img`
@@ -554,7 +555,17 @@ export const UserAvatar = styled.img`
     margin-right: 12px;
     border: 1px solid var(--surface-border);
 `;
-
+export const UserAvatarFallback = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2a2a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 16px;
+`;
 export const UserInfo = styled.div``;
 
 export const UserName = styled.h3`
@@ -1863,7 +1874,7 @@ export const ToolButton = styled.button`
   }
 `;
 
-export const DraftStatus = styled.div`
+export const DraftStatus = styled.button`
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -1876,7 +1887,8 @@ export const DraftStatus = styled.div`
   letter-spacing: 1px;
   vertical-align: middle;
   text-transform: uppercase;
-
+  background: none;
+  border:none;
   color: #444;
 `;
 

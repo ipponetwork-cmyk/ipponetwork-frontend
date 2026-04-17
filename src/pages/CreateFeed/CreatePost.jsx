@@ -58,17 +58,18 @@ const CreatePost = () => {
     const [domains, setDomains] = useState([])
     const [freeTtl, setFreeTtl] = useState(null)
     const [costTtl, setCostTtl] = useState(null)
+    console.log(costTtl, "costTtlcostTtl133")
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadedPdf, setUploadedPdf] = useState(null);
     const [submitError, setSubmitError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    console.log(currentUser,"currentUser123")
+    console.log(currentUser, "currentUser123")
     const createduserid = currentUser?._id || currentUser?.id || '';
     const createdusername = currentUser?.username || currentUser?.name || '';
-    const FREE_TYPE = import.meta.env.FREE_TYPE;
-    const COST_TYPE = import.meta.env.COST_TYPE;
+    const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
+    const COST_TYPE = import.meta.env.VITE_COST_TYPE;
     const handleImageUpload = (e) => {
         const files = e.target.files;
         if (files && files.length > 0) {
@@ -122,10 +123,12 @@ const CreatePost = () => {
         try {
             const response = await authAPI.getTimeToLive(domain);
             const items = Array.isArray(response) ? response : response.data || [];
+            console.log(items, "items123")
             // Find items by type only to capture the dynamic posttype and seconds from API
-            
+
             const freeItem = items.find(item => item.type === FREE_TYPE);
             const costItem = items.find(item => item.type === COST_TYPE);
+            console.log(costItem, "costItem123")
             setFreeTtl(freeItem || null);
             setCostTtl(costItem || null);
 
@@ -159,6 +162,14 @@ const CreatePost = () => {
                     }))
                     : [];
                 setDomains(mapped);
+
+                // Auto-select the domain matching current hostname
+                const matchedDomain = mapped.find(
+                    d => d.value?.toLowerCase() === domainName?.toLowerCase()
+                );
+                if (matchedDomain) {
+                    setSelectedDomains(new Set([matchedDomain.id]));
+                }
             })
             .catch((error) => {
                 console.error('Failed to load domain list', error);
@@ -204,7 +215,8 @@ const CreatePost = () => {
         .filter(domain => selectedDomains.has(domain.id))
         .map(domain => domain.value);
 
-    const handleCreatePost = async () => {
+    const handleCreatePost = async (statusType) => {
+        console.log("Creating post with data:")
         setSubmitError('');
 
         if (!title.trim() || !description.trim()) {
@@ -223,7 +235,7 @@ const CreatePost = () => {
         const posttype = import.meta.env.POST_TYPE;
         const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
 
-        const status = 'submitted';
+        const status = statusType;
 
         const formData = new FormData();
         formData.append('title', title.trim());
@@ -308,6 +320,22 @@ const CreatePost = () => {
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
+    const getDomainName = () => {
+        const host = window.location.hostname;
+
+        if (host === 'localhost') {
+            return 'ippomadurai';
+        }
+        const parts = host.split('.');
+
+        if (parts.length >= 2) {
+            return parts[1]; // 
+        }
+
+        return parts[0];
+    };
+    const domainName = getDomainName();
+    console.log(domainName, "domainName123")
     return (
         <>
             <Header>
@@ -459,7 +487,7 @@ const CreatePost = () => {
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
-                        <DraftStatus>
+                        <DraftStatus onClick={()=>handleCreatePost("DRAFT")}>
                             {t('draftSaved')}
                             <PulseDot />
                         </DraftStatus>
@@ -750,7 +778,7 @@ const CreatePost = () => {
                         {submitError}
                     </div>
                 )}
-                <PublishButton onClick={handleCreatePost} disabled={isSubmitting}>
+                <PublishButton onClick={()=>handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
                     {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
                 </PublishButton>
             </CreatePostWrapper>

@@ -30,7 +30,8 @@ import {
     EnquiryBadge,
     EnquiryText,
     IconButton,
-    CountText
+    CountText,
+    UserAvatarFallback
 } from '../../css/index';
 import { IoIosArrowForward } from "react-icons/io";
 import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
@@ -38,11 +39,13 @@ import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';
+import { FaUser } from "react-icons/fa";
+import { GrSearchAdvanced } from "react-icons/gr";
 
 const getLangString = (field, defaultStr = '') => {
     if (!field) return defaultStr;
     if (typeof field === 'string') return field;
-    
+
     if (field.en) {
         const enVal = field.en;
         if (typeof enVal === 'string') return enVal;
@@ -53,7 +56,7 @@ const getLangString = (field, defaultStr = '') => {
         if (typeof taVal === 'string') return taVal;
         return Object.values(taVal)[0] || defaultStr;
     }
-    
+
     const extract = Object.values(field)[0];
     return typeof extract === 'string' ? extract : defaultStr;
 };
@@ -67,7 +70,7 @@ const transformPost = (apiPost) => {
         type: apiPost.attachment?.length > 0 ? 'image' : 'text',
         username: apiPost.createdusername || 'User',
         location: apiPost.listofdomain?.[0] || 'Location',
-        attachment:apiPost.attachment,
+        attachment: apiPost.attachment,
         images: apiPost.attachment || [],
         video: null,
         title: getLangString(apiPost.title, 'Post Title'),
@@ -82,7 +85,7 @@ const transformPost = (apiPost) => {
         whatsappmessage: apiPost.whatsappmessage,
         callnumber: apiPost.callnumber,
         calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
-        createduserid:apiPost.createduserid
+        createduserid: apiPost.createduserid
     };
 };
 
@@ -105,36 +108,53 @@ const FeedItem = ({ post, onEnquiryUpdate }) => {
         touchEndX.current = null;
     };
 
-const handleEnquiryClick = async () => {
-    try {
-        await postAPI.increaseEnquiryCount(post._id);
-        // Refetch posts to update enquiry count
-        if (onEnquiryUpdate) {
-            onEnquiryUpdate();
+    const handleEnquiryClick = async () => {
+        try {
+            await postAPI.increaseEnquiryCount(post._id);
+            if (onEnquiryUpdate) {
+                onEnquiryUpdate();
+            }
+
+            // Safely extract action type, lowering case and removing spaces
+            let rawActionType = typeof post.calltoaction === 'string'
+                ? post.calltoaction
+                : (post.calltoaction?.type || post.calltoactiontype || '');
+            let actionType = String(rawActionType).toLowerCase().replace(/[^a-z]/g, '');
+
+            // Safely extract target values, trying both root and nested object
+            const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber || post.calltoaction?.number || post.number;
+            const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || post.calltoaction?.message || 'Hi, I am interested in your post';
+            const cNumber = post.callnumber || post.calltoaction?.callnumber || post.calltoaction?.number || post.number;
+            const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl || post.externallinkurl || post.calltoaction?.url;
+
+            // If actionType wasn't explicitly provided but we have the data, try to infer it
+            if (!actionType) {
+                if (waNumber) actionType = 'whatsapp';
+                else if (cNumber) actionType = 'call';
+                else if (extLink) actionType = 'externallink';
+            }
+
+            console.log('Processed actionType:', actionType);
+            console.log('Post details:', { waNumber, cNumber, extLink });
+
+            if (actionType.includes('whatsapp') && waNumber) {
+                window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`, '_blank');
+            } else if (actionType.includes('call') && cNumber) {
+                window.location.href = `tel:${cNumber}`;
+            } else if (actionType.includes('external') && extLink) {
+                let finalUrl = extLink;
+                if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+                    finalUrl = 'https://' + finalUrl;
+                }
+                window.open(finalUrl, '_blank');
+            } else {
+                alert('Action not configured for this post (Missing data or unknown type: ' + actionType + ')');
+            }
+
+        } catch (err) {
+            console.error('Enquiry error:', err);
         }
-        const actionType = post.calltoaction?.type || '';
-
-        console.log('actionType:', actionType);
-        console.log('post:', post);
-
-        if (actionType === 'whatsapp' && post.whatsappnumber) {
-            const message = post.whatsappmessage || 'Hi, I am interested in your post';
-            window.open(`https://wa.me/${post.whatsappnumber}?text=${encodeURIComponent(message)}`, '_blank');
-
-        } else if (actionType === 'call' && post.callnumber) {
-            window.location.href = `tel:${post.callnumber}`;
-
-        } else if (actionType === 'externallink' && post.calltoaction?.externallinkurl) {
-            window.open(post.calltoaction.externallinkurl, '_blank');
-
-        } else {
-            alert('Action not configured for this post');
-        }
-
-    } catch (err) {
-        console.error('Enquiry error:', err);
-    }
-};
+    };
 
     const safeCaption = typeof post.caption === 'string' ? post.caption : String(post.caption || '');
     const words = safeCaption.split(' ');
@@ -217,7 +237,16 @@ const handleEnquiryClick = async () => {
     return (
         <FeedPost>
             <PostHeader>
-                <UserAvatar src={post.attachment} alt={post.attachment} />
+                {post?.createduserid?.photo ? (
+                    <UserAvatar
+                        src={post.createduserid.photo}
+                        alt="user"
+                    />
+                ) : (
+                    <UserAvatarFallback>
+                        <FaUser />
+                    </UserAvatarFallback>
+                )}
                 <UserInfo>
                     <UserName>{post.createduserid ? post.createduserid?.name : post.username}</UserName>
                     <UserLocation>{post.createduserid ? post.createduserid?.username : post.username}</UserLocation>
@@ -229,7 +258,7 @@ const handleEnquiryClick = async () => {
 
             <PostContent>
                 <PostCaption>
-                    {post.type !== 'text' && <CaptionUser>{post.captionUser} </CaptionUser>}
+                    {post.type !== 'text' && <CaptionUser>{post.title} </CaptionUser>}
                     {post.type !== 'text' && <CaptionText>{post.caption}</CaptionText>}
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
@@ -238,7 +267,7 @@ const handleEnquiryClick = async () => {
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
-                            <RiSearchEyeLine size={16} color="#444" />
+                            <GrSearchAdvanced size={16} />
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 
@@ -264,53 +293,29 @@ const FeedPage = () => {
     const [error, setError] = useState(null);
     console.log(posts, "postPage1232")
 
-    // const fetchPosts = async () => {
-    //     try {
-    //         setLoading(true);
-
-    //         const rawDomain = window.location.hostname;
-    //         console.log(rawDomain, "raw domain")
-    //         const domain = rawDomain === 'localhost' ? 'ippomadurai' : rawDomain.split('.')[0];
-
-    //         const response = await postAPI.getPostsByDomain(domain);
-    //         console.log(response, "response9090")
-    //         if (response.success && response.data) {
-    //             const transformedPosts = response.data.map(transformPost);
-    //             console.log(transformedPosts, "transformed posts")
-    //             setPosts(transformedPosts);
-    //         } else {
-    //             setError(response.message || 'Failed to fetch posts');
-    //         }
-    //     } catch (err) {
-    //         setError(err.message || 'Error fetching posts');
-    //         console.error('Error fetching posts:', err);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
     const fetchPosts = useCallback(async () => {
-    try {
-        setLoading(true);
+        try {
+            setLoading(true);
 
-        const rawDomain = window.location.hostname;
-        const domain = rawDomain === 'localhost'
-            ? 'ippomadurai'
-            : rawDomain.split('.')[0];
+            const rawDomain = window.location.hostname;
+            const domain = rawDomain === 'localhost'
+                ? 'ippomadurai'
+                : rawDomain.split('.')[0];
 
-        const response = await postAPI.getPostsByDomain(domain);
+            const response = await postAPI.getPostsByDomain(domain);
 
-        if (response.success && response.data) {
-            const transformedPosts = response.data.map(transformPost);
-            setPosts(transformedPosts);
-        } else {
-            setError(response.message || 'Failed to fetch posts');
+            if (response.success && response.data) {
+                const transformedPosts = response.data.map(transformPost);
+                setPosts(transformedPosts);
+            } else {
+                setError(response.message || 'Failed to fetch posts');
+            }
+        } catch (err) {
+            setError(err.message || 'Error fetching posts');
+        } finally {
+            setLoading(false);
         }
-    } catch (err) {
-        setError(err.message || 'Error fetching posts');
-    } finally {
-        setLoading(false);
-    }
-}, []);
+    }, []);
 
     useEffect(() => {
         fetchPosts();

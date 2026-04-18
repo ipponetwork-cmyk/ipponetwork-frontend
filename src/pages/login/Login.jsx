@@ -267,12 +267,28 @@ function Login() {
             setLoading(false);
         }
     };
+    const getDomainName = () => {
+        console.log(window.location, "window.location123")
+        const host = window.location.hostname;
 
+        if (host === 'localhost') {
+            return 'ippomadurai';
+        }
+        const parts = host.split('.');
+
+        if (parts.length >= 2) {
+            return parts[1]; // 
+        }
+
+        return parts[0];
+    };
+    const domainName = getDomainName();
+    console.log(domainName, "domainName123Login")
     return (
         <PageWrapper>
-            <PwaInstallPrompt message="Install the app for faster access and offline support." />
             <BackgroundPanel>
-                <Logo>{t('appName')}</Logo>
+                {/* <Logo>{t('appName')}</Logo> */}
+                <Logo>{domainName}</Logo>
                 <Headline>{t('headline')}</Headline>
             </BackgroundPanel>
 
@@ -320,6 +336,7 @@ function Login() {
                     {loading ? "Sending OTP..." : "Next"}
                 </Button>
             </LoginCard>
+            <PwaInstallPrompt message="Install the app for faster access and offline support." />
         </PageWrapper>
     );
 }

@@ -11,6 +11,7 @@ import {
     OtpWrapper,
     OtpInput,
 } from '../../css';
+import bgImage from '../../assets/Background-ippo.png';
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { useState } from 'react';
@@ -99,7 +100,7 @@ function VerifyOtp() {
 
     return (
         <PageWrapper>
-            <BackgroundPanel>
+            <BackgroundPanel $bgImage={bgImage}>
                 <Logo>{t('appName')}</Logo>
                 <Headline>{t('headline')}</Headline>
             </BackgroundPanel>

@@ -17,26 +17,37 @@ function SharePostDialog({ open, onClose, postId = '123' }) {
   const [copied, setCopied] = useState(false)
   // const { themeData } = useTheme()
 
+  // const getDomainName = () => {
+  //   const host = window.location.hostname;
+
+  //   if (host === 'localhost') {
+  //     return 'ippomadurai'; // default for local
+  //   }
+
+  //   // Example:
+  //   // multitenant.ippochennai.com → ippochennai
+  //   const parts = host.split('.');
+
+  //   if (parts.length >= 2) {
+  //     return parts[1]; // 👈 main domain name
+  //   }
+
+  //   return parts[0];
+  // };
   const getDomainName = () => {
     const host = window.location.hostname;
 
     if (host === 'localhost') {
-      return 'ippomadurai'; // default for local
+      return 'ippomadurai';
     }
 
-    // Example:
-    // multitenant.ippochennai.com → ippochennai
     const parts = host.split('.');
+    const domain = parts.find(part => part.startsWith('ippo'));
 
-    if (parts.length >= 2) {
-      return parts[1]; // 👈 main domain name
-    }
-
-    return parts[0];
+    return domain ?? parts[0];
   };
-
-  // Generate share link based on post ID
   const domainName = getDomainName();
+  // Generate share link based on post ID
 
   const shareLink = `${domainName}/${postId}`;
 

@@ -175,6 +175,7 @@ import { useState, useRef, useEffect } from 'react';
 import { auth } from '../../firebase';
 import PwaInstallPrompt from '../../components/PwaInstallPrompt';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import bgImage from '../../assets/Background-ippo.png';
 
 function Login() {
     const navigate = useNavigate();
@@ -245,7 +246,7 @@ function Login() {
                 fullPhone,
                 appVerifier
             );
-
+            console.log(confirmationResult, "confirmationResultlogin")
             // Store globally for OTP page
             window.confirmationResult = confirmationResult;
 
@@ -267,77 +268,93 @@ function Login() {
             setLoading(false);
         }
     };
+    // const getDomainName = () => {
+    //     const host = window.location.hostname;
+
+    //     if (host === 'localhost') {
+    //         return 'ippomadurai';
+    //     }
+
+    //     const parts = host.split('.');
+
+    //     // Handle cases like multitenant.ippochennai.com
+    //     if (parts.length >= 3) {
+    //         return parts[1];
+    //     }
+
+    //     // Handle cases like ippomadurai.com
+    //     return parts[0];
+    // };
     const getDomainName = () => {
-        console.log(window.location, "window.location123")
         const host = window.location.hostname;
 
         if (host === 'localhost') {
             return 'ippomadurai';
         }
+
         const parts = host.split('.');
+        const domain = parts.find(part => part.startsWith('ippo'));
 
-        if (parts.length >= 2) {
-            return parts[1]; // 
-        }
-
-        return parts[0];
+        return domain ?? parts[0];
     };
     const domainName = getDomainName();
     console.log(domainName, "domainName123Login")
     return (
-        <PageWrapper>
-            <BackgroundPanel>
-                {/* <Logo>{t('appName')}</Logo> */}
-                <Logo>{domainName}</Logo>
-                <Headline>{t('headline')}</Headline>
-            </BackgroundPanel>
+        <>
+            <PageWrapper>
+                <BackgroundPanel $bgImage={bgImage}>
+                    {/* <Logo>{t('appName')}</Logo> */}
+                    <Logo>{domainName}</Logo>
+                    <Headline>{t('headline')}</Headline>
+                </BackgroundPanel>
 
-            <LoginCard>
-                <CardHeader>{t('signIn')}</CardHeader>
-                <CardSubTitle>Enter your phone number</CardSubTitle>
+                <LoginCard>
+                    <CardHeader>{t('signIn')}</CardHeader>
+                    <CardSubTitle>Enter your phone number</CardSubTitle>
 
-                <PhoneNumber>PHONE NUMBER</PhoneNumber>
+                    <PhoneNumber>PHONE NUMBER</PhoneNumber>
 
-                <PhoneInputGroup>
-                    <CountryCode>
-                        <Code>+91</Code>
-                        <DropdownIcon>
-                            <svg width="12" height="12" viewBox="0 0 12 12">
-                                <path d="M2 4L6 8L10 4" stroke="#888" strokeWidth="1.5" />
-                            </svg>
-                        </DropdownIcon>
-                    </CountryCode>
+                    <PhoneInputGroup>
+                        <CountryCode>
+                            <Code>+91</Code>
+                            <DropdownIcon>
+                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                    <path d="M2 4L6 8L10 4" stroke="#888" strokeWidth="1.5" />
+                                </svg>
+                            </DropdownIcon>
+                        </CountryCode>
 
-                    <PhoneInput
-                        type="tel"
-                        placeholder="00000 00000"
-                        value={phone}
-                        onChange={(e) =>
-                            setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
-                        }
+                        <PhoneInput
+                            type="tel"
+                            placeholder="00000 00000"
+                            value={phone}
+                            onChange={(e) =>
+                                setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
+                            }
+                        />
+                    </PhoneInputGroup>
+
+                    {/* reCAPTCHA */}
+
+                    <div
+                        ref={recaptchaRef}
+                        style={{
+                            marginTop: '16px',
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}
                     />
-                </PhoneInputGroup>
-
-                {/* reCAPTCHA */}
-
-                <div
-                    ref={recaptchaRef}
-                    style={{
-                        marginTop: '16px',
-                        display: 'flex',
-                        justifyContent: 'center'
-                    }}
-                />
 
 
-                {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
+                    {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
 
-                <Button onClick={handleNext} disabled={loading}>
-                    {loading ? "Sending OTP..." : "Next"}
-                </Button>
-            </LoginCard>
+                    <Button onClick={handleNext} disabled={loading}>
+                        {loading ? "Sending OTP..." : "Next"}
+                    </Button>
+                </LoginCard>
+            </PageWrapper>
             <PwaInstallPrompt message="Install the app for faster access and offline support." />
-        </PageWrapper>
+        </>
     );
 }
 

@@ -318,22 +318,35 @@ const CreatePost = () => {
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
+    // const getDomainName = () => {
+    //     const host = window.location.hostname;
+
+    //     if (host === 'localhost') {
+    //         return 'ippomadurai';
+    //     }
+    //     const parts = host.split('.');
+
+    //     if (parts.length >= 2) {
+    //         return parts[1]; // 
+    //     }
+
+    //     return parts[0];
+    // };
+    // const domainName = getDomainName();
+    // console.log(domainName, "domainName123")
     const getDomainName = () => {
         const host = window.location.hostname;
 
         if (host === 'localhost') {
             return 'ippomadurai';
         }
+
         const parts = host.split('.');
+        const domain = parts.find(part => part.startsWith('ippo'));
 
-        if (parts.length >= 2) {
-            return parts[1]; // 
-        }
-
-        return parts[0];
+        return domain ?? parts[0];
     };
     const domainName = getDomainName();
-    console.log(domainName, "domainName123")
     return (
         <>
             <Header>

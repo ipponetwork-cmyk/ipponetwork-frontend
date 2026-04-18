@@ -113,7 +113,7 @@ export const BackgroundPanel = styled.section`
   justify-content: center;
   gap: 12px;
   color: white;
-  background: url('/src/assets/Background-ippo.png') center/cover no-repeat;
+  background: url(${props => props.$bgImage}) center/cover no-repeat;
   background-size: contain;
   background-position: center;
   background-attachment: fixed;

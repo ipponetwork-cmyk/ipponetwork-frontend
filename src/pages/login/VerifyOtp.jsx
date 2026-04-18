@@ -70,7 +70,7 @@ function VerifyOtp() {
             console.log(phone, "phone")
             // 🔹 Call your backend
             const response = await authAPI.getUserProfileByMobileNo(phone);
-            console.log(response, "responseotp")
+            console.log(response, "response3456")
             if (response.success) {
                 const token = response.token || response.data?.token || idToken;
                 localStorage.setItem('authToken', token);

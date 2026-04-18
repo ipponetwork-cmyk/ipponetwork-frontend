@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import { IoClose, IoLogOutOutline } from 'react-icons/io5';
 import { GoHome } from 'react-icons/go';
@@ -42,9 +42,29 @@ const menuItems = [
 function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('Home');
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleTheme, language, setLanguage, selectedThemeName, themes } = useTheme();
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        if (window.scrollY > lastScrollY && window.scrollY > 50) { // scrolling down
+          setShow(false);
+        } else { // scrolling up
+          setShow(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => {
+      window.removeEventListener('scroll', controlNavbar);
+    };
+  }, [lastScrollY]);
 
   const isToggled = themes.length > 0 && selectedThemeName === themes[0]?.themename;
 
@@ -75,7 +95,7 @@ function Navbar() {
 
   return (
     <>
-      <NavShell>
+      <NavShell $show={show}>
         <NavbarWrap>
           <MenuButton type="button" aria-label="Open menu" onClick={() => setOpen(true)}>
             <FiMenu size={22} />

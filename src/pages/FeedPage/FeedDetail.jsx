@@ -133,6 +133,14 @@ const FeedDetail = () => {
                                 <Dot key={i} active={i === activeSlide} onClick={() => setActiveSlide(i)} />
                             ))}
                         </CarouselDots>
+                        {isLastImage && (
+                            <DetailSlideActionButton onClick={handleEnquiryClick}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                    <span>Enquiry Now</span>
+                                    <IoIosArrowForward size={18} />
+                                </div>
+                            </DetailSlideActionButton>
+                        )}
                     </PostMedia>
                     <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
                         <UserRow>
@@ -159,13 +167,6 @@ const FeedDetail = () => {
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
-                    {isLastImage && (
-                        <DetailSlideActionButton onClick={handleEnquiryClick}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span>Enquiry Now</span>
-                                <IoIosArrowForward size={18} />
-                            </div>                    </DetailSlideActionButton>
-                    )}
                 </DetailWrapper>
                 <SharePostDialog
                     open={shareDialogOpen}

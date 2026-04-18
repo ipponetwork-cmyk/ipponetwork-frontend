@@ -33,6 +33,7 @@ import {
     IoLinkOutline
 } from "react-icons/io5";
 import { IoCallSharp } from "react-icons/io5";
+import { showToast } from '../../redux/actions';
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -62,7 +63,9 @@ const CreatePost = () => {
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadedPdf, setUploadedPdf] = useState(null);
     const [submitError, setSubmitError] = useState('');
+    console.log(submitError, "submitError")
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDraftSaved, setIsDraftSaved] = useState(false);
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     console.log(currentUser, "currentUser123")
@@ -118,6 +121,10 @@ const CreatePost = () => {
         if (!seconds || !costPerSecond) return 0;
         return Number((seconds * costPerSecond).toFixed(2));
     };
+
+    useEffect(() => {
+        setIsDraftSaved(false);
+    }, [title, description]);
 
     const loadTimeToLive = async (domain = 'ippochennai') => {
         try {
@@ -220,11 +227,13 @@ const CreatePost = () => {
         setSubmitError('');
 
         if (!title.trim() || !description.trim()) {
+            dispatch(showToast('Title and description are required', 'error'));
             setSubmitError('Title and description are required');
             return;
         }
 
         if (selectedDomainValues.length === 0) {
+            dispatch(showToast('Please select at least one domain', 'error'));
             setSubmitError('Please select at least one domain');
             return;
         }
@@ -270,8 +279,14 @@ const CreatePost = () => {
             setIsSubmitting(true);
             await dispatch(createPost(formData));
             setSubmitError('');
-            navigate(-1);
+
+            if (statusType === 'DRAFT') {
+                setIsDraftSaved(true);
+            } else {
+                navigate(-1);
+            }
         } catch (error) {
+            dispatch(showToast(error?.message || 'Failed to create post', 'error'));
             setSubmitError(error?.message || 'Failed to create post');
         } finally {
             setIsSubmitting(false);
@@ -499,7 +514,7 @@ const CreatePost = () => {
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
                         <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
-                            {t('draftSaved')}
+                            {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
                             <PulseDot />
                         </DraftStatus>
                     </Toolbar>
@@ -784,11 +799,11 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
-                {submitError && (
+                {/* {submitError && (
                     <div style={{ color: '#ff4d4f', marginTop: 16, textAlign: 'center' }}>
                         {submitError}
                     </div>
-                )}
+                )} */}
                 <PublishButton onClick={() => handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
                     {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
                 </PublishButton>

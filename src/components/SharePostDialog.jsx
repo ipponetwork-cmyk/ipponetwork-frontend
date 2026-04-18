@@ -11,34 +11,45 @@ import {
 import { MdContentCopy } from 'react-icons/md'
 import { MdClose } from 'react-icons/md'
 import { useState } from 'react'
-import useTheme from '../context/useTheme'
+// import useTheme from '../context/useTheme'
 
 function SharePostDialog({ open, onClose, postId = '123' }) {
   const [copied, setCopied] = useState(false)
-  const { isDark } = useTheme()
-  
+  // const { themeData } = useTheme()
+
+  // const getDomainName = () => {
+  //   const host = window.location.hostname;
+
+  //   if (host === 'localhost') {
+  //     return 'ippomadurai'; // default for local
+  //   }
+
+  //   // Example:
+  //   // multitenant.ippochennai.com → ippochennai
+  //   const parts = host.split('.');
+
+  //   if (parts.length >= 2) {
+  //     return parts[1]; // 👈 main domain name
+  //   }
+
+  //   return parts[0];
+  // };
   const getDomainName = () => {
     const host = window.location.hostname;
 
     if (host === 'localhost') {
-        return 'ippomadurai'; // default for local
+      return 'ippomadurai';
     }
 
-    // Example:
-    // multitenant.ippochennai.com → ippochennai
     const parts = host.split('.');
+    const domain = parts.find(part => part.startsWith('ippo'));
 
-    if (parts.length >= 2) {
-        return parts[1]; // 👈 main domain name
-    }
-
-    return parts[0];
-};
-
-  // Generate share link based on post ID
+    return domain ?? parts[0];
+  };
   const domainName = getDomainName();
+  // Generate share link based on post ID
 
-const shareLink = `${domainName}/${postId}`;
+  const shareLink = `${domainName}/${postId}`;
 
 
   const handleCopyLink = async () => {
@@ -54,50 +65,50 @@ const shareLink = `${domainName}/${postId}`;
     }
   }
 
-  const dialogBgColor = isDark ? '#1a1a1a' : '#ffffff'
-  const textColor = isDark ? '#ffffff' : '#000000'
-  const inputBgColor = isDark ? '#2a2a2e' : '#f5f5f5'
-  const inputTextColor = isDark ? '#e0e0e0' : '#333333'
-  const closeIconColor = isDark ? '#aaa' : '#666'
-  const closeIconHoverColor = isDark ? '#fff' : '#000'
+  const dialogBgColor = 'var(--surface)'
+  const textColor = 'var(--text)'
+  const inputBgColor = 'var(--accent-bg)'
+  const inputTextColor = 'var(--text)'
+  const closeIconColor = 'var(--text-muted)'
+  const closeIconHoverColor = 'var(--text)'
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
-      maxWidth="sm" 
-      PaperProps={{ 
-        sx: { 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
           borderRadius: '15px',
           backgroundColor: dialogBgColor,
-        } 
+        }
       }}
     >
       <DialogTitle
-  sx={{
-    fontFamily: 'Maven Pro, sans-serif',
-    fontWeight: 800,
-    fontSize: '24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    color: textColor,
-    backgroundColor: dialogBgColor,
-  }}
->
-  Share Post
-  <IconButton
-    onClick={onClose}
-    size="small"
-    sx={{
-      color: closeIconColor,
-      '&:hover': { color: closeIconHoverColor },
-    }}
-  >
-    <MdClose size={24} />
-  </IconButton>
-</DialogTitle>
+        sx={{
+          fontFamily: 'Maven Pro, sans-serif',
+          fontWeight: 800,
+          fontSize: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          color: textColor,
+          backgroundColor: dialogBgColor,
+        }}
+      >
+        Share Post
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
+            color: closeIconColor,
+            '&:hover': { color: closeIconHoverColor },
+          }}
+        >
+          <MdClose size={24} />
+        </IconButton>
+      </DialogTitle>
 
       <DialogContent sx={{ py: 2, backgroundColor: dialogBgColor }}>
         <Box
@@ -130,7 +141,7 @@ const shareLink = `${domainName}/${postId}`;
         </Box>
       </DialogContent>
       <DialogActions sx={{ p: 2, backgroundColor: dialogBgColor }}>
-        <Button onClick={handleCopyLink} variant="contained" fullWidth style={{borderRadius: '13px', backgroundColor: 'black', padding:"15px 10px", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#fff'}}>
+        <Button onClick={handleCopyLink} variant="contained" fullWidth style={{ borderRadius: '13px', backgroundColor: 'black', padding: "15px 10px", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#fff' }}>
           <MdContentCopy size={20} />
           {copied ? 'Copied!' : 'Copy Link'}
         </Button>

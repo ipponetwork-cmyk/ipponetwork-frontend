@@ -42,7 +42,14 @@ export const NavShell = styled.header`
   padding: 0;
   background: var(--nav-bg);
   color: var(--nav-text);
-`
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+  transform: ${({ $show }) => ($show ? 'translateY(0)' : 'translateY(-100%)')};
+`;
 
 export const NavbarWrap = styled.div`
   height: 54px;
@@ -107,18 +114,20 @@ export const PageWrapper = styled.main`
 
 export const BackgroundPanel = styled.section`
   flex: 1;
-  padding: 48px 28px 40px;
+  // padding: 48px 28px 40px;
+  padding:48px 4px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 12px;
   color: white;
-  background: url('/src/assets/Background-ippo.png') center/cover no-repeat;
+  background: url(${props => props.$bgImage}) center/cover no-repeat;
   background-size: contain;
   background-position: center;
   background-attachment: fixed;
   background-repeat:repeat;
-  width:390px;
+  // width: 100%;
+  // max-width: 390px;
   height:353px;
 `;
 
@@ -132,6 +141,7 @@ export const Logo = styled.span`
   letter-spacing: 0px;
   vertical-align: middle;
   color: #FFC201;
+  padding:12px;
 `;
 
 export const Headline = styled.h1`
@@ -144,6 +154,7 @@ export const Headline = styled.h1`
   letter-spacing: -2.4px;
   vertical-align: middle;
   color: #ffffff;
+  padding:12px
 `;
 
 
@@ -926,7 +937,8 @@ export const DetailCommentsCount = styled.span`
 export const PostMedia = styled.div`
     position: relative;
     width: 100%;
-    height: 56vh;
+    height: auto;
+    aspect-ratio: 1 / 1.25;
     overflow: hidden;
     background: var(--page-bg);
 `;
@@ -956,11 +968,11 @@ export const SlideActionButton = styled.button`
 
 export const DetailSlideActionButton = styled.button`
     position: absolute;
-    left: 50%;
-    width:100%;
-    // max-width: 420px;
-    top:50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    width: 100%;
+    bottom: 0;
+    transform: none;
     background: #111111;
     color: #ffffff;
     border: none;
@@ -971,12 +983,6 @@ export const DetailSlideActionButton = styled.button`
     cursor: pointer;
     z-index: 55;
     box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-        opacity: 0.95;
-        transform: translateX(-50%) translateY(-2px);
-    }
 `;
 export const DetailWrapper = styled.div`
     min-height: 100vh;
@@ -1173,7 +1179,7 @@ export const DrawerLabel = styled.span`
 
 export const TextContentBox = styled.div`
     background: var(--surface);
-    border-left: 4px solid #ffc400;
+    border-left: 5px solid orange;
     margin: 0 0 4px 0;
     padding: 20px 16px;
     min-height: 160px;
@@ -1431,8 +1437,8 @@ export const EnquiryBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--enquiry-badge-bg);
-  color: var(--enquiry-badge-text);
+  background: var(--button-bg);
+  color: var(--button-text);
   border-radius: 20px;
   padding: 6px 12px;
   cursor: pointer;
@@ -2384,7 +2390,7 @@ export const ActionButtonDropdown = styled.button`
     color: #777;
     transition: transform 0.2s;
     transform: ${({ $isOpen }) =>
-      $isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+    $isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
   }
 `;
 

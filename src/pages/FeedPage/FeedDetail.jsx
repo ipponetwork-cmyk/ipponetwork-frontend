@@ -18,16 +18,17 @@ import { RiSearchEyeLine } from "react-icons/ri";
 import { IoIosArrowForward, IoIosShareAlt } from "react-icons/io";
 import { postAPI } from '../../services/postAPI';
 import SharePostDialog from '../../components/SharePostDialog';
+import { getDynamicText } from '../../utils/languageUtils';
 
 const FooterBar = ({ enquirycount, onShare }) => (
     <DetailFooter>
         <ActionBar>
             <EnquiryBadge>
-                <RiSearchEyeLine size={16} color="currentColor" />
+                <RiSearchEyeLine size={16} />
                 <EnquiryText>{enquirycount}</EnquiryText>
             </EnquiryBadge>
             <IconButton onClick={onShare}>
-                <IoIosShareAlt size={20} color="currentColor" />
+                <IoIosShareAlt size={20} />
                 {/* <CountText>Share</CountText> */}
             </IconButton>
         </ActionBar>
@@ -45,24 +46,24 @@ const FeedDetail = () => {
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
     const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
-    const captionText = dynamicLanguage === 'ta' ? post.captionTa : post.captionEn;
-    const titleText = dynamicLanguage === 'ta' ? post.titleTa : post.titleEn;
-        useEffect(() => {
-            const handleStorage = () => {
-                const storedLanguage = localStorage.getItem('language') || 'en';
-                if (storedLanguage !== dynamicLanguage) {
-                    setDynamicLanguage(storedLanguage);
-                }
-            };
-    
-            window.addEventListener('storage', handleStorage);
-            const interval = setInterval(handleStorage, 500);
-    
-            return () => {
-                window.removeEventListener('storage', handleStorage);
-                clearInterval(interval);
-            };
-        }, [dynamicLanguage]);
+    const captionText = getDynamicText(post?.captionObj, dynamicLanguage, post?.captionEn || '');
+    const titleText = getDynamicText(post?.titleObj, dynamicLanguage, post?.titleEn || 'Post Title');
+    useEffect(() => {
+        const handleStorage = () => {
+            const storedLanguage = localStorage.getItem('language') || 'en';
+            if (storedLanguage !== dynamicLanguage) {
+                setDynamicLanguage(storedLanguage);
+            }
+        };
+
+        window.addEventListener('storage', handleStorage);
+        const interval = setInterval(handleStorage, 500);
+
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            clearInterval(interval);
+        };
+    }, [dynamicLanguage]);
     if (!post) { navigate('/home'); return null; }
     const handleEnquiryClick = async () => {
         try {
@@ -132,6 +133,14 @@ const FeedDetail = () => {
                                 <Dot key={i} active={i === activeSlide} onClick={() => setActiveSlide(i)} />
                             ))}
                         </CarouselDots>
+                        {isLastImage && (
+                            <DetailSlideActionButton onClick={handleEnquiryClick}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                    <span>Enquiry Now</span>
+                                    <IoIosArrowForward size={18} />
+                                </div>
+                            </DetailSlideActionButton>
+                        )}
                     </PostMedia>
                     <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
                         <UserRow>
@@ -158,13 +167,6 @@ const FeedDetail = () => {
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
-                    {isLastImage && (
-                        <DetailSlideActionButton onClick={handleEnquiryClick}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span>Enquiry Now</span>
-                                <IoIosArrowForward size={18} />
-                            </div>                    </DetailSlideActionButton>
-                    )}
                 </DetailWrapper>
                 <SharePostDialog
                     open={shareDialogOpen}

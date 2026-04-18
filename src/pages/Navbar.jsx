@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiMenu } from 'react-icons/fi';
-import { IoClose } from 'react-icons/io5';
+import { IoClose, IoLogOutOutline } from 'react-icons/io5';
 import { GoHome } from 'react-icons/go';
 import { CiCirclePlus } from "react-icons/ci";
 import { useNavigate, useLocation } from 'react-router-dom';
 import useTheme from '../context/useTheme';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
 import {
   NavShell,
   NavbarWrap,
@@ -40,9 +42,31 @@ const menuItems = [
 function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('Home');
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDark, toggleTheme, language, setLanguage } = useTheme();
+  const { toggleTheme, language, setLanguage, selectedThemeName, themes } = useTheme();
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        if (window.scrollY > lastScrollY && window.scrollY > 50) { // scrolling down
+          setShow(false);
+        } else { // scrolling up
+          setShow(true);
+        }
+        setLastScrollY(window.scrollY);
+      }
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => {
+      window.removeEventListener('scroll', controlNavbar);
+    };
+  }, [lastScrollY]);
+
+  const isToggled = themes.length > 0 && selectedThemeName === themes[0]?.themename;
 
   const handleNavigate = (item) => {
     setActive(item.label);
@@ -55,12 +79,23 @@ function Navbar() {
     setLanguage(langCode);
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      setOpen(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error', error);
+    }
+  };
+
   const languages = ['English', 'Tamil'];
   const displayLanguage = language === 'ta' ? 'Tamil' : 'English';
 
   return (
     <>
-      <NavShell>
+      <NavShell $show={show}>
         <NavbarWrap>
           <MenuButton type="button" aria-label="Open menu" onClick={() => setOpen(true)}>
             <FiMenu size={22} />
@@ -95,15 +130,24 @@ function Navbar() {
               </DrawerLabel>
             </DrawerItem>
           ))}
+
+          <DrawerItem onClick={handleLogout}>
+            <DrawerIcon>
+              <IoLogOutOutline size={20} color="#ff4d4d" />
+            </DrawerIcon>
+            <DrawerLabel style={{ color: '#ff4d4d' }}>
+              Logout
+            </DrawerLabel>
+          </DrawerItem>
         </DrawerMenu>
 
         <DrawerFooter>
           <DrawerLanguageSection>
             <DrawerLanguageHeader>
-                <div style={{display:'flex', flexDirection:'column'}}>
-                  <DrawerLanguageLabel>Language</DrawerLanguageLabel>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <DrawerLanguageLabel>Language</DrawerLanguageLabel>
                 <DrawerLanguageSubtitle>{displayLanguage}</DrawerLanguageSubtitle>
-                </div>
+              </div>
             </DrawerLanguageHeader>
 
             <DrawerLanguageButtons>
@@ -124,9 +168,9 @@ function Navbar() {
             <DrawerThemeSection onClick={toggleTheme}>
               <div>
                 <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
-                <DrawerThemeSubtitle>Invert Theme</DrawerThemeSubtitle>
+                <DrawerThemeSubtitle>Toggle Theme</DrawerThemeSubtitle>
               </div>
-              <ToggleSwitch isEnabled={isDark} />
+              <ToggleSwitch isEnabled={isToggled} />
             </DrawerThemeSection>
           )}
         </DrawerFooter>

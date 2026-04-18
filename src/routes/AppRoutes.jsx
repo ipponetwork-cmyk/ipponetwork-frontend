@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import PrivateRoute from './PrivateRoute'
 import App from '../App'
 import Login from '../pages/login/Login'
 import MainLayout from '../components/MainLayout'
@@ -14,12 +15,14 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/verifyotp" element={< VerifyOtp />} />
-      <Route element={<MainLayout />}>
-        <Route path="/profilepage/:id" element={<ProfilePage />} />
-        <Route path="/feed" element={<FeedPage />} />
-        <Route path="/feed-detail" element={<FeedDetail />} />
-        <Route path="/createfeed" element={<CreateFeed />} />
-        <Route path="/create-post" element={<CreatePost />} />
+      <Route element={<PrivateRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/profilepage/:id" element={<ProfilePage />} />
+          <Route path="/feed" element={<FeedPage />} />
+          <Route path="/feed-detail" element={<FeedDetail />} />
+          <Route path="/createfeed" element={<CreateFeed />} />
+          <Route path="/create-post" element={<CreatePost />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

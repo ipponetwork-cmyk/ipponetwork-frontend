@@ -3,25 +3,8 @@ import { useLocation } from 'react-router-dom'
 import ThemeCtx from './themeCtx'
 import { listOfValuesAPI } from '../services/listOfValuesAPI'
 
-const DEFAULT_LIGHT_THEME = {
-  primarycolor: '#ffffff',
-  secondarycolor: '#000000',
-  themename: 'theme2',
-}
-
-const DEFAULT_DARK_THEME = {
-  primarycolor: '#000000',
-  secondarycolor: '#ffffff',
-  themename: 'theme1',
-}
-
 const getInitialThemeName = () => {
-  return localStorage.getItem('themeName') || DEFAULT_LIGHT_THEME.themename
-}
-
-const getInitialIsDark = () => {
-  const savedTheme = localStorage.getItem('theme')
-  return savedTheme ? JSON.parse(savedTheme) : false
+  return localStorage.getItem('themeName') || 'theme2'
 }
 
 const applyThemeColors = (theme) => {
@@ -47,7 +30,6 @@ export function ThemeProvider({ children }) {
   const [themes, setThemes] = useState([])
   const [themeData, setThemeData] = useState(null)
   const [selectedThemeName, setSelectedThemeName] = useState(getInitialThemeName)
-  const [isDark, setIsDark] = useState(getInitialIsDark)
   const [language, setLanguage] = useState(() => {
     const savedLanguage = localStorage.getItem('language')
     return savedLanguage || 'en'
@@ -61,8 +43,8 @@ export function ThemeProvider({ children }) {
     const loadThemes = async () => {
       try {
         const response = await listOfValuesAPI.getThemes()
-        console.log(response,"themesResponse12563")
-        
+        console.log(response, "themesResponse12563")
+
         // Handle API response format { data: [...] }
         let fetchedThemes = []
         if (response && Array.isArray(response.data)) {
@@ -80,16 +62,10 @@ export function ThemeProvider({ children }) {
           if (selected) {
             setSelectedThemeName(selected.themename)
             setThemeData(selected)
-            setIsDark(
-              selected.primarycolor === '#000000' ||
-              (selected.themename || '').toLowerCase().includes('dark')
-            )
           }
         }
       } catch (error) {
         console.error('Failed to load themes:', error)
-        const fallback = isDark ? DEFAULT_DARK_THEME : DEFAULT_LIGHT_THEME
-        setThemeData(fallback)
       }
     }
 
@@ -102,41 +78,32 @@ export function ThemeProvider({ children }) {
       const selected = themes.find((theme) => theme.themename === selectedThemeName)
       if (selected) {
         setThemeData(selected)
-        setIsDark(
-          selected.primarycolor === '#000000' ||
-          (selected.themename || '').toLowerCase().includes('dark')
-        )
       }
     }
   }, [selectedThemeName, themes])
 
   useEffect(() => {
     if (shouldApplyTheme) {
-      document.documentElement.dataset.theme = isDark ? 'dark' : 'light'
-    } else {
-      document.documentElement.dataset.theme = 'light'
+      document.documentElement.dataset.theme = selectedThemeName
     }
 
     if (themeData) {
       applyThemeColors(themeData)
     }
 
-    localStorage.setItem('theme', JSON.stringify(isDark))
     localStorage.setItem('themeName', selectedThemeName)
-  }, [isDark, shouldApplyTheme, themeData, selectedThemeName])
+  }, [shouldApplyTheme, themeData, selectedThemeName])
 
   useEffect(() => {
     localStorage.setItem('language', language)
   }, [language])
 
   const toggleTheme = () => {
-    if (themes.length > 1) {
+    if (themes.length > 0) {
       const currentIndex = themes.findIndex((theme) => theme.themename === selectedThemeName)
       const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % themes.length
       const nextTheme = themes[nextIndex]
       setSelectedThemeName(nextTheme.themename)
-    } else {
-      setIsDark((prev) => !prev)
     }
   }
 
@@ -154,7 +121,6 @@ export function ThemeProvider({ children }) {
   return (
     <ThemeCtx.Provider
       value={{
-        isDark,
         toggleTheme,
         language,
         setLanguage: handleLanguageChange,

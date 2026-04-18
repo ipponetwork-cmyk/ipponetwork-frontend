@@ -278,7 +278,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                         </EnquiryBadge>
 
                         <IconButton onClick={() => setShareDialogOpen(true)}>
-                            <IoIosShareAlt size={20} color="#444" />
+                            <IoIosShareAlt size={20} />
                             {/* <CountText>Share</CountText> */}
                         </IconButton>
                     </ActionBar>

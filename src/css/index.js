@@ -938,9 +938,8 @@ export const PostMedia = styled.div`
     position: relative;
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1.25;
     overflow: hidden;
-    background: var(--page-bg);
+    background: var(--button-bg);
 `;
 
 export const SlideActionButton = styled.button`
@@ -1029,15 +1028,16 @@ export const DetailDot = styled.span`
 `;
 export const SliderTrack = styled.div`
     display: flex;
+    align-items: center;
     transition: transform 0.3s ease;
     transform: ${({ activeSlide }) => `translateX(-${activeSlide * 100}%)`};
+    background:var(--space-bg)
 `;
 
 export const SliderImage = styled.img`
     min-width: 100%;
     width: 100%;
-    aspect-ratio: 1 / 1.25;
-    object-fit: cover;
+    height: auto;
     display: block;
     flex-shrink: 0;
 `;

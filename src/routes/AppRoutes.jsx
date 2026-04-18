@@ -15,7 +15,7 @@ function AppRoutes() {
       <Route path="/" element={<Login />} />
       <Route path="/verifyotp" element={< VerifyOtp />} />
       <Route element={<MainLayout />}>
-        <Route path="/profilepage" element={<ProfilePage />} />
+        <Route path="/profilepage/:id" element={<ProfilePage />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/feed-detail" element={<FeedDetail />} />
         <Route path="/createfeed" element={<CreateFeed />} />

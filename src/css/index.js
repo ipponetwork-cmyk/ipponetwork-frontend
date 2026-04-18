@@ -1431,8 +1431,8 @@ export const EnquiryBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--enquiry-badge-bg);
-  color: var(--enquiry-badge-text);
+  background: var(--button-bg);
+  color: var(--button-text);
   border-radius: 20px;
   padding: 6px 12px;
   cursor: pointer;
@@ -2384,7 +2384,7 @@ export const ActionButtonDropdown = styled.button`
     color: #777;
     transition: transform 0.2s;
     transform: ${({ $isOpen }) =>
-      $isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+    $isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
   }
 `;
 

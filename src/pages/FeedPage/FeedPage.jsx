@@ -41,6 +41,7 @@ import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';
 import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
+import { getDynamicText } from '../../utils/languageUtils';
 
 const getLangString = (field, defaultStr = '') => {
     if (!field) return defaultStr;
@@ -73,11 +74,13 @@ const transformPost = (apiPost) => {
         attachment: apiPost.attachment,
         images: apiPost.attachment || [],
         video: null,
-        titleEn: getLangString(apiPost.title.en, 'Post Title'),
-        titleTa: getLangString(apiPost.title.ta, 'Post Title'),
+        titleObj: apiPost.title,
+        captionObj: apiPost.description,
+        titleEn: getLangString(apiPost.title?.en, 'Post Title'),
+        titleTa: getLangString(apiPost.title?.ta, 'Post Title'),
         captionUser: apiPost.createdusername || 'user',
-        captionEn: getLangString(apiPost.description.en, ''),
-        captionTa: getLangString(apiPost.description.ta, ''),
+        captionEn: getLangString(apiPost.description?.en, ''),
+        captionTa: getLangString(apiPost.description?.ta, ''),
         time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
         enquirycount: apiPost.enquirycount || 0,
         // Call-to-action details
@@ -109,8 +112,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
         touchStartX.current = null;
         touchEndX.current = null;
     };
-    const captionText = dynamicLanguage === 'ta' ? post.captionTa : post.captionEn;
-    const titleText = dynamicLanguage === 'ta' ? post.titleTa : post.titleEn;
+    const captionText = getDynamicText(post.captionObj, dynamicLanguage, post.captionEn || '');
+    const titleText = getDynamicText(post.titleObj, dynamicLanguage, post.titleEn || 'Post Title');
     const handleEnquiryClick = async () => {
         try {
             await postAPI.increaseEnquiryCount(post._id);
@@ -325,22 +328,22 @@ const FeedPage = () => {
         fetchPosts();
     }, [fetchPosts, dynamicLanguage]);
 
-        useEffect(() => {
-            const handleStorage = () => {
-                const storedLanguage = localStorage.getItem('language') || 'en';
-                if (storedLanguage !== dynamicLanguage) {
-                    setDynamicLanguage(storedLanguage);
-                }
-            };
+    useEffect(() => {
+        const handleStorage = () => {
+            const storedLanguage = localStorage.getItem('language') || 'en';
+            if (storedLanguage !== dynamicLanguage) {
+                setDynamicLanguage(storedLanguage);
+            }
+        };
 
-            window.addEventListener('storage', handleStorage);
-            const interval = setInterval(handleStorage, 500);
+        window.addEventListener('storage', handleStorage);
+        const interval = setInterval(handleStorage, 500);
 
-            return () => {
-                window.removeEventListener('storage', handleStorage);
-                clearInterval(interval);
-            };
-        }, [dynamicLanguage]);
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            clearInterval(interval);
+        };
+    }, [dynamicLanguage]);
 
     return (
         <FeedPageWrapper>

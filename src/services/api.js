@@ -19,6 +19,19 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add response interceptor to handle token expiration (auto logout)
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear storage and redirect to login
+      localStorage.clear();
+      window.location.href = '/';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
   // Get user profile by mobile number
   getUserProfileByMobileNo: async (mobileno) => {

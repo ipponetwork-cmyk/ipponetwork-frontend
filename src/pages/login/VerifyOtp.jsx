@@ -42,6 +42,7 @@ function VerifyOtp() {
     };
 
     const handleVerify = async () => {
+        console.log("handleverify")
         const enteredOtp = otp.join('');
 
         if (enteredOtp.length !== 6) {
@@ -51,8 +52,9 @@ function VerifyOtp() {
         setLoading(true);
 
         try {
+            console.log("tryBlock")
             const confirmationResult = window.confirmationResult;
-            console.log(console,"confirmationResult123")
+            console.log(confirmationResult, "confirmationResult")
             if (!confirmationResult) {
                 alert("Session expired. Please login again.");
                 return navigate('/');
@@ -62,31 +64,35 @@ function VerifyOtp() {
 
             const firebaseUser = result.user;
             const idToken = await firebaseUser.getIdToken();
-
+            console.log(idToken, "idToken")
             const phone = localStorage.getItem('phone');
-
+            console.log(phone, "phone")
             // 🔹 Call your backend
             const response = await authAPI.getUserProfileByMobileNo(phone);
-            console.log(response,"response123")
+            console.log(response, "responseotp")
             if (response.success) {
-                localStorage.setItem('authToken', idToken);
+                const token = response.token || response.data?.token || idToken;
+                localStorage.setItem('authToken', token);
                 localStorage.setItem('user', JSON.stringify(response.data));
                 localStorage.setItem('isNewUser', response.isNewUser ? 'true' : 'false');
 
                 const userId = response.data?._id || response.data?.id || phone;
-                console.log(userId,"userId123")
+                console.log(userId, "userId123")
                 if (response.isNewUser) {
                     navigate(`/profilepage/${userId}`);
                 } else {
                     navigate('/feed');
                 }
             } else {
+                console.log("elseBlock")
                 alert(response.message || 'Login failed.');
             }
 
         } catch (error) {
-            console.error(error);
+            console.log("catchBlock", error.message)
+            console.error(error.message);
         } finally {
+            console.log("finallyBlock")
             setLoading(false);
         }
     };

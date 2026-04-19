@@ -304,7 +304,7 @@ function Login() {
             <PageWrapper>
                 <BackgroundPanel $bgImage={bgImage}>
                     {/* <Logo>{t('appName')}</Logo> */}
-                    <Logo>{domainName}</Logo>
+                    <Logo>{domainName} dev</Logo>
                     <Headline>{t('headline')}</Headline>
                 </BackgroundPanel>
 

@@ -122,7 +122,7 @@ function Navbar() {
       <Drawer open={open}>
 
         <DrawerHeader>
-          <DrawerLogo>ippoChennai</DrawerLogo>
+          <DrawerLogo>{domainName}</DrawerLogo>
           <CloseButton onClick={() => setOpen(false)}>
             <IoClose size={22} color="#ffffff" />
           </CloseButton>

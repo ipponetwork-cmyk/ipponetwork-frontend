@@ -65,10 +65,17 @@ const CreatePost = () => {
     console.log(costTtl, "costTtlcostTtl133")
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadedPdf, setUploadedPdf] = useState(null);
+    const [uploadedVideo, setUploadedVideo] = useState(null);
     const [submitError, setSubmitError] = useState('');
     console.log(submitError, "submitError")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDraftSaved, setIsDraftSaved] = useState(false);
+    const [showActionDropdown, setShowActionDropdown] = useState(false)
+    const [selectedAction, setSelectedAction] = useState('')
+    const [callPhone, setCallPhone] = useState('')
+    const [whatsappPhone, setWhatsappPhone] = useState('')
+    const [whatsappMessage, setWhatsappMessage] = useState('')
+    const [externalLink, setExternalLink] = useState('')
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     console.log(currentUser, "currentUser123")
@@ -76,18 +83,44 @@ const CreatePost = () => {
     const createdusername = currentUser?.username || currentUser?.name || '';
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
-    const handleImageUpload = (e) => {
+    const handleMediaUpload = (e) => {
         const files = e.target.files;
         if (files && files.length > 0) {
-            const newImages = Array.from(files).map(file => ({
-                file,
-                url: URL.createObjectURL(file),
-                name: file.name
-            }));
-            setUploadedImages([...uploadedImages, ...newImages]);
+            const newImages = [];
+            let newVideo = null;
+
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    newImages.push({
+                        file,
+                        url: URL.createObjectURL(file),
+                        name: file.name
+                    });
+                } else if (file.type.startsWith('video/')) {
+                    if (file.size > 50 * 1024 * 1024) {
+                        dispatch(showToast('Video size should be less than 50MB', 'error'));
+                    } else {
+                        newVideo = {
+                            file,
+                            url: URL.createObjectURL(file),
+                            name: file.name
+                        };
+                    }
+                }
+            });
+
+            if (newImages.length > 0) {
+                setUploadedImages(prev => [...prev, ...newImages]);
+            }
+            if (newVideo) {
+                setUploadedVideo(newVideo);
+            }
         }
-        // Reset input so same file can be selected again
         e.target.value = '';
+    };
+
+    const removeVideo = () => {
+        setUploadedVideo(null);
     };
 
     const removeImage = (index) => {
@@ -127,7 +160,7 @@ const CreatePost = () => {
 
     useEffect(() => {
         setIsDraftSaved(false);
-    }, [title, description]);
+    }, [title, description, selectedDomains, selectedAction, callPhone, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
 
     const loadTimeToLive = async (domain = 'ippochennai') => {
         try {
@@ -300,6 +333,9 @@ const CreatePost = () => {
         if (uploadedPdf?.file) {
             formData.append('attachment', uploadedPdf.file);
         }
+        if (uploadedVideo?.file) {
+            formData.append('attachment', uploadedVideo.file);
+        }
 
         try {
             setIsSubmitting(true);
@@ -365,12 +401,6 @@ const CreatePost = () => {
         setSelectedDomains(newSelected)
     }
 
-    const [showActionDropdown, setShowActionDropdown] = useState(false)
-    const [selectedAction, setSelectedAction] = useState('')
-    const [callPhone, setCallPhone] = useState('')
-    const [whatsappPhone, setWhatsappPhone] = useState('')
-    const [whatsappMessage, setWhatsappMessage] = useState('')
-    const [externalLink, setExternalLink] = useState('')
 
     const actionMethods = [
         { id: 'call', title: t('call'), description: t('talkInstantly'), icon: <IoCallSharp fontSize={20} color="#f0f0f0" /> },
@@ -424,6 +454,42 @@ const CreatePost = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
+
+                        {/* Video Preview */}
+                        {uploadedVideo && (
+                            <div style={{
+                                position: 'relative',
+                                marginTop: '10px',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                background: '#000'
+                            }}>
+                                <video
+                                    src={uploadedVideo.url}
+                                    controls
+                                    style={{ width: '100%', display: 'block' }}
+                                />
+                                <button
+                                    onClick={removeVideo}
+                                    style={{
+                                        position: 'absolute',
+                                        top: 8,
+                                        right: 8,
+                                        background: 'rgba(0,0,0,0.7)',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        color: '#fff',
+                                        width: 28,
+                                        height: 28,
+                                        cursor: 'pointer',
+                                        zIndex: 10,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >✕</button>
+                            </div>
+                        )}
 
                         {/* Images Preview */}
                         {uploadedImages.length > 0 && (
@@ -509,12 +575,12 @@ const CreatePost = () => {
                     <Toolbar>
                         {/* Hidden file inputs */}
                         <input
-                            id="image-upload"
+                            id="media-upload"
                             type="file"
-                            accept="image/*"
+                            accept="image/*,video/*"
                             multiple
                             style={{ display: 'none' }}
-                            onChange={handleImageUpload}
+                            onChange={handleMediaUpload}
                         />
                         <input
                             id="pdf-upload"
@@ -524,7 +590,7 @@ const CreatePost = () => {
                             onChange={handlePdfUpload}
                         />
 
-                        <ToolButton title={t('addImage')} as="label" htmlFor="image-upload" style={{ cursor: 'pointer' }}>
+                        <ToolButton title={t('addMedia')} as="label" htmlFor="media-upload" style={{ cursor: 'pointer' }}>
                             <MdInsertPhoto fontSize={30} color="white" />
                         </ToolButton>
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>

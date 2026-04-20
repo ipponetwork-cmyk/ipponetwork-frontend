@@ -43,6 +43,7 @@ import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
+import { getDomainName } from '../../utils/domainUtils';
 
 const getLangString = (field, defaultStr = '') => {
     if (!field) return defaultStr;
@@ -304,11 +305,8 @@ const FeedPage = () => {
         try {
             setLoading(true);
 
-            const rawDomain = window.location.hostname;
-            const domain = rawDomain === 'localhost'
-                ? 'ippomani.com'
-                : rawDomain.split('.')[0];
-
+            const domain = getDomainName();
+            console.log(domain, "DOMDOMAIN")
             const response = await postAPI.getPostsByDomain(domain);
 
             if (response.success && response.data) {

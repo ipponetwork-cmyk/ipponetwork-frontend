@@ -35,6 +35,7 @@ import {
 import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
 import Loader from '../../components/Loader';
+import { getDomainName } from '../../utils/domainUtils';
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -391,24 +392,8 @@ const CreatePost = () => {
 
     //     return domain ?? parts[0];
     // };
-    const getDomainName = () => {
-        const host = window.location.hostname;
-        console.log(host, "host1234");
-
-        if (host === 'localhost') {
-            return 'ippomani.com';
-        }
-
-        const parts = host.split('.');
-        const index = parts.findIndex(part => part.startsWith('ippo'));
-
-        if (index !== -1) {
-            return `${parts[index]}.${parts[index + 1]}`; // ← returns "ippomani.com"
-        }
-
-        return `${parts[0]}.${parts[1]}`; // fallback
-    };
     const domainName = getDomainName();
+    console.log(domainName, "domainName1234");
 
     if (isSubmitting) {
         return <Loader />;
@@ -425,26 +410,6 @@ const CreatePost = () => {
                 <HeaderTitle>{t('createPost')}</HeaderTitle>
             </Header>
             <CreatePostWrapper>
-                {/* <PhoneFrame>
-                    <ContentArea>
-                        <TitleInput type="text" placeholder={t('title')} />
-                        <Divider />
-                        <BodyInput placeholder={t('provideContent')} />
-                    </ContentArea>
-
-                    <Toolbar>
-                        <ToolButton title={t('addImage')}>
-                            <MdInsertPhoto fontSize={30} color="white" />
-                        </ToolButton>
-                        <ToolButton title={t('attachFile')}>
-                            <IoMdAttach fontSize={30} />
-                        </ToolButton>
-                        <DraftStatus>
-                            {t('draftSaved')}
-                            <PulseDot />
-                        </DraftStatus>
-                    </Toolbar>
-                </PhoneFrame> */}
                 <PhoneFrame>
                     <ContentArea>
                         <TitleInput
@@ -598,14 +563,6 @@ const CreatePost = () => {
                             />
                             <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
-                        {/* <div style={{ marginTop: 10, color: '#999', fontSize: '12px' }}>
-                            {isFreeMode && freeTtl && (
-                                `${formatCount(freeTtl.seconds / unitSeconds[selected])} ${selected} = ${freeTtl.seconds} sec (free)`
-                            )}
-                            {isCostMode && costTtl && (
-                                `${count || '0'} ${selected} = ${formatCount(derivedSeconds)} sec · ${formatCount(derivedCredits)} credits`
-                            )}
-                        </div> */}
                         <UnitRow>
                             <Select
                                 value={selected}
@@ -872,11 +829,6 @@ const CreatePost = () => {
                         {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
                     </DraftStatus>
                 </div>
-                {/* {submitError && (
-                    <div style={{ color: '#ff4d4f', marginTop: 16, textAlign: 'center' }}>
-                        {submitError}
-                    </div>
-                )} */}
                 <PublishButton onClick={() => handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
                     {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
                 </PublishButton>

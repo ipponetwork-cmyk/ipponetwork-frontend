@@ -1897,11 +1897,11 @@ export const ToolButton = styled.button`
 `;
 
 export const DraftStatus = styled.button`
-  margin-left: auto;
+  // margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
-
+  justify-content:center;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 10px;
@@ -2370,6 +2370,13 @@ export const ActionButtonLabel = styled.h3`
   html[data-theme='dark'] & {
     color: #f0f0f0;
   }
+`;
+
+export const ActionButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
 `;
 
 export const ActionButtonDropdown = styled.button`

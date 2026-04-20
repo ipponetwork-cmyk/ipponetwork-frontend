@@ -51,13 +51,14 @@ const CreatePost = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [on, setOn] = useState(false)
-    const [count, setCount] = useState('1')
+    const [count, setCount] = useState('60')
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [selected, setSelected] = useState('Minutes')
     const [showDomainDropdown, setShowDomainDropdown] = useState(false)
     const [selectedDomains, setSelectedDomains] = useState(new Set())
     const [domains, setDomains] = useState([])
+    const [domainSearch, setDomainSearch] = useState('');
     const [freeTtl, setFreeTtl] = useState(null)
     const [costTtl, setCostTtl] = useState(null)
     console.log(costTtl, "costTtlcostTtl133")
@@ -324,9 +325,29 @@ const CreatePost = () => {
 
 
     const getEndTimeLabel = (seconds) => {
-        if (!seconds) return t('todayTime');
-        const endDate = new Date(getNow() + seconds * 1000);
-        return endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+        if (!seconds) return t('todayTime') || 'Today';
+        const now = new Date(getNow());
+        const endDate = new Date(getNow() + (seconds * 1000));
+
+        const isSameDay = now.toDateString() === endDate.toDateString();
+        const timeStr = endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
+        if (isSameDay) {
+            return timeStr;
+        }
+
+        // Check if tomorrow
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = tomorrow.toDateString() === endDate.toDateString();
+
+        if (isTomorrow) {
+            return `Tomorrow, ${timeStr}`;
+        }
+
+        // Otherwise show date
+        const dateStr = endDate.toLocaleDateString([], { day: 'numeric', month: 'short' });
+        return `${dateStr}, ${timeStr}`;
     };
 
     const endsInValue = isFreeMode && freeTtl
@@ -637,7 +658,7 @@ const CreatePost = () => {
                                 <CiCalendar fontSize={20} color="white" />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
-                            <InfoValue>{isFreeMode ? '-' : endsInValue}</InfoValue>
+                            <InfoValue>{endsInValue}</InfoValue>
                             <InfoSub>{t('startsFromPublished')}</InfoSub>
                         </InfoCard>
 
@@ -661,31 +682,47 @@ const CreatePost = () => {
                                     <path d="M21 21l-4.35-4.35" />
                                 </svg>
                             </SearchIcon>
-                            <DomainInput type="text" placeholder={t('searchDomains')} />
+                            <DomainInput
+                                type="text"
+                                placeholder={t('searchDomains')}
+                                value={domainSearch}
+                                onChange={(e) => setDomainSearch(e.target.value)}
+                            />
                         </DomainSearch>
                         {showDomainDropdown && (
                             <DomainList>
-                                {domains.map(domain => (
-                                    <DomainListItem
-                                        key={domain.id}
-                                        $isSelected={selectedDomains.has(domain.id)}
-                                        onClick={() => toggleDomainSelection(domain.id)}
-                                    >
-                                        <DomainItemLeft>
-                                            <DomainIcon $isSelected={selectedDomains.has(domain.id)}>
-                                                {domain.icon}
-                                            </DomainIcon>
-                                            <DomainName>{domain.name}</DomainName>
-                                        </DomainItemLeft>
-                                        <DomainCheckbox $isSelected={selectedDomains.has(domain.id)}>
-                                            {selectedDomains.has(domain.id) && (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                                    <path d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            )}
-                                        </DomainCheckbox>
-                                    </DomainListItem>
-                                ))}
+                                {[...domains]
+                                    .filter(domain =>
+                                        domain.name.toLowerCase().includes(domainSearch.toLowerCase())
+                                    )
+                                    .sort((a, b) => {
+                                        const aSelected = selectedDomains.has(a.id);
+                                        const bSelected = selectedDomains.has(b.id);
+                                        if (aSelected && !bSelected) return -1;
+                                        if (!aSelected && bSelected) return 1;
+                                        return 0;
+                                    })
+                                    .map(domain => (
+                                        <DomainListItem
+                                            key={domain.id}
+                                            $isSelected={selectedDomains.has(domain.id)}
+                                            onClick={() => toggleDomainSelection(domain.id)}
+                                        >
+                                            <DomainItemLeft>
+                                                <DomainIcon $isSelected={selectedDomains.has(domain.id)}>
+                                                    {domain.icon}
+                                                </DomainIcon>
+                                                <DomainName>{domain.name}</DomainName>
+                                            </DomainItemLeft>
+                                            <DomainCheckbox $isSelected={selectedDomains.has(domain.id)}>
+                                                {selectedDomains.has(domain.id) && (
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                        <path d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </DomainCheckbox>
+                                        </DomainListItem>
+                                    ))}
                             </DomainList>
                         )}
                     </DomainCard>
@@ -830,6 +867,11 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
+                <div style={{ marginTop: "12px" }}>
+                    <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
+                        {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
+                    </DraftStatus>
+                </div>
                 {/* {submitError && (
                     <div style={{ color: '#ff4d4f', marginTop: 16, textAlign: 'center' }}>
                         {submitError}

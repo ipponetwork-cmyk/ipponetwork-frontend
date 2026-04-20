@@ -97,11 +97,23 @@ function VerifyOtp() {
             setLoading(false);
         }
     };
+    const getDomainName = () => {
+        const host = window.location.hostname;
 
+        if (host === 'localhost') {
+            return 'ippomani.com';
+        }
+
+        const parts = host.split('.');
+        const domain = parts.find(part => part.startsWith('ippo'));
+
+        return domain ?? parts[0];
+    };
+    const domainName = getDomainName();
     return (
         <PageWrapper>
             <BackgroundPanel $bgImage={bgImage}>
-                <Logo>{t('appName')}</Logo>
+                <Logo>{domainName}</Logo>
                 <Headline>{t('headline')}</Headline>
             </BackgroundPanel>
 

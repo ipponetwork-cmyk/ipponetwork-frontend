@@ -306,7 +306,7 @@ const FeedPage = () => {
 
             const rawDomain = window.location.hostname;
             const domain = rawDomain === 'localhost'
-                ? 'ippomadurai'
+                ? 'ippomani.com'
                 : rawDomain.split('.')[0];
 
             const response = await postAPI.getPostsByDomain(domain);

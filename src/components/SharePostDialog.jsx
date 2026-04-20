@@ -17,34 +17,36 @@ function SharePostDialog({ open, onClose, postId = '123' }) {
   const [copied, setCopied] = useState(false)
   // const { themeData } = useTheme()
 
+
   // const getDomainName = () => {
   //   const host = window.location.hostname;
+  //   console.log(host, "host1234")
 
   //   if (host === 'localhost') {
-  //     return 'ippomadurai'; // default for local
+  //     return 'ippomani.com';
   //   }
 
-  //   // Example:
-  //   // multitenant.ippochennai.com → ippochennai
   //   const parts = host.split('.');
+  //   const domain = parts.find(part => part.startsWith('ippo'));
 
-  //   if (parts.length >= 2) {
-  //     return parts[1]; // 👈 main domain name
-  //   }
-
-  //   return parts[0];
+  //   return domain ?? parts[0];
   // };
   const getDomainName = () => {
     const host = window.location.hostname;
+    console.log(host, "host1234");
 
     if (host === 'localhost') {
-      return 'ippomadurai';
+      return 'ippomani.com';
     }
 
     const parts = host.split('.');
-    const domain = parts.find(part => part.startsWith('ippo'));
+    const index = parts.findIndex(part => part.startsWith('ippo'));
 
-    return domain ?? parts[0];
+    if (index !== -1) {
+      return `${parts[index]}.${parts[index + 1]}`;
+    }
+
+    return `${parts[0]}.${parts[1]}`; // fallback
   };
   const domainName = getDomainName();
   // Generate share link based on post ID

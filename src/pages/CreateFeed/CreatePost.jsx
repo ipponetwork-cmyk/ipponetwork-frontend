@@ -357,33 +357,35 @@ const CreatePost = () => {
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
+
     // const getDomainName = () => {
     //     const host = window.location.hostname;
 
     //     if (host === 'localhost') {
-    //         return 'ippomadurai';
+    //         return 'ippomani.com';
     //     }
+
     //     const parts = host.split('.');
+    //     const domain = parts.find(part => part.startsWith('ippo'));
 
-    //     if (parts.length >= 2) {
-    //         return parts[1]; // 
-    //     }
-
-    //     return parts[0];
+    //     return domain ?? parts[0];
     // };
-    // const domainName = getDomainName();
-    // console.log(domainName, "domainName123")
     const getDomainName = () => {
         const host = window.location.hostname;
+        console.log(host, "host1234");
 
         if (host === 'localhost') {
-            return 'ippomadurai';
+            return 'ippomani.com';
         }
 
         const parts = host.split('.');
-        const domain = parts.find(part => part.startsWith('ippo'));
+        const index = parts.findIndex(part => part.startsWith('ippo'));
 
-        return domain ?? parts[0];
+        if (index !== -1) {
+            return `${parts[index]}.${parts[index + 1]}`; // ← returns "ippomani.com"
+        }
+
+        return `${parts[0]}.${parts[1]}`; // fallback
     };
     const domainName = getDomainName();
 

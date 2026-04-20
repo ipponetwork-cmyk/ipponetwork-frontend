@@ -154,7 +154,8 @@ export const Headline = styled.h1`
   letter-spacing: -2.4px;
   vertical-align: middle;
   color: #ffffff;
-  padding:12px
+  padding:12px;
+  text-align: start;
 `;
 
 

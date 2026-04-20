@@ -42,6 +42,7 @@ import { postAPI } from '../../services/postAPI';
 import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
+import Loader from '../../components/Loader';
 
 const getLangString = (field, defaultStr = '') => {
     if (!field) return defaultStr;
@@ -349,7 +350,7 @@ const FeedPage = () => {
         <FeedPageWrapper>
             <FeedContainer>
                 {loading ? (
-                    <div style={{ padding: '20px', textAlign: 'center' }}>Loading posts...</div>
+                    <div style={{ textAlign: 'center' }}><Loader /></div>
                 ) : error ? (
                     <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
                 ) : posts.length > 0 ? (

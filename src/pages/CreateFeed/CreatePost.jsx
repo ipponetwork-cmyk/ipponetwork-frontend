@@ -34,6 +34,7 @@ import {
 } from "react-icons/io5";
 import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
+import Loader from '../../components/Loader';
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -238,11 +239,34 @@ const CreatePost = () => {
             return;
         }
 
-        const createdbydomain = selectedDomainValues; // Array of selected domains
+        const createdbydomain = selectedDomainValues;
         const isfreeornot = !on;
         // const currentTtl = isfreeornot ? freeTtl : costTtl;
-        const posttype = import.meta.env.POST_TYPE;
+        const posttype = import.meta.env.VITE_POST_TYPE || 'FEED';
         const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
+
+        // CTA Validation
+        if (!selectedAction) {
+            dispatch(showToast('Please select a call to action method', 'error'));
+            return;
+        }
+
+        if (selectedAction === 'whatsapp') {
+            if (!/^\d{10}$/.test(whatsappPhone)) {
+                dispatch(showToast('Please enter a valid 10-digit WhatsApp number', 'error'));
+                return;
+            }
+        } else if (selectedAction === 'call') {
+            if (!/^\d{10}$/.test(callPhone)) {
+                dispatch(showToast('Please enter a valid 10-digit phone number', 'error'));
+                return;
+            }
+        } else if (selectedAction === 'link') {
+            if (!externalLink || !externalLink.startsWith('http')) {
+                dispatch(showToast('Please enter a valid URL (starting with http:// or https://)', 'error'));
+                return;
+            }
+        }
 
         const status = statusType; const formData = new FormData();
         formData.append('title', title.trim());
@@ -252,6 +276,7 @@ const CreatePost = () => {
         formData.append('createdbydomain', JSON.stringify(createdbydomain));
         formData.append('totalseconds', String(totalseconds));
         formData.append('calltoaction', selectedAction);
+        formData.append('calltoactiontype', selectedAction === 'link' ? 'externallink' : selectedAction);
         formData.append('status', status);
         formData.append('posttype', posttype);
         formData.append('createduserid', createduserid);
@@ -259,13 +284,12 @@ const CreatePost = () => {
 
         // Handle different action types
         if (selectedAction === 'whatsapp') {
-            formData.append('whatsappnumber', whatsappPhone);
-            formData.append('whatsappmessage', whatsappMessage);
+            formData.append('whatsappnumber', '91' + whatsappPhone);
+            formData.append('whatsappmessage', whatsappMessage || 'Hi, I am interested in your post');
         } else if (selectedAction === 'link') {
-            formData.append('calltoactiontype', 'externallink');
             formData.append('calltoactionexternallinkurl', externalLink);
         } else if (selectedAction === 'call') {
-            formData.append('callnumber', callPhone);
+            formData.append('callnumber', '91' + callPhone);
         }
 
         uploadedImages.forEach(image => {
@@ -283,7 +307,7 @@ const CreatePost = () => {
             if (statusType === 'DRAFT') {
                 setIsDraftSaved(true);
             } else {
-                navigate(-1);
+                navigate('/feed');
             }
         } catch (error) {
             dispatch(showToast(error?.message || 'Failed to create post', 'error'));
@@ -362,6 +386,11 @@ const CreatePost = () => {
         return domain ?? parts[0];
     };
     const domainName = getDomainName();
+
+    if (isSubmitting) {
+        return <Loader />;
+    }
+
     return (
         <>
             <Header>

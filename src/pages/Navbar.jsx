@@ -77,6 +77,7 @@ function Navbar() {
   const handleSelectLanguage = (lang) => {
     const langCode = lang === 'English' ? 'en' : 'ta';
     setLanguage(langCode);
+    setOpen(false);
   };
 
   const handleLogout = async () => {
@@ -165,7 +166,7 @@ function Navbar() {
           </DrawerLanguageSection>
 
           {location.pathname !== '/profilepage' && (
-            <DrawerThemeSection onClick={toggleTheme}>
+            <DrawerThemeSection onClick={() => { toggleTheme(); setOpen(false); }}>
               <div>
                 <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
                 <DrawerThemeSubtitle>Toggle Theme</DrawerThemeSubtitle>

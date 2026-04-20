@@ -114,8 +114,8 @@ export const PageWrapper = styled.main`
 
 export const BackgroundPanel = styled.section`
   flex: 1;
-  // padding: 48px 28px 40px;
-  padding:48px 4px 40px;
+  // padding:48px 4px 40px;
+  padding:20px;
   display: flex;
   flex-direction: column;
   justify-content: center;

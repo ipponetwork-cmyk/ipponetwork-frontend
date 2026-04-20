@@ -93,7 +93,19 @@ function Navbar() {
 
   const languages = ['English', 'Tamil'];
   const displayLanguage = language === 'ta' ? 'Tamil' : 'English';
+  const getDomainName = () => {
+    const host = window.location.hostname;
 
+    if (host === 'localhost') {
+      return 'ippomadurai';
+    }
+
+    const parts = host.split('.');
+    const domain = parts.find(part => part.startsWith('ippo'));
+
+    return domain ?? parts[0];
+  };
+  const domainName = getDomainName();
   return (
     <>
       <NavShell $show={show}>
@@ -101,7 +113,7 @@ function Navbar() {
           <MenuButton type="button" aria-label="Open menu" onClick={() => setOpen(true)}>
             <FiMenu size={22} />
           </MenuButton>
-          <BrandTitle>ippoChennai</BrandTitle>
+          <BrandTitle>{domainName}</BrandTitle>
         </NavbarWrap>
       </NavShell>
 

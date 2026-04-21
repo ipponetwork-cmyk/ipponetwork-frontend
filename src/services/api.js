@@ -14,6 +14,12 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Don't set Content-Type for FormData - let axios/browser handle it
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -23,6 +29,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log error details for debugging
+    console.error('API Error:', {
+      status: error.response?.status,
+      message: error.message,
+      data: error.response?.data,
+      url: error.config?.url,
+    });
+    
     if (error.response && error.response.status === 401) {
       // Clear storage and redirect to login
       localStorage.clear();

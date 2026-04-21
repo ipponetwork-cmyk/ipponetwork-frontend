@@ -337,6 +337,19 @@ const CreatePost = () => {
             formData.append('attachment', uploadedVideo.file);
         }
 
+        // Log FormData contents for debugging
+        console.log('FormData contents:', {
+            title,
+            description,
+            domains: selectedDomainValues,
+            isfreeornot,
+            totalseconds,
+            selectedAction,
+            imagesCount: uploadedImages.length,
+            hasPdf: !!uploadedPdf,
+            hasVideo: !!uploadedVideo,
+        });
+
         try {
             setIsSubmitting(true);
             await dispatch(createPost(formData));
@@ -348,8 +361,10 @@ const CreatePost = () => {
                 navigate('/feed');
             }
         } catch (error) {
-            dispatch(showToast(error?.message || 'Failed to create post', 'error'));
-            setSubmitError(error?.message || 'Failed to create post');
+            console.error('Error creating post:', error);
+            const errorMsg = error?.message || error?.data?.message;
+            dispatch(showToast(errorMsg, 'error'));
+            setSubmitError(errorMsg);
         } finally {
             setIsSubmitting(false);
         }
@@ -596,10 +611,10 @@ const CreatePost = () => {
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
-                        <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
+                        {/* <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
                             {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
                             <PulseDot />
-                        </DraftStatus>
+                        </DraftStatus> */}
                     </Toolbar>
                 </PhoneFrame>
                 <Card>
@@ -630,48 +645,52 @@ const CreatePost = () => {
                             <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
                         <UnitRow>
-                            <Select
-                                value={selected}
-                                onChange={(e) => handleUnitChange(e.target.value)}
-                                variant="standard"
-                                disableUnderline
-                                sx={{
-                                    color: '#777',
-                                    fontSize: '13px',
-                                    fontWeight: 500,
-                                    fontFamily: 'Sora, sans-serif',
-                                    '& .MuiSelect-icon': { color: '#777' },
-                                    '& .MuiSelect-select': { paddingBottom: 0 },
-                                }}
-                                MenuProps={{
-                                    PaperProps: {
-                                        sx: {
-                                            background: '#1e1e22',
-                                            border: '1px solid #2a2a2e',
-                                            borderRadius: '14px',
-                                            mt: 1,
-                                            '& .MuiMenuItem-root': {
-                                                fontSize: '13px',
-                                                fontWeight: 500,
-                                                color: '#777',
-                                                justifyContent: 'center',
-                                                '&.Mui-selected': {
-                                                    background: '#2a2a2e',
-                                                    color: '#f0f0f0',
-                                                },
-                                                '&:hover': {
-                                                    background: '#2a2a2e',
-                                                    color: '#f0f0f0',
+                            {isFreeMode ? (
+                                <UnitText>Minutes</UnitText>
+                            ) : (
+                                <Select
+                                    value={selected}
+                                    onChange={(e) => handleUnitChange(e.target.value)}
+                                    variant="standard"
+                                    disableUnderline
+                                    sx={{
+                                        color: '#777',
+                                        fontSize: '13px',
+                                        fontWeight: 500,
+                                        fontFamily: 'Sora, sans-serif',
+                                        '& .MuiSelect-icon': { color: '#777' },
+                                        '& .MuiSelect-select': { paddingBottom: 0 },
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                background: '#1e1e22',
+                                                border: '1px solid #2a2a2e',
+                                                borderRadius: '14px',
+                                                mt: 1,
+                                                '& .MuiMenuItem-root': {
+                                                    fontSize: '13px',
+                                                    fontWeight: 500,
+                                                    color: '#777',
+                                                    justifyContent: 'center',
+                                                    '&.Mui-selected': {
+                                                        background: '#2a2a2e',
+                                                        color: '#f0f0f0',
+                                                    },
+                                                    '&:hover': {
+                                                        background: '#2a2a2e',
+                                                        color: '#f0f0f0',
+                                                    },
                                                 },
                                             },
                                         },
-                                    },
-                                }}
-                            >
-                                <MenuItem value="Minutes">Minutes</MenuItem>
-                                <MenuItem value="Hours">Hours</MenuItem>
-                                <MenuItem value="Days">Days</MenuItem>
-                            </Select>
+                                    }}
+                                >
+                                    <MenuItem value="Minutes">Minutes</MenuItem>
+                                    <MenuItem value="Hours">Hours</MenuItem>
+                                    <MenuItem value="Days">Days</MenuItem>
+                                </Select>
+                            )}
                         </UnitRow>
                     </PeriodSection>
                     <BorderLine />

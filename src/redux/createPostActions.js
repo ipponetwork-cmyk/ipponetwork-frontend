@@ -26,13 +26,16 @@ export const createPost = (postData) => {
   return async (dispatch) => {
     dispatch(createPostRequest());
     try {
+      console.log('Creating post with data:', postData);
       const response = await postAPI.createPost(postData);
       dispatch(createPostSuccess(response));
       dispatch(showToast('Post created successfully', 'success'));
       return response;
     } catch (error) {
-      dispatch(createPostFailure(error));
-      dispatch(showToast(error.message || 'Failed to create post', 'error'));
+      console.error('Create post error:', error);
+      const errorMessage = error?.message || error?.statusText || 'Failed to create post';
+      dispatch(createPostFailure(errorMessage));
+      dispatch(showToast(errorMessage, 'error'));
       throw error;
     }
   };

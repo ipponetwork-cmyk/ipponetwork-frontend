@@ -14,10 +14,17 @@ export const postAPI = {
   // Create a new post
   createPost: async (postData) => {
     try {
+      console.log('PostAPI: Creating post');
       const response = await apiClient.post('/post/createpost', postData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      console.error('PostAPI createPost error:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.message,
+        data: error.response?.data,
+      });
+      throw error.response?.data || { message: error.message };
     }
   },
 

@@ -766,14 +766,13 @@ export const EnquiryButton = styled.button`
 `;
 
 export const PublishButton = styled.button`
-    width: 380px;
-    margin-top: 30px;
+   width: 380px;
     background-color: var(--button-bg);
-    // background:black;
     color: var(--button-text);
     border: none;
+    margin-top:20px;
     padding: 25px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: 600;
     font-size: 15px;
     cursor: pointer;
@@ -2437,7 +2436,7 @@ export const TitleText = styled.div`
   line-height: 36px;
   letter-spacing: -1.5px;
   vertical-align: middle;
-  color: #111111;
+  color:var(--text);
 
   html[data-theme='dark'] & {
     color: #f0f0f0;

@@ -77,6 +77,7 @@ function Navbar() {
   const handleSelectLanguage = (lang) => {
     const langCode = lang === 'English' ? 'en' : 'ta';
     setLanguage(langCode);
+    setOpen(false);
   };
 
   const handleLogout = async () => {
@@ -92,7 +93,19 @@ function Navbar() {
 
   const languages = ['English', 'Tamil'];
   const displayLanguage = language === 'ta' ? 'Tamil' : 'English';
+  const getDomainName = () => {
+    const host = window.location.hostname;
 
+    if (host === 'localhost') {
+      return 'ippomadurai';
+    }
+
+    const parts = host.split('.');
+    const domain = parts.find(part => part.startsWith('ippo'));
+
+    return domain ?? parts[0];
+  };
+  const domainName = getDomainName();
   return (
     <>
       <NavShell $show={show}>
@@ -100,7 +113,7 @@ function Navbar() {
           <MenuButton type="button" aria-label="Open menu" onClick={() => setOpen(true)}>
             <FiMenu size={22} />
           </MenuButton>
-          <BrandTitle>ippoChennai</BrandTitle>
+          <BrandTitle>{domainName}</BrandTitle>
         </NavbarWrap>
       </NavShell>
 
@@ -109,7 +122,7 @@ function Navbar() {
       <Drawer open={open}>
 
         <DrawerHeader>
-          <DrawerLogo>ippoChennai</DrawerLogo>
+          <DrawerLogo>{domainName}</DrawerLogo>
           <CloseButton onClick={() => setOpen(false)}>
             <IoClose size={22} color="#ffffff" />
           </CloseButton>
@@ -165,7 +178,7 @@ function Navbar() {
           </DrawerLanguageSection>
 
           {location.pathname !== '/profilepage' && (
-            <DrawerThemeSection onClick={toggleTheme}>
+            <DrawerThemeSection onClick={() => { toggleTheme(); setOpen(false); }}>
               <div>
                 <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
                 <DrawerThemeSubtitle>Toggle Theme</DrawerThemeSubtitle>

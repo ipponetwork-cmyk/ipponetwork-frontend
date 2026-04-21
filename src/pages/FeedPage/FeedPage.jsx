@@ -42,6 +42,8 @@ import { postAPI } from '../../services/postAPI';
 import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
+import Loader from '../../components/Loader';
+import { getDomainName } from '../../utils/domainUtils';
 
 const getLangString = (field, defaultStr = '') => {
     if (!field) return defaultStr;
@@ -62,18 +64,34 @@ const getLangString = (field, defaultStr = '') => {
     return typeof extract === 'string' ? extract : defaultStr;
 };
 
-// Transform API response to FeedItem format
 const transformPost = (apiPost) => {
     console.log(apiPost, "API POST TRANSFORM")
+    const attachments = apiPost.attachment || [];
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.m4v'];
+    const videoFile = attachments.find(url =>
+        videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
+    );
+    const imageFiles = attachments.filter(url =>
+        !videoExtensions.some(ext => url.toLowerCase().endsWith(ext)) &&
+        !url.toLowerCase().endsWith('.pdf')
+    );
+
+    let type = 'text';
+    if (videoFile) {
+        type = 'video';
+    } else if (imageFiles.length > 0) {
+        type = 'image';
+    }
+
     return {
         id: apiPost._id,
         _id: apiPost._id,
-        type: apiPost.attachment?.length > 0 ? 'image' : 'text',
+        type,
         username: apiPost.createdusername || 'User',
         location: apiPost.listofdomain?.[0] || 'Location',
         attachment: apiPost.attachment,
-        images: apiPost.attachment || [],
-        video: null,
+        images: imageFiles,
+        video: videoFile,
         titleObj: apiPost.title,
         captionObj: apiPost.description,
         titleEn: getLangString(apiPost.title?.en, 'Post Title'),
@@ -278,7 +296,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                         </EnquiryBadge>
 
                         <IconButton onClick={() => setShareDialogOpen(true)}>
-                            <IoIosShareAlt size={20} color="#444" />
+                            <IoIosShareAlt size={20} />
                             {/* <CountText>Share</CountText> */}
                         </IconButton>
                     </ActionBar>
@@ -303,11 +321,8 @@ const FeedPage = () => {
         try {
             setLoading(true);
 
-            const rawDomain = window.location.hostname;
-            const domain = rawDomain === 'localhost'
-                ? 'ippomadurai'
-                : rawDomain.split('.')[0];
-
+            const domain = getDomainName();
+            console.log(domain, "DOMDOMAIN")
             const response = await postAPI.getPostsByDomain(domain);
 
             if (response.success && response.data) {
@@ -349,7 +364,7 @@ const FeedPage = () => {
         <FeedPageWrapper>
             <FeedContainer>
                 {loading ? (
-                    <div style={{ padding: '20px', textAlign: 'center' }}>Loading posts...</div>
+                    <div style={{ textAlign: 'center' }}><Loader /></div>
                 ) : error ? (
                     <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
                 ) : posts.length > 0 ? (

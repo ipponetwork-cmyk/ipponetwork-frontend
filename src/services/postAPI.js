@@ -25,19 +25,20 @@ export const postAPI = {
   getPostsByDomain: async (domain) => {
     try {
       const response = await apiClient.get(`/post/viewposts/domain/${domain}`);
+      console.log("getPostsByDomain", response)
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
-   increaseEnquiryCount: async (postId) => {
+  increaseEnquiryCount: async (postId) => {
     try {
-        const response = await apiClient.post(`/post/increaseenquirycount/${postId}`);
-        console.log("Response from increaseEnquiryCount:", response);
-        return response.data;
+      const response = await apiClient.post(`/post/increaseenquirycount/${postId}`);
+      console.log("Response from increaseEnquiryCount:", response);
+      return response.data;
     } catch (error) {
-        throw error.response?.data || error.message;
+      throw error.response?.data || error.message;
     }
-},
+  },
 };
 

@@ -34,6 +34,8 @@ import {
 } from "react-icons/io5";
 import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
+import Loader from '../../components/Loader';
+import { getDomainName } from '../../utils/domainUtils';
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,22 +52,30 @@ const CreatePost = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [on, setOn] = useState(false)
-    const [count, setCount] = useState('1')
+    const [count, setCount] = useState('60')
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [selected, setSelected] = useState('Minutes')
     const [showDomainDropdown, setShowDomainDropdown] = useState(false)
     const [selectedDomains, setSelectedDomains] = useState(new Set())
     const [domains, setDomains] = useState([])
+    const [domainSearch, setDomainSearch] = useState('');
     const [freeTtl, setFreeTtl] = useState(null)
     const [costTtl, setCostTtl] = useState(null)
     console.log(costTtl, "costTtlcostTtl133")
     const [uploadedImages, setUploadedImages] = useState([]);
     const [uploadedPdf, setUploadedPdf] = useState(null);
+    const [uploadedVideo, setUploadedVideo] = useState(null);
     const [submitError, setSubmitError] = useState('');
     console.log(submitError, "submitError")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDraftSaved, setIsDraftSaved] = useState(false);
+    const [showActionDropdown, setShowActionDropdown] = useState(false)
+    const [selectedAction, setSelectedAction] = useState('')
+    const [callPhone, setCallPhone] = useState('')
+    const [whatsappPhone, setWhatsappPhone] = useState('')
+    const [whatsappMessage, setWhatsappMessage] = useState('')
+    const [externalLink, setExternalLink] = useState('')
 
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
     console.log(currentUser, "currentUser123")
@@ -73,18 +83,44 @@ const CreatePost = () => {
     const createdusername = currentUser?.username || currentUser?.name || '';
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
-    const handleImageUpload = (e) => {
+    const handleMediaUpload = (e) => {
         const files = e.target.files;
         if (files && files.length > 0) {
-            const newImages = Array.from(files).map(file => ({
-                file,
-                url: URL.createObjectURL(file),
-                name: file.name
-            }));
-            setUploadedImages([...uploadedImages, ...newImages]);
+            const newImages = [];
+            let newVideo = null;
+
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    newImages.push({
+                        file,
+                        url: URL.createObjectURL(file),
+                        name: file.name
+                    });
+                } else if (file.type.startsWith('video/')) {
+                    if (file.size > 50 * 1024 * 1024) {
+                        dispatch(showToast('Video size should be less than 50MB', 'error'));
+                    } else {
+                        newVideo = {
+                            file,
+                            url: URL.createObjectURL(file),
+                            name: file.name
+                        };
+                    }
+                }
+            });
+
+            if (newImages.length > 0) {
+                setUploadedImages(prev => [...prev, ...newImages]);
+            }
+            if (newVideo) {
+                setUploadedVideo(newVideo);
+            }
         }
-        // Reset input so same file can be selected again
         e.target.value = '';
+    };
+
+    const removeVideo = () => {
+        setUploadedVideo(null);
     };
 
     const removeImage = (index) => {
@@ -124,7 +160,7 @@ const CreatePost = () => {
 
     useEffect(() => {
         setIsDraftSaved(false);
-    }, [title, description]);
+    }, [title, description, selectedDomains, selectedAction, callPhone, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
 
     const loadTimeToLive = async (domain = 'ippochennai') => {
         try {
@@ -238,11 +274,34 @@ const CreatePost = () => {
             return;
         }
 
-        const createdbydomain = selectedDomainValues; // Array of selected domains
+        const createdbydomain = selectedDomainValues;
         const isfreeornot = !on;
         // const currentTtl = isfreeornot ? freeTtl : costTtl;
-        const posttype = import.meta.env.POST_TYPE;
+        const posttype = import.meta.env.VITE_POST_TYPE || 'FEED';
         const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
+
+        // CTA Validation
+        if (!selectedAction) {
+            dispatch(showToast('Please select a call to action method', 'error'));
+            return;
+        }
+
+        if (selectedAction === 'whatsapp') {
+            if (!/^\d{10}$/.test(whatsappPhone)) {
+                dispatch(showToast('Please enter a valid 10-digit WhatsApp number', 'error'));
+                return;
+            }
+        } else if (selectedAction === 'call') {
+            if (!/^\d{10}$/.test(callPhone)) {
+                dispatch(showToast('Please enter a valid 10-digit phone number', 'error'));
+                return;
+            }
+        } else if (selectedAction === 'link') {
+            if (!externalLink || !externalLink.startsWith('http')) {
+                dispatch(showToast('Please enter a valid URL (starting with http:// or https://)', 'error'));
+                return;
+            }
+        }
 
         const status = statusType; const formData = new FormData();
         formData.append('title', title.trim());
@@ -252,6 +311,7 @@ const CreatePost = () => {
         formData.append('createdbydomain', JSON.stringify(createdbydomain));
         formData.append('totalseconds', String(totalseconds));
         formData.append('calltoaction', selectedAction);
+        formData.append('calltoactiontype', selectedAction === 'link' ? 'externallink' : selectedAction);
         formData.append('status', status);
         formData.append('posttype', posttype);
         formData.append('createduserid', createduserid);
@@ -259,13 +319,12 @@ const CreatePost = () => {
 
         // Handle different action types
         if (selectedAction === 'whatsapp') {
-            formData.append('whatsappnumber', whatsappPhone);
-            formData.append('whatsappmessage', whatsappMessage);
+            formData.append('whatsappnumber', '91' + whatsappPhone);
+            formData.append('whatsappmessage', whatsappMessage || 'Hi, I am interested in your post');
         } else if (selectedAction === 'link') {
-            formData.append('calltoactiontype', 'externallink');
             formData.append('calltoactionexternallinkurl', externalLink);
         } else if (selectedAction === 'call') {
-            formData.append('callnumber', callPhone);
+            formData.append('callnumber', '91' + callPhone);
         }
 
         uploadedImages.forEach(image => {
@@ -273,6 +332,9 @@ const CreatePost = () => {
         });
         if (uploadedPdf?.file) {
             formData.append('attachment', uploadedPdf.file);
+        }
+        if (uploadedVideo?.file) {
+            formData.append('attachment', uploadedVideo.file);
         }
 
         try {
@@ -283,7 +345,7 @@ const CreatePost = () => {
             if (statusType === 'DRAFT') {
                 setIsDraftSaved(true);
             } else {
-                navigate(-1);
+                navigate('/feed');
             }
         } catch (error) {
             dispatch(showToast(error?.message || 'Failed to create post', 'error'));
@@ -300,9 +362,29 @@ const CreatePost = () => {
 
 
     const getEndTimeLabel = (seconds) => {
-        if (!seconds) return t('todayTime');
-        const endDate = new Date(getNow() + seconds * 1000);
-        return endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+        if (!seconds) return t('todayTime') || 'Today';
+        const now = new Date(getNow());
+        const endDate = new Date(getNow() + (seconds * 1000));
+
+        const isSameDay = now.toDateString() === endDate.toDateString();
+        const timeStr = endDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
+        if (isSameDay) {
+            return timeStr;
+        }
+
+        // Check if tomorrow
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = tomorrow.toDateString() === endDate.toDateString();
+
+        if (isTomorrow) {
+            return `Tomorrow, ${timeStr}`;
+        }
+
+        // Otherwise show date
+        const dateStr = endDate.toLocaleDateString([], { day: 'numeric', month: 'short' });
+        return `${dateStr}, ${timeStr}`;
     };
 
     const endsInValue = isFreeMode && freeTtl
@@ -319,12 +401,6 @@ const CreatePost = () => {
         setSelectedDomains(newSelected)
     }
 
-    const [showActionDropdown, setShowActionDropdown] = useState(false)
-    const [selectedAction, setSelectedAction] = useState('')
-    const [callPhone, setCallPhone] = useState('')
-    const [whatsappPhone, setWhatsappPhone] = useState('')
-    const [whatsappMessage, setWhatsappMessage] = useState('')
-    const [externalLink, setExternalLink] = useState('')
 
     const actionMethods = [
         { id: 'call', title: t('call'), description: t('talkInstantly'), icon: <IoCallSharp fontSize={20} color="#f0f0f0" /> },
@@ -333,35 +409,26 @@ const CreatePost = () => {
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
+
     // const getDomainName = () => {
     //     const host = window.location.hostname;
 
     //     if (host === 'localhost') {
-    //         return 'ippomadurai';
+    //         return 'ippomani.com';
     //     }
+
     //     const parts = host.split('.');
+    //     const domain = parts.find(part => part.startsWith('ippo'));
 
-    //     if (parts.length >= 2) {
-    //         return parts[1]; // 
-    //     }
-
-    //     return parts[0];
+    //     return domain ?? parts[0];
     // };
-    // const domainName = getDomainName();
-    // console.log(domainName, "domainName123")
-    const getDomainName = () => {
-        const host = window.location.hostname;
-
-        if (host === 'localhost') {
-            return 'ippomadurai';
-        }
-
-        const parts = host.split('.');
-        const domain = parts.find(part => part.startsWith('ippo'));
-
-        return domain ?? parts[0];
-    };
     const domainName = getDomainName();
+    console.log(domainName, "domainName1234");
+
+    if (isSubmitting) {
+        return <Loader />;
+    }
+
     return (
         <>
             <Header>
@@ -373,26 +440,6 @@ const CreatePost = () => {
                 <HeaderTitle>{t('createPost')}</HeaderTitle>
             </Header>
             <CreatePostWrapper>
-                {/* <PhoneFrame>
-                    <ContentArea>
-                        <TitleInput type="text" placeholder={t('title')} />
-                        <Divider />
-                        <BodyInput placeholder={t('provideContent')} />
-                    </ContentArea>
-
-                    <Toolbar>
-                        <ToolButton title={t('addImage')}>
-                            <MdInsertPhoto fontSize={30} color="white" />
-                        </ToolButton>
-                        <ToolButton title={t('attachFile')}>
-                            <IoMdAttach fontSize={30} />
-                        </ToolButton>
-                        <DraftStatus>
-                            {t('draftSaved')}
-                            <PulseDot />
-                        </DraftStatus>
-                    </Toolbar>
-                </PhoneFrame> */}
                 <PhoneFrame>
                     <ContentArea>
                         <TitleInput
@@ -407,6 +454,42 @@ const CreatePost = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
+
+                        {/* Video Preview */}
+                        {uploadedVideo && (
+                            <div style={{
+                                position: 'relative',
+                                marginTop: '10px',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                background: '#000'
+                            }}>
+                                <video
+                                    src={uploadedVideo.url}
+                                    controls
+                                    style={{ width: '100%', display: 'block' }}
+                                />
+                                <button
+                                    onClick={removeVideo}
+                                    style={{
+                                        position: 'absolute',
+                                        top: 8,
+                                        right: 8,
+                                        background: 'rgba(0,0,0,0.7)',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        color: '#fff',
+                                        width: 28,
+                                        height: 28,
+                                        cursor: 'pointer',
+                                        zIndex: 10,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >✕</button>
+                            </div>
+                        )}
 
                         {/* Images Preview */}
                         {uploadedImages.length > 0 && (
@@ -492,12 +575,12 @@ const CreatePost = () => {
                     <Toolbar>
                         {/* Hidden file inputs */}
                         <input
-                            id="image-upload"
+                            id="media-upload"
                             type="file"
-                            accept="image/*"
+                            accept="image/*,video/*"
                             multiple
                             style={{ display: 'none' }}
-                            onChange={handleImageUpload}
+                            onChange={handleMediaUpload}
                         />
                         <input
                             id="pdf-upload"
@@ -507,7 +590,7 @@ const CreatePost = () => {
                             onChange={handlePdfUpload}
                         />
 
-                        <ToolButton title={t('addImage')} as="label" htmlFor="image-upload" style={{ cursor: 'pointer' }}>
+                        <ToolButton title={t('addMedia')} as="label" htmlFor="media-upload" style={{ cursor: 'pointer' }}>
                             <MdInsertPhoto fontSize={30} color="white" />
                         </ToolButton>
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
@@ -546,14 +629,6 @@ const CreatePost = () => {
                             />
                             <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
-                        {/* <div style={{ marginTop: 10, color: '#999', fontSize: '12px' }}>
-                            {isFreeMode && freeTtl && (
-                                `${formatCount(freeTtl.seconds / unitSeconds[selected])} ${selected} = ${freeTtl.seconds} sec (free)`
-                            )}
-                            {isCostMode && costTtl && (
-                                `${count || '0'} ${selected} = ${formatCount(derivedSeconds)} sec · ${formatCount(derivedCredits)} credits`
-                            )}
-                        </div> */}
                         <UnitRow>
                             <Select
                                 value={selected}
@@ -606,7 +681,7 @@ const CreatePost = () => {
                                 <CiCalendar fontSize={20} color="white" />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
-                            <InfoValue>{isFreeMode ? '-' : endsInValue}</InfoValue>
+                            <InfoValue>{endsInValue}</InfoValue>
                             <InfoSub>{t('startsFromPublished')}</InfoSub>
                         </InfoCard>
 
@@ -630,31 +705,47 @@ const CreatePost = () => {
                                     <path d="M21 21l-4.35-4.35" />
                                 </svg>
                             </SearchIcon>
-                            <DomainInput type="text" placeholder={t('searchDomains')} />
+                            <DomainInput
+                                type="text"
+                                placeholder={t('searchDomains')}
+                                value={domainSearch}
+                                onChange={(e) => setDomainSearch(e.target.value)}
+                            />
                         </DomainSearch>
                         {showDomainDropdown && (
                             <DomainList>
-                                {domains.map(domain => (
-                                    <DomainListItem
-                                        key={domain.id}
-                                        $isSelected={selectedDomains.has(domain.id)}
-                                        onClick={() => toggleDomainSelection(domain.id)}
-                                    >
-                                        <DomainItemLeft>
-                                            <DomainIcon $isSelected={selectedDomains.has(domain.id)}>
-                                                {domain.icon}
-                                            </DomainIcon>
-                                            <DomainName>{domain.name}</DomainName>
-                                        </DomainItemLeft>
-                                        <DomainCheckbox $isSelected={selectedDomains.has(domain.id)}>
-                                            {selectedDomains.has(domain.id) && (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                                    <path d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            )}
-                                        </DomainCheckbox>
-                                    </DomainListItem>
-                                ))}
+                                {[...domains]
+                                    .filter(domain =>
+                                        domain.name.toLowerCase().includes(domainSearch.toLowerCase())
+                                    )
+                                    .sort((a, b) => {
+                                        const aSelected = selectedDomains.has(a.id);
+                                        const bSelected = selectedDomains.has(b.id);
+                                        if (aSelected && !bSelected) return -1;
+                                        if (!aSelected && bSelected) return 1;
+                                        return 0;
+                                    })
+                                    .map(domain => (
+                                        <DomainListItem
+                                            key={domain.id}
+                                            $isSelected={selectedDomains.has(domain.id)}
+                                            onClick={() => toggleDomainSelection(domain.id)}
+                                        >
+                                            <DomainItemLeft>
+                                                <DomainIcon $isSelected={selectedDomains.has(domain.id)}>
+                                                    {domain.icon}
+                                                </DomainIcon>
+                                                <DomainName>{domain.name}</DomainName>
+                                            </DomainItemLeft>
+                                            <DomainCheckbox $isSelected={selectedDomains.has(domain.id)}>
+                                                {selectedDomains.has(domain.id) && (
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                        <path d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </DomainCheckbox>
+                                        </DomainListItem>
+                                    ))}
                             </DomainList>
                         )}
                     </DomainCard>
@@ -799,11 +890,11 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
-                {/* {submitError && (
-                    <div style={{ color: '#ff4d4f', marginTop: 16, textAlign: 'center' }}>
-                        {submitError}
-                    </div>
-                )} */}
+                <div style={{ marginTop: "12px" }}>
+                    <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
+                        {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
+                    </DraftStatus>
+                </div>
                 <PublishButton onClick={() => handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
                     {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
                 </PublishButton>

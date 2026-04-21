@@ -6,7 +6,7 @@ import { keyframes } from "styled-components";
 
 // Media Queries
 // const mobile = '@media (max-width: 480px)';
-const tablet = '@media (max-width: 768px)';
+// const tablet = '@media (max-width: 768px)';
 
 // ── Theme toggle ──────────────────────────────────────────────────────────────
 
@@ -103,32 +103,32 @@ export const BrandTitle = styled.h1`
 // ------------Login Page Styles-------------------
 
 export const PageWrapper = styled.main`
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-   ${tablet} {
-    flex-direction: column;
+  background: white;
+
+  @media (min-width: 769px) {
+    flex-direction: row;
     align-items: stretch;
   }
 `;
 
 export const BackgroundPanel = styled.section`
   flex: 1;
-  // padding: 48px 28px 40px;
-  padding:48px 4px 40px;
+  // padding: 40px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
+  align-items: start;
   color: white;
-  background: url(${props => props.$bgImage}) center/cover no-repeat;
-  background-size: contain;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat:repeat;
-  // width: 100%;
-  // max-width: 390px;
-  height:353px;
+  background: #000000;
+  min-height: 300px;
+  text-align: center;
+
+  @media (min-width: 769px) {
+    min-height: 100vh;
+  }
 `;
 
 export const Logo = styled.span`
@@ -154,21 +154,28 @@ export const Headline = styled.h1`
   letter-spacing: -2.4px;
   vertical-align: middle;
   color: #ffffff;
-  padding:12px
+  padding:12px;
+  text-align: start;
 `;
 
 
 export const LoginCard = styled.section`
   background: #ffffff;
-  border-radius: 32px 32px 0 0;
+  // border-radius: 32px 32px 0 0;
   padding: 36px 24px 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-   ${tablet} {
-    border-radius: 0 32px 32px 0;
-    width: 380px;
+  margin-top: -32px;
+  box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
+
+  @media (min-width: 769px) {
+    margin-top: 0;
+    border-radius: 0;
+    width: 450px;
     flex-shrink: 0;
+    justify-content: center;
+    box-shadow: -10px 0 25px rgba(0,0,0,0.05);
   }
 `;
 
@@ -265,14 +272,16 @@ export const PhoneInput = styled.input`
 `;
 
 export const Button = styled.button`
-  width: 380px;
-  height: 68px;
+  width: 100%;
+  max-width: 400px;
+  height: 60px;
   border: none;
-  border-radius: 24px;
+  border-radius: 16px;
   background: #111111;
   color: #ffffff;
   cursor: pointer;
-  opacity: 1;
+  align-self: center;
+  margin-top: 10px;
 
   box-shadow: 0px 8px 10px -6px #0000000D, 0px 20px 25px -5px #0000000D;
 
@@ -488,20 +497,27 @@ export const ContinueButton = styled.button`
 `;
 
 export const OtpInput = styled.input`
-  width: 55px;
-  height: 55px;
+  width: 45px;
+  height: 45px;
   border-radius: 9px;
-  border: 0.5px solid #000000;
+  border: 1px solid #e0e0e0;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #111111;
   outline: none;
-  caret-color: #111111;
+  background: #f8f9fa;
+
+  @media (min-width: 375px) {
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
+  }
 
   &:focus {
     border-color: #111111;
-    background: #cccccc;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.05);
   }
 `;
 export const LangToggle = styled.div`
@@ -938,9 +954,8 @@ export const PostMedia = styled.div`
     position: relative;
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1.25;
     overflow: hidden;
-    background: var(--page-bg);
+    background: var(--button-bg);
 `;
 
 export const SlideActionButton = styled.button`
@@ -1029,15 +1044,16 @@ export const DetailDot = styled.span`
 `;
 export const SliderTrack = styled.div`
     display: flex;
+    align-items: center;
     transition: transform 0.3s ease;
     transform: ${({ activeSlide }) => `translateX(-${activeSlide * 100}%)`};
+    background:var(--space-bg)
 `;
 
 export const SliderImage = styled.img`
     min-width: 100%;
     width: 100%;
-    aspect-ratio: 1 / 1.25;
-    object-fit: cover;
+    height: auto;
     display: block;
     flex-shrink: 0;
 `;
@@ -1881,11 +1897,11 @@ export const ToolButton = styled.button`
 `;
 
 export const DraftStatus = styled.button`
-  margin-left: auto;
+  // margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
-
+  justify-content:center;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 10px;
@@ -2354,6 +2370,13 @@ export const ActionButtonLabel = styled.h3`
   html[data-theme='dark'] & {
     color: #f0f0f0;
   }
+`;
+
+export const ActionButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
 `;
 
 export const ActionButtonDropdown = styled.button`

@@ -36,6 +36,7 @@ import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
+import { compressImage } from '../../utils/imageUtils';
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -72,7 +73,7 @@ const CreatePost = () => {
     const [isDraftSaved, setIsDraftSaved] = useState(false);
     const [showActionDropdown, setShowActionDropdown] = useState(false)
     const [selectedAction, setSelectedAction] = useState('')
-    const [callPhone, setCallPhone] = useState('')
+    // const [callPhone, setCallPhone] = useState('')
     const [whatsappPhone, setWhatsappPhone] = useState('')
     const [whatsappMessage, setWhatsappMessage] = useState('')
     const [externalLink, setExternalLink] = useState('')
@@ -83,42 +84,82 @@ const CreatePost = () => {
     const createdusername = currentUser?.username || currentUser?.name || '';
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
-    const handleMediaUpload = (e) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            const newImages = [];
-            let newVideo = null;
+    // const handleMediaUpload = (e) => {
+    //     const files = e.target.files;
+    //     if (files && files.length > 0) {
+    //         const newImages = [];
+    //         let newVideo = null;
 
-            Array.from(files).forEach(file => {
-                if (file.type.startsWith('image/')) {
+    //         Array.from(files).forEach(file => {
+    //             if (file.type.startsWith('image/')) {
+    //                 newImages.push({
+    //                     file,
+    //                     url: URL.createObjectURL(file),
+    //                     name: file.name
+    //                 });
+    //             } else if (file.type.startsWith('video/')) {
+    //                 if (file.size > 50 * 1024 * 1024) {
+    //                     dispatch(showToast('Video size should be less than 50MB', 'error'));
+    //                 } else {
+    //                     newVideo = {
+    //                         file,
+    //                         url: URL.createObjectURL(file),
+    //                         name: file.name
+    //                     };
+    //                 }
+    //             }
+    //         });
+
+    //         if (newImages.length > 0) {
+    //             setUploadedImages(prev => [...prev, ...newImages]);
+    //         }
+    //         if (newVideo) {
+    //             setUploadedVideo(newVideo);
+    //         }
+    //     }
+    //     e.target.value = '';
+    // };
+    const handleMediaUpload = async (e) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const newImages = [];
+        let newVideo = null;
+
+        for (const file of Array.from(files)) {
+            if (file.type.startsWith('image/')) {
+                try {
+                    const compressed = await compressImage(file);   // ← compress here
+                    newImages.push({
+                        file: compressed,                            // ← store compressed file
+                        url: URL.createObjectURL(compressed),
+                        name: file.name,
+                    });
+                } catch {
+                    // fallback to original if compression fails
                     newImages.push({
                         file,
                         url: URL.createObjectURL(file),
-                        name: file.name
+                        name: file.name,
                     });
-                } else if (file.type.startsWith('video/')) {
-                    if (file.size > 50 * 1024 * 1024) {
-                        dispatch(showToast('Video size should be less than 50MB', 'error'));
-                    } else {
-                        newVideo = {
-                            file,
-                            url: URL.createObjectURL(file),
-                            name: file.name
-                        };
-                    }
                 }
-            });
-
-            if (newImages.length > 0) {
-                setUploadedImages(prev => [...prev, ...newImages]);
-            }
-            if (newVideo) {
-                setUploadedVideo(newVideo);
+            } else if (file.type.startsWith('video/')) {
+                if (file.size > 50 * 1024 * 1024) {
+                    dispatch(showToast('Video size should be less than 50MB', 'error'));
+                } else {
+                    newVideo = {
+                        file,
+                        url: URL.createObjectURL(file),
+                        name: file.name,
+                    };
+                }
             }
         }
+
+        if (newImages.length > 0) setUploadedImages(prev => [...prev, ...newImages]);
+        if (newVideo) setUploadedVideo(newVideo);
         e.target.value = '';
     };
-
     const removeVideo = () => {
         setUploadedVideo(null);
     };
@@ -160,7 +201,7 @@ const CreatePost = () => {
 
     useEffect(() => {
         setIsDraftSaved(false);
-    }, [title, description, selectedDomains, selectedAction, callPhone, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
+    }, [title, description, selectedDomains, selectedAction, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
 
     const loadTimeToLive = async (domain = 'ippochennai') => {
         try {
@@ -291,11 +332,6 @@ const CreatePost = () => {
                 dispatch(showToast('Please enter a valid 10-digit WhatsApp number', 'error'));
                 return;
             }
-        } else if (selectedAction === 'call') {
-            if (!/^\d{10}$/.test(callPhone)) {
-                dispatch(showToast('Please enter a valid 10-digit phone number', 'error'));
-                return;
-            }
         } else if (selectedAction === 'link') {
             if (!externalLink || !externalLink.startsWith('http')) {
                 dispatch(showToast('Please enter a valid URL (starting with http:// or https://)', 'error'));
@@ -323,8 +359,6 @@ const CreatePost = () => {
             formData.append('whatsappmessage', whatsappMessage || 'Hi, I am interested in your post');
         } else if (selectedAction === 'link') {
             formData.append('calltoactionexternallinkurl', externalLink);
-        } else if (selectedAction === 'call') {
-            formData.append('callnumber', '91' + callPhone);
         }
 
         uploadedImages.forEach(image => {
@@ -418,7 +452,6 @@ const CreatePost = () => {
 
 
     const actionMethods = [
-        { id: 'call', title: t('call'), description: t('talkInstantly'), icon: <IoCallSharp fontSize={20} color="#f0f0f0" /> },
         { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <BsWhatsapp fontSize={18} color="#f0f0f0" /> },
         { id: 'link', title: t('externalLink'), description: t('visitMoreDetails'), icon: <MdOutlineOpenInNew fontSize={18} color="#f0f0f0" /> }
     ]
@@ -845,7 +878,7 @@ const CreatePost = () => {
                                 </ActionButtonHeader>
 
                                 {/* CALL */}
-                                {selectedAction === "call" && (
+                                {/* {selectedAction === "call" && (
                                     <ActionInputField>
                                         <ActionInputLabel>{t('enterPhoneNumber')}</ActionInputLabel>
                                         <ActionInputContainer>
@@ -858,7 +891,7 @@ const CreatePost = () => {
                                             />
                                         </ActionInputContainer>
                                     </ActionInputField>
-                                )}
+                                )} */}
 
                                 {/* WHATSAPP */}
                                 {selectedAction === "whatsapp" && (

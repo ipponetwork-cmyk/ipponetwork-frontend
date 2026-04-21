@@ -2,7 +2,14 @@ import styled from '@emotion/styled'
 import { keyframes } from "styled-components";
 
 
-
+// breakpoints.js
+export const responsive = {
+  xsmall: '@media (max-width: 320px)',
+  small: '@media (min-width: 321px) and (max-width: 424px)',
+  medium: '@media (min-width: 425px) and (max-width: 767px)',
+  tablet: '@media (min-width: 768px) and (max-width: 1023px)',
+  desktop: '@media (min-width: 1024px)',
+};
 
 // Media Queries
 // const mobile = '@media (max-width: 480px)';
@@ -430,7 +437,44 @@ export const FieldLabel = styled.label`
   text-align: left;
 `;
 
+export const InputWrapper = styled.div`
+  position: relative;
+`;
 
+export const DropdownContainer = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  z-index: 10;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+`;
+
+export const DropdownHeader = styled.div`
+  font-size: 11px;
+  color: #666;
+  padding: 8px 12px 5px;
+  border-bottom: 1px solid #2a2a2a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+export const SuggestionItem = styled.div`
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #e0e0e0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #2a2a2a;
+    color: #fff;
+  }
+`;
 export const FieldInput = styled.input`
     background: #191c1c;
     border: 1px solid #2f3336;
@@ -1786,32 +1830,112 @@ export const HeaderTitle = styled.span`
   }
 `;
 
+// export const CreatePostWrapper = styled.div`
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     width: 100%;
+//     margin-top:20px;
+// `
 export const CreatePostWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top:20px;
-`
+    margin-top: 20px;
+    // padding: 0 16px;        
+
+    @media (max-width: 320px) {
+        margin-top: 12px;
+        padding: 0 10px;
+    }
+
+    @media (min-width: 321px) and (max-width: 424px) {
+        margin-top: 16px;
+        padding: 0 14px;
+    }
+
+    @media (min-width: 425px) and (max-width: 767px) {
+        margin-top: 18px;
+        // padding: 0 16px;
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+        max-width: 640px;
+        margin: 24px auto 0;
+        padding: 0 24px;
+    }
+
+    @media (min-width: 1024px) {
+        max-width: 800px;
+        margin: 30px auto 0;
+        padding: 0;
+    }
+`;
 export const pulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
 `;
 
 // --- Styled Components ---
+// export const PhoneFrame = styled.div`
+//   width: 380px;
+//   background: #0F1011;
+//   border-radius: 24px;
+//   overflow: hidden;
+//   border: 1px solid #222;
+//   font-family: "Sora", sans-serif;
+//   html[data-theme='dark'] & {
+//     box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
+//   }
+// `;
 export const PhoneFrame = styled.div`
-  width: 380px;
-  background: #0F1011;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid #222;
-  font-family: "Sora", sans-serif;
-  html[data-theme='dark'] & {
-    box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
-  }
-`;
+    width: 380px;
+    background: #0F1011;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #222;
+    font-family: "Sora", sans-serif;
 
+    html[data-theme='dark'] & {
+        box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Small phones — iPhone SE (320px) */
+    @media (max-width: 320px) {
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    /* Medium phones (321px–424px) */
+    @media (min-width: 321px) and (max-width: 424px) {
+        width: 100%;
+        border-radius: 16px;
+    }
+
+    /* Large phones (425px–767px) */
+    @media (min-width: 425px) and (max-width: 767px) {
+        width: 100%;
+        max-width: 400px;
+        border-radius: 20px;
+    }
+
+    /* Tablets (768px–1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        width: 380px;
+        border-radius: 24px;
+    }
+
+    /* Laptops and above (1024px+) */
+    @media (min-width: 1024px) {
+        width: 380px;
+        border-radius: 24px;
+    }
+`;
 export const ContentArea = styled.div`
   padding: 20px 20px 0;
   min-height: 340px;
@@ -1929,19 +2053,66 @@ export const fadeIn = keyframes`
   to   { opacity: 1; transform: translateY(0); }
 `
 
+// export const Card = styled.div`
+//   width: 380px;
+//   background: #0F1011;
+//   border-radius: 28px;
+//   overflow: hidden;
+//   font-family: 'Sora', sans-serif;
+//   animation: ${fadeIn} 0.3s ease;
+//   border: 1px solid #1e1e22;
+//   margin-top:20px;
+//   html[data-theme='dark'] & {
+//     box-shadow: 0 28px 60px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.42);
+//   }
+// `
 export const Card = styled.div`
-  width: 380px;
-  background: #0F1011;
-  border-radius: 28px;
-  overflow: hidden;
-  font-family: 'Sora', sans-serif;
-  animation: ${fadeIn} 0.3s ease;
-  border: 1px solid #1e1e22;
-  margin-top:20px;
-  html[data-theme='dark'] & {
-    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.42);
-  }
-`
+    width: 380px;
+    background: #0F1011;
+    border-radius: 28px;
+    overflow: hidden;
+    font-family: 'Sora', sans-serif;
+    animation: ${fadeIn} 0.3s ease;
+    border: 1px solid #1e1e22;
+    margin-top: 20px;
+
+    html[data-theme='dark'] & {
+        box-shadow: 0 28px 60px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.42);
+    }
+
+    ${responsive.xsmall} {
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin-top: 12px;
+    }
+
+    ${responsive.small} {
+        width: 100%;
+        border-radius: 18px;
+        margin-top: 14px;
+    }
+
+   ${responsive.medium} {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    margin-top: 16px;
+}
+
+    ${responsive.tablet} {
+        width: 380px;
+        border-radius: 26px;
+        margin-top: 18px;
+    }
+
+    ${responsive.desktop} {
+        width: 380px;
+        border-radius: 28px;
+        margin-top: 20px;
+    }
+`;
 
 export const Banner = styled.div`
   display: flex;

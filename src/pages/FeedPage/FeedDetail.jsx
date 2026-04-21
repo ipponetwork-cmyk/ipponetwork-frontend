@@ -136,7 +136,7 @@ const FeedDetail = () => {
                         {isLastImage && (
                             <DetailSlideActionButton onClick={handleEnquiryClick}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                    <span>Enquiry Now</span>
+                                    <span>Enquiry</span>
                                     <IoIosArrowForward size={18} />
                                 </div>
                             </DetailSlideActionButton>
@@ -164,7 +164,7 @@ const FeedDetail = () => {
                         {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
                         <DetailCaption>{captionText}</DetailCaption>
                         <DetailTime>{titleText}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
                 </DetailWrapper>
@@ -200,7 +200,7 @@ const FeedDetail = () => {
                         </UserRow>
                         <DetailCaption>{post.caption}</DetailCaption>
                         <DetailTime>{post.time}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
                 </DetailWrapper>
@@ -232,7 +232,7 @@ const FeedDetail = () => {
                             </DetailUserInfo>
                         </UserRow>
                         <DetailTime>{post.time}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry Now</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
                     </OverlayContent>
                 </DetailWrapper>

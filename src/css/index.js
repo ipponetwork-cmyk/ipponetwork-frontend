@@ -1,7 +1,5 @@
 import styled from '@emotion/styled'
-import { keyframes } from "styled-components";
-
-
+import { keyframes, createGlobalStyle } from "styled-components";
 // breakpoints.js
 export const responsive = {
   xsmall: '@media (max-width: 320px)',
@@ -750,7 +748,7 @@ export const PostTime = styled.p`
 `;
 
 export const EnquiryButton = styled.button`
-    width: 100%;
+    width: 380px;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -770,8 +768,8 @@ export const EnquiryButton = styled.button`
 export const PublishButton = styled.button`
     width: 380px;
     margin-top: 30px;
-    // background-color: var(--button-bg);
-    background:black;
+    background-color: var(--button-bg);
+    // background:black;
     color: var(--button-text);
     border: none;
     padding: 25px;
@@ -1497,8 +1495,8 @@ export const EnquiryBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--button-bg);
-  color: var(--button-text);
+  // background: var(--button-bg);
+  color: var(--button-bg);
   border-radius: 20px;
   padding: 6px 12px;
   cursor: pointer;
@@ -1799,7 +1797,7 @@ export const CreatePostBackButton = styled.button`
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  color: #111111;
+  color: var(--text);
   transition: background 0.15s;
 
   &:hover {
@@ -1822,7 +1820,7 @@ export const HeaderTitle = styled.span`
   line-height: 100%;
   letter-spacing: 0;
 
-  color: #111111;
+  color: var(--text);
 
   html[data-theme='dark'] & {
     color: #fff;
@@ -2826,4 +2824,38 @@ export const ActionLinkIcon = styled.div`
   justify-content: center;
   color: #777;
   font-size: 16px;
+`;
+
+
+//Toaster
+
+export const GlobalStyle = createGlobalStyle`
+    /* existing styles... */
+
+    .Toastify__toast {
+        background: var(--bg) !important;
+        border-radius: 14px !important;
+        padding: 14px 16px !important;
+        min-width: 300px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .Toastify__toast-body {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .Toastify__close-button {
+        color: #666666 !important;
+        opacity: 1 !important;
+        align-self: center !important;
+    }
+
+    .Toastify__close-button:hover {
+        color: #ffffff !important;
+    }
+
+    .Toastify__progress-bar {
+        display: none !important;
+    }
 `;

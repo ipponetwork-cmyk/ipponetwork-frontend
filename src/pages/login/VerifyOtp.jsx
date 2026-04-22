@@ -102,18 +102,18 @@ function VerifyOtp() {
             setLoading(false);
         }
     };
-    const getDomainName = () => {
-        const host = window.location.hostname;
+    // const getDomainName = () => {
+    //     const host = window.location.hostname;
 
-        if (host === 'localhost') {
-            return 'ippomani.com';
-        }
+    //     if (host === 'localhost') {
+    //         return 'ippomani.com';
+    //     }
 
-        const parts = host.split('.');
-        const domain = parts.find(part => part.startsWith('ippo'));
+    //     const parts = host.split('.');
+    //     const domain = parts.find(part => part.startsWith('ippo'));
 
-        return domain ?? parts[0];
-    };
+    //     return domain ?? parts[0];
+    // };
     const domainName = getDomainShortName();
     return (
         <PageWrapper>

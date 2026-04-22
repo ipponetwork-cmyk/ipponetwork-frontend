@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
     PageWrappers,
@@ -32,7 +32,7 @@ import { showToast } from '../../redux/actions';
 
 function ProfilePage() {
     const navigate = useNavigate();
-    const { id } = useParams();
+    // const { id } = useParams();
     const dispatch = useDispatch();
 
     const [avatar, setAvatar] = useState(null);
@@ -164,8 +164,10 @@ function ProfilePage() {
         // }
 
         console.log(data, 'Datata from form');
-        const userId = id;
-
+        // const userId = id;
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = user?._id || user?.id;
+        console.log(user, "Huefiub")
         try {
             const profileData = {
                 name: data.name,

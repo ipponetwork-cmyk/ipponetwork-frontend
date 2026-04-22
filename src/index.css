@@ -38,6 +38,8 @@
   --accent: #ffb703;
   --accent-bg: rgba(255, 183, 3, 0.15);
   --accent-border: rgba(255, 183, 3, 0.35);
+  --card-background:"black";
+  --card-text: "white";
   --shadow: rgba(0, 0, 0, 0.08) 0 10px 15px -3px, rgba(0, 0, 0, 0.04) 0 4px 6px -2px;
   color-scheme: light;
 }
@@ -65,8 +67,11 @@
   --accent: #ffb703;
   --accent-bg: rgba(255, 183, 3, 0.15);
   --accent-border: rgba(255, 183, 3, 0.35);
+  --card-background:"white";
+  --card-text: "black";
   --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   color-scheme: dark;
+
 }
 
 body {

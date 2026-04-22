@@ -11,7 +11,7 @@ import {
     CountryCode,
     Code,
     PhoneInput,
-    Button,
+    Buttons,
     PhoneNumber,
     DropdownIcon,
 } from '../../css';
@@ -23,6 +23,7 @@ import { auth } from '../../firebase';
 import PwaInstallPrompt from '../../components/PwaInstallPrompt';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import bgImage from '../../assets/Background-ippo.png';
+import { getDomainShortName } from '../../utils/domainUtils';
 
 function Login() {
     const navigate = useNavigate();
@@ -144,7 +145,7 @@ function Login() {
 
         return domain ?? parts[0];
     };
-    const domainName = getDomainName();
+    const domainName = getDomainShortName();
     console.log(domainName, "domainName123Login")
     return (
         <>
@@ -195,9 +196,9 @@ function Login() {
 
                     {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
 
-                    <Button onClick={handleNext} disabled={loading}>
+                    <Buttons onClick={handleNext} disabled={loading}>
                         {loading ? "Sending OTP..." : "Next"}
-                    </Button>
+                    </Buttons>
                 </LoginCard>
             </PageWrapper>
             <PwaInstallPrompt message="Install the app for faster access and offline support." />

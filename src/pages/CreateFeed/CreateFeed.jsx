@@ -22,7 +22,7 @@ function CreateFeed() {
             <CardWrapper>
                 <CreateHeader>
                     <IconBox>
-                        <BsFillGridFill size={20} color="#ffffff" />
+                        <BsFillGridFill size={20} />
                     </IconBox>
                     <CardTitle>Create Post</CardTitle>
                 </CreateHeader>

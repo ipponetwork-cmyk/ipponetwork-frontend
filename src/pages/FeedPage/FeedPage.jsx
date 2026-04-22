@@ -44,14 +44,14 @@ import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
-// import { useDispatch } from 'react-redux';
-// import { showToast } from '../../redux/actions';
+import { useDispatch } from 'react-redux';
+import { showToast } from '../../redux/actions';
 import { transformPost } from '../../utils/transformPost';
 
 
 const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     console.log(post, "post in feed item")
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
     const [color, setColor] = useState(
@@ -94,12 +94,12 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const captionText = getDynamicText(post.captionObj, dynamicLanguage, post.captionEn || '');
     const titleText = getDynamicText(post.titleObj, dynamicLanguage, post.titleEn || 'Post Title');
     const handleEnquiryClick = async () => {
-        // const token = localStorage.getItem('authToken');
-        // if (!token) {
-        //     dispatch(showToast('Login to continue', 'info'));
-        //     setTimeout(() => navigate('/login'), 1500);
-        //     return;
-        // }
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            dispatch(showToast('Login to continue', 'info'));
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         try {
             await postAPI.increaseEnquiryCount(post._id);
             if (onEnquiryUpdate) {

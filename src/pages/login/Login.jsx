@@ -133,18 +133,18 @@ function Login() {
     //     // Handle cases like ippomadurai.com
     //     return parts[0];
     // };
-    const getDomainName = () => {
-        const host = window.location.hostname;
+    // const getDomainName = () => {
+    //     const host = window.location.hostname;
 
-        if (host === 'localhost') {
-            return 'ippomadurai';
-        }
+    //     if (host === 'localhost') {
+    //         return 'ippomadurai';
+    //     }
 
-        const parts = host.split('.');
-        const domain = parts.find(part => part.startsWith('ippo'));
+    //     const parts = host.split('.');
+    //     const domain = parts.find(part => part.startsWith('ippo'));
 
-        return domain ?? parts[0];
-    };
+    //     return domain ?? parts[0];
+    // };
     const domainName = getDomainShortName();
     console.log(domainName, "domainName123Login")
     return (

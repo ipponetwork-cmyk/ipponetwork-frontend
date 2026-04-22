@@ -290,7 +290,7 @@ const FeedPage = () => {
         try {
             setLoading(true);
 
-            const domain = getDomainShortName();
+            const domain = getDomainName();
             console.log(domain, "DOMDOMAIN")
             const response = await postAPI.getPostsByDomain(domain);
 

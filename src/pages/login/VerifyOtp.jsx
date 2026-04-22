@@ -7,7 +7,7 @@ import {
     LoginCard,
     CardHeader,
     CardSubTitle,
-    Button,
+    Buttons,
     OtpWrapper,
     OtpInput,
 } from '../../css';
@@ -80,7 +80,7 @@ function VerifyOtp() {
                 const userId = response.data?._id || response.data?.id || phone;
                 console.log(userId, "userId123")
                 if (response.isNewUser) {
-                    navigate(`/profilepage/${userId}`);
+                    navigate(`/profilepage`);
                 } else {
                     navigate('/feed');
                 }

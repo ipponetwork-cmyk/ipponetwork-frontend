@@ -11,7 +11,7 @@ import {
     CountryCode,
     Code,
     PhoneInput,
-    Button,
+    Buttons,
     PhoneNumber,
     DropdownIcon,
 } from '../../css';

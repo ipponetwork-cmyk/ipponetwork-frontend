@@ -8,8 +8,12 @@ const getInitialThemeName = () => {
 }
 
 const applyThemeColors = (theme) => {
+  console.log("Applying theme:", theme)
   if (!theme) return
   const root = document.documentElement
+  root.style.setProperty('--card-background', theme.secondarycolor)
+  root.style.setProperty('--card-text', theme.primarycolor)
+  root.style.setProperty('--secondarycolor', theme.secondarycolor)
   root.style.setProperty('--bg', theme.primarycolor)
   root.style.setProperty('--page-bg', theme.primarycolor)
   root.style.setProperty('--surface', theme.primarycolor)

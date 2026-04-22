@@ -10,7 +10,9 @@ import {
     DomainList, DomainListItem, DomainItemLeft, DomainIcon, DomainName, DomainCheckbox,
     ActionButtonSection, ActionButtonLabel, ActionButtonDropdown, ActionButtonList, ActionButtonItem, ActionButtonItemIcon, ActionButtonItemContent, ActionButtonItemTitle, ActionButtonItemDescription, ActionButtonItemCheckmark,
     ActionButtonContent, ActionButtonHeader, ActionButtonHeaderLeft, ActionButtonHeaderIcon, ActionButtonHeaderInfo, ActionButtonHeaderTitle, ActionButtonHeaderSubtitle, ActionButtonHeaderChevron,
-    ActionInputField, ActionInputLabel, ActionInputContainer, ActionPhonePrefix, ActionInput, ActionTextarea, ActionLinkInputContainer, ActionLinkIcon, Action, PublishButton
+    ActionInputField, ActionInputLabel, ActionInputContainer, ActionPhonePrefix, ActionInput, ActionTextarea, ActionLinkInputContainer, ActionLinkIcon, Action, PublishButton,
+    StyledSelect,
+    selectMenuProps
 } from '../../css/index';
 import { useState, useEffect } from 'react';
 import Select from '@mui/material/Select';
@@ -84,41 +86,6 @@ const CreatePost = () => {
     const createdusername = currentUser?.username || currentUser?.name || '';
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
-    // const handleMediaUpload = (e) => {
-    //     const files = e.target.files;
-    //     if (files && files.length > 0) {
-    //         const newImages = [];
-    //         let newVideo = null;
-
-    //         Array.from(files).forEach(file => {
-    //             if (file.type.startsWith('image/')) {
-    //                 newImages.push({
-    //                     file,
-    //                     url: URL.createObjectURL(file),
-    //                     name: file.name
-    //                 });
-    //             } else if (file.type.startsWith('video/')) {
-    //                 if (file.size > 50 * 1024 * 1024) {
-    //                     dispatch(showToast('Video size should be less than 50MB', 'error'));
-    //                 } else {
-    //                     newVideo = {
-    //                         file,
-    //                         url: URL.createObjectURL(file),
-    //                         name: file.name
-    //                     };
-    //                 }
-    //             }
-    //         });
-
-    //         if (newImages.length > 0) {
-    //             setUploadedImages(prev => [...prev, ...newImages]);
-    //         }
-    //         if (newVideo) {
-    //             setUploadedVideo(newVideo);
-    //         }
-    //     }
-    //     e.target.value = '';
-    // };
     const handleMediaUpload = async (e) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
@@ -457,19 +424,6 @@ const CreatePost = () => {
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
-
-    // const getDomainName = () => {
-    //     const host = window.location.hostname;
-
-    //     if (host === 'localhost') {
-    //         return 'ippomani.com';
-    //     }
-
-    //     const parts = host.split('.');
-    //     const domain = parts.find(part => part.startsWith('ippo'));
-
-    //     return domain ?? parts[0];
-    // };
     const domainName = getDomainName();
     console.log(domainName, "domainName1234");
 
@@ -639,7 +593,7 @@ const CreatePost = () => {
                         />
 
                         <ToolButton title={t('addMedia')} as="label" htmlFor="media-upload" style={{ cursor: 'pointer' }}>
-                            <MdInsertPhoto fontSize={30} color="white" />
+                            <MdInsertPhoto fontSize={30} />
                         </ToolButton>
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
                             <IoMdAttach fontSize={30} />
@@ -681,48 +635,17 @@ const CreatePost = () => {
                             {isFreeMode ? (
                                 <UnitText>Minutes</UnitText>
                             ) : (
-                                <Select
+                                <StyledSelect
                                     value={selected}
                                     onChange={(e) => handleUnitChange(e.target.value)}
                                     variant="standard"
                                     disableUnderline
-                                    sx={{
-                                        color: '#777',
-                                        fontSize: '13px',
-                                        fontWeight: 500,
-                                        fontFamily: 'Sora, sans-serif',
-                                        '& .MuiSelect-icon': { color: '#777' },
-                                        '& .MuiSelect-select': { paddingBottom: 0 },
-                                    }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                background: '#1e1e22',
-                                                border: '1px solid #2a2a2e',
-                                                borderRadius: '14px',
-                                                mt: 1,
-                                                '& .MuiMenuItem-root': {
-                                                    fontSize: '13px',
-                                                    fontWeight: 500,
-                                                    color: '#777',
-                                                    justifyContent: 'center',
-                                                    '&.Mui-selected': {
-                                                        background: '#2a2a2e',
-                                                        color: '#f0f0f0',
-                                                    },
-                                                    '&:hover': {
-                                                        background: '#2a2a2e',
-                                                        color: '#f0f0f0',
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }}
+                                    MenuProps={selectMenuProps}
                                 >
                                     <MenuItem value="Minutes">Minutes</MenuItem>
                                     <MenuItem value="Hours">Hours</MenuItem>
                                     <MenuItem value="Days">Days</MenuItem>
-                                </Select>
+                                </StyledSelect>
                             )}
                         </UnitRow>
                     </PeriodSection>
@@ -730,7 +653,7 @@ const CreatePost = () => {
                     <Grid>
                         <InfoCard>
                             <InfoHeader>
-                                <CiCalendar fontSize={20} color="white" />
+                                <CiCalendar fontSize={20} />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
                             <InfoValue>{endsInValue}</InfoValue>

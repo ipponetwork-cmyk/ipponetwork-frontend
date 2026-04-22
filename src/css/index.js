@@ -1,5 +1,8 @@
 import styled from '@emotion/styled'
 import { keyframes, createGlobalStyle } from "styled-components";
+import { Select, MenuItem } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material'
+
 // breakpoints.js
 export const responsive = {
   xsmall: '@media (max-width: 320px)',
@@ -276,14 +279,14 @@ export const PhoneInput = styled.input`
   }
 `;
 
-export const Button = styled.button`
+export const Buttons = styled.button`
   width: 100%;
   max-width: 400px;
   height: 60px;
   border: none;
   border-radius: 16px;
-  background: #111111;
-  color: #ffffff;
+  background:var(--card-background);
+  color: var(--card-text);
   cursor: pointer;
   align-self: center;
   margin-top: 10px;
@@ -1683,7 +1686,7 @@ export const CenterWrapper = styled.div`
 `
 export const CardWrapper = styled.div`
   // background: url('/src/assets/CreateFeed.png') center/cover no-repeat;
-  background:black;
+  background:var(--card-background);
   border-radius: 16px;
   padding: 24px 20px;
   width: 342px;
@@ -1700,7 +1703,7 @@ export const CreateHeader = styled.div`
 `;
 
 export const IconBox = styled.div`
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--card-background);
   border-radius: 10px;
   width: 44px;
   height: 44px;
@@ -1708,6 +1711,7 @@ export const IconBox = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: var(--card-text);
 `;
 
 export const CardTitle = styled.h2`
@@ -1718,7 +1722,7 @@ export const CardTitle = styled.h2`
   letter-spacing: 0px;
   vertical-align: middle;
   
-  color: #ffffff;
+  color: var(--card-text);
   margin: 0;
 `;
 
@@ -1731,7 +1735,7 @@ export const CardDescription = styled.p`
   letter-spacing: 0px;
   vertical-align: middle;
 
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--card-text);
   margin: 0;
 `;
 
@@ -1742,8 +1746,8 @@ export const ButtonWrapper = styled.div`
     margin-top: 12px;
 `;
 export const CreateButton = styled.button`
-  background: #ffffff;
-  color: #111111;
+  background: var(--card-text);
+  color: var(--card-background);
   border: none;
   border-radius: 10px;
   padding: 12px;
@@ -1888,51 +1892,51 @@ export const pulse = keyframes`
 //     box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
 //   }
 // `;
-export const PhoneFrame = styled.div`
-    width: 380px;
-    background: #0F1011;
-    border-radius: 24px;
-    overflow: hidden;
-    border: 1px solid #222;
-    font-family: "Sora", sans-serif;
+  export const PhoneFrame = styled.div`
+      width: 380px;
+      background: var(--card-background);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #222;
+      font-family: "Sora", sans-serif;
 
-    html[data-theme='dark'] & {
-        box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
-    }
+      html[data-theme='dark'] & {
+          box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
+      }
 
-    /* Small phones — iPhone SE (320px) */
-    @media (max-width: 320px) {
-        width: 100%;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-    }
+      /* Small phones — iPhone SE (320px) */
+      @media (max-width: 320px) {
+          width: 100%;
+          border-radius: 0;
+          border-left: none;
+          border-right: none;
+      }
 
-    /* Medium phones (321px–424px) */
-    @media (min-width: 321px) and (max-width: 424px) {
-        width: 100%;
-        border-radius: 16px;
-    }
+      /* Medium phones (321px–424px) */
+      @media (min-width: 321px) and (max-width: 424px) {
+          width: 100%;
+          border-radius: 16px;
+      }
 
-    /* Large phones (425px–767px) */
-    @media (min-width: 425px) and (max-width: 767px) {
-        width: 100%;
-        max-width: 400px;
-        border-radius: 20px;
-    }
+      /* Large phones (425px–767px) */
+      @media (min-width: 425px) and (max-width: 767px) {
+          width: 100%;
+          max-width: 400px;
+          border-radius: 20px;
+      }
 
-    /* Tablets (768px–1023px) */
-    @media (min-width: 768px) and (max-width: 1023px) {
-        width: 380px;
-        border-radius: 24px;
-    }
+      /* Tablets (768px–1023px) */
+      @media (min-width: 768px) and (max-width: 1023px) {
+          width: 380px;
+          border-radius: 24px;
+      }
 
-    /* Laptops and above (1024px+) */
-    @media (min-width: 1024px) {
-        width: 380px;
-        border-radius: 24px;
-    }
-`;
+      /* Laptops and above (1024px+) */
+      @media (min-width: 1024px) {
+          width: 380px;
+          border-radius: 24px;
+      }
+  `;
 export const ContentArea = styled.div`
   padding: 20px 20px 0;
   min-height: 340px;
@@ -1951,7 +1955,7 @@ export const TitleInput = styled.input`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: #ffffff;
+  color:var(--card-text);
   margin-bottom: 18px;
   caret-color: #5b8dee;
 
@@ -1980,7 +1984,7 @@ export const BodyInput = styled.textarea`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: #d9d9d9;
+  color: var(-card-text);
   resize: none;
   min-height: 220px;
   caret-color: #5b8dee;
@@ -2049,23 +2053,9 @@ export const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 `
-
-// export const Card = styled.div`
-//   width: 380px;
-//   background: #0F1011;
-//   border-radius: 28px;
-//   overflow: hidden;
-//   font-family: 'Sora', sans-serif;
-//   animation: ${fadeIn} 0.3s ease;
-//   border: 1px solid #1e1e22;
-//   margin-top:20px;
-//   html[data-theme='dark'] & {
-//     box-shadow: 0 28px 60px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.42);
-//   }
-// `
 export const Card = styled.div`
     width: 380px;
-    background: #0F1011;
+    background:var(--card-background);
     border-radius: 28px;
     overflow: hidden;
     font-family: 'Sora', sans-serif;
@@ -2151,7 +2141,7 @@ export const BannerTitle = styled.span`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: #f0f0f0;
+  color: var(--card-text);
 `;
 
 
@@ -2161,7 +2151,7 @@ export const BannerSub = styled.span`
   font-size: 10px;
   line-height: 100%;
   letter-spacing: 0;
-  color: #555;
+  color: var(--card-text);
   margin-top: 2px;
 `;
 
@@ -2181,7 +2171,7 @@ export const ToggleThumb = styled.div`
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background:var(--card-background);
   position: absolute;
   top: 3px;
   left: ${({ $on }) => ($on ? '21px' : '3px')};
@@ -2202,11 +2192,9 @@ export const PeriodLabel = styled.p`
   vertical-align: middle;
   text-transform: capitalize;
 
-  color: #FFFFFF;
+  color:var(--card-text);
   margin: 0 0 16px;
 `;
-
-
 
 export const CounterRow = styled.div`
   display: flex;
@@ -2220,8 +2208,8 @@ export const CountBtn = styled.button`
   height: 52px;
   border-radius: 16px;
   background: transparent;
-  border: 1px solid #FFFFFF;
-  color: #cccccc;
+  border: 1px solid var(--card-text);
+  color:var(--card-text);
   font-size: 35px;
   font-weight: 300;
   cursor: pointer;
@@ -2239,7 +2227,7 @@ export const CountAddBtn = styled.button`
   height: 52px;
   border-radius: 16px;
   background: white;
-  border: 1px solid #FFFFFF;
+  border: 1px solid var(--card-text);
   color: black;
   font-size: 35px;
   font-weight: 300;
@@ -2262,7 +2250,7 @@ export const CountValue = styled.input`
   text-align: center;
   font-size: 52px;
   font-weight: 700;
-  color: #f0f0f0;
+  color: var(--card-text);
   letter-spacing: -0.03em;
   line-height: 1;
   appearance: textfield;
@@ -2290,9 +2278,8 @@ export const UnitText = styled.span`
   font-size: 14px;
   line-height: 100%;
   letter-spacing: 0;
-  color: #FFFFFF;
+  color: var(--card-text);
 `;
-
 
 export const Grid = styled.div`
   display: flex;
@@ -2303,11 +2290,12 @@ export const Grid = styled.div`
 `
 
 export const InfoCard = styled.div`
-  background: #000000;
+  background: var(--card-background);
   border-radius: 18px;
   padding:20px 10px;
   text-align:left;
   width:120px;
+  border: 1px solid var(--card-text);
   html[data-theme='dark'] & {
     box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58), 0 10px 24px rgba(0, 0, 0, 0.35);
   }
@@ -2337,7 +2325,7 @@ export const InfoLabel = styled.span`
   vertical-align: middle;
   text-transform: uppercase;
 
-  color: #FFFFFF;
+  color: var(--card-text);
 `;
 
 
@@ -2348,7 +2336,7 @@ export const InfoValue = styled.div`
   line-height: 24px;
   letter-spacing: 0;
   text-align: left;
-  color: #e8e8e8;
+  color: var(--card-text);
   margin-bottom: 5px;
 `;
 
@@ -2375,9 +2363,9 @@ export const ChooseDomain = styled.div`
 
 export const DomainCard = styled.div`
   width: 380px;
-  background: #0F1011;
+  background: var(--card-background);
   border-radius: 20px;
-  border: 1px solid #1e1e22;
+  border: 1px solid var(--card-text);
   padding: 15px 0px;
   margin-top: 20px;
   font-family: 'Sora', sans-serif;
@@ -2401,7 +2389,7 @@ export const DomainSearch = styled.div`
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #111315;
+  background: var(--card-background);
   border: none;
   border-radius: 18px;
   padding: 12px 16px;
@@ -2419,7 +2407,7 @@ export const DomainInput = styled.input`
   background: transparent;
   border: none;
   outline: none;
-  color: #f0f0f0;
+  color: var(--card-text);
   font-family: 'Maven Pro', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -2459,7 +2447,7 @@ export const DomainListItem = styled.div`
   transition: background 0.15s;
 
   &:hover {
-    background: #1a1a1e;
+    background: var(--card-background);
   }
 
   // background: ${({ $isSelected }) => ($isSelected ? '#1a3a5c' : 'transparent')};
@@ -2490,7 +2478,7 @@ export const DomainName = styled.span`
   font-weight: 500;
   font-size: 14px;
   line-height: 20px;
-  color: #f0f0f0;
+  color: var(--card-text);
 `;
 
 export const DomainCheckbox = styled.div`
@@ -2533,7 +2521,7 @@ export const ActionButtonLabel = styled.h3`
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
-  color: #111111;
+  color: var(--card-text);
 
   html[data-theme='dark'] & {
     color: #f0f0f0;
@@ -2549,8 +2537,8 @@ export const ActionButtonWrapper = styled.div`
 
 export const ActionButtonDropdown = styled.button`
   width: 380px;
-  background: #0F1011;
-  border: 1px solid #1e1e22;
+  background: var(--card-background);
+  border: 1px solid var(--card-text);
   border-radius: 12px;
   padding: 25px 25px;
   display: flex;
@@ -2568,7 +2556,7 @@ export const ActionButtonDropdown = styled.button`
   letter-spacing: 0px;
   vertical-align: middle;
 
-  color: #f0f0f0;
+  color: var(--card-text);
   transition: border-color 0.2s, background 0.2s;
 
   &:hover {
@@ -2587,8 +2575,8 @@ export const ActionButtonDropdown = styled.button`
 
 
 export const ActionButtonList = styled.div`
-  background: #0F1011;
-  border: 1px solid #1e1e22;
+  background: var(--card-background);
+  border: 1px solid var(--card-text);
   border-radius: 20px;
   overflow: hidden;
   animation: ${fadeIn} 0.2s ease;
@@ -2599,7 +2587,7 @@ export const ActionButtonItem = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  border-bottom: 1px solid #1e1e22;
+  border-bottom: 1px solid var(--card-text);
   cursor: pointer;
   transition: background 0.15s;
 
@@ -2636,7 +2624,7 @@ export const ActionButtonItemTitle = styled.div`
   font-family: 'Maven Pro', sans-serif;
   font-weight: 600;
   font-size: 14px;
-  color: #f0f0f0;
+  color: var(--card-text);
   margin-bottom: 2px;
 `;
 
@@ -2644,7 +2632,7 @@ export const ActionButtonItemDescription = styled.div`
   font-family: 'Maven Pro', sans-serif;
   font-weight: 400;
   font-size: 11px;
-  color: #777;
+  color: var(--card-text);
 `;
 
 export const ActionButtonItemCheckmark = styled.div`
@@ -2666,8 +2654,8 @@ export const ActionButtonItemCheckmark = styled.div`
 `;
 
 export const ActionButtonContent = styled.div`
-  background: #0F1011;
-  border: 1px solid #1e1e22;
+  background: var(--card-background);
+  border: 1px solid var(--card-text);
   border-radius: 20px;
   padding: 20px 25px;
   margin-top: 12px;
@@ -2683,7 +2671,7 @@ export const ActionButtonHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 14px;
-  border-bottom: 1px solid #1e1e22;
+  border-bottom: 1px solid var(--card-text);
   margin-bottom: 14px;
 `;
 
@@ -2692,7 +2680,45 @@ export const ActionButtonHeaderLeft = styled.div`
   align-items: center;
   gap: 12px;
 `;
+export const StyledSelect = styled(Select)`
+    color: var(--card-text);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Sora', sans-serif;
 
+    & .MuiSelect-icon {
+        color: var(--card-text);
+    }
+
+    & .MuiSelect-select {
+        padding-bottom: 0;
+    }
+`;
+
+export const selectMenuProps = {
+    PaperProps: {
+        sx: {
+            background: 'var(--card-background)',
+            border: '1px solid var(--card-text)',
+            borderRadius: '14px',
+            mt: 1,
+            '& .MuiMenuItem-root': {
+                fontSize: '13px',
+                fontWeight: 500,
+                color: 'var(--card-text)',
+                justifyContent: 'center',
+                '&.Mui-selected': {
+                    background: 'var(--card-background)',
+                    color: 'var(--card-text)',
+                },
+                '&:hover': {
+                    background: 'var(--card-background)',
+                    color: 'var(--card-text)',
+                },
+            },
+        },
+    },
+};
 export const ActionButtonHeaderIcon = styled.div`
   width: 40px;
   height: 40px;
@@ -2713,7 +2739,7 @@ export const ActionButtonHeaderTitle = styled.span`
   font-family: 'Maven Pro', sans-serif;
   font-weight: 600;
   font-size: 14px;
-  color: #f0f0f0;
+  color: var(--card-text);
 `;
 
 export const ActionButtonHeaderSubtitle = styled.span`
@@ -2749,7 +2775,7 @@ export const ActionInputLabel = styled.label`
   font-family: 'Maven Pro', sans-serif;
   font-weight: 500;
   font-size: 12px;
-  color: #f0f0f0;
+  color: var(--card-text);
 `;
 
 export const ActionInputContainer = styled.div`
@@ -2757,26 +2783,28 @@ export const ActionInputContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  background: var(--card-background);
 `;
 
 export const ActionPhonePrefix = styled.span`
   font-family: 'Maven Pro', sans-serif;
   font-weight: 600;
   font-size: 13px;
-  color: #f0f0f0;
-  background: #2a2a2e;
+  color: var(--card-text);
+  background: var(--card-background);
   padding: 10px 12px;
   border-radius: 10px;
   min-width: 50px;
   text-align: center;
+  border: 1px solid var(--card-text);
 `;
 
 export const ActionInput = styled.input`
   flex: 1;
-  background: #2a2a2e;
-  border: none;
+  background: var(--card-background);
+  border: 1px solid var(--card-text);
   outline: none;
-  color: #f0f0f0;
+  color: var(--card-text);
   font-family: 'Maven Pro', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -2789,10 +2817,10 @@ export const ActionInput = styled.input`
 `;
 
 export const ActionTextarea = styled.textarea`
-  background: #2a2a2e;
-  border: none;
+  background: var(--card-background);
+  border: 1px solid var(--card-text);
   outline: none;
-  color: #f0f0f0;
+  color: var(--card-text);
   font-family: 'Maven Pro', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -2816,16 +2844,81 @@ export const ActionLinkInputContainer = styled.div`
 export const ActionLinkIcon = styled.div`
   width: 40px;
   height: 40px;
-  background: #2a2a2e;
+  background: var(--card-background);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #777;
+  color: var(--card-text);
   font-size: 16px;
 `;
 
 
+//Share Post
+export const StyledDialog = styled(Dialog)`
+    & .MuiPaper-root {
+        border-radius: 15px;
+        background-color: var(--bg);
+        border: 1px solid var(--card-text);
+    }
+`
+
+export const StyledDialogTitle = styled(DialogTitle)`
+    font-family: 'Maven Pro', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 24px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    color: var(--card-text) !important;
+    background-color: var(--card-background) !important;
+`
+
+export const StyledDialogContent = styled(DialogContent)`
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    background-color: var(--card-background) !important;
+`
+
+export const StyledDialogActions = styled(DialogActions)`
+    padding: 16px !important;
+    background-color: var(--card-background) !important;
+`
+
+export const LinkBox = styled.div`
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background-color: var(--card-background);
+    padding: 12px;
+    // border-radius: 8px;
+    margin-top: 12px;
+    color: var(--card-text);
+    border-bottom: 1px solid var(--card-text);
+    border-top:none;
+    boder-left:none;
+    border-right:none;
+`
+
+export const StyledTextField = styled(TextField)`
+    & .MuiInputBase-input {
+        font-size: 14px;
+        font-family: monospace;
+        color: var(--card-text);
+    }
+`
+
+export const CopyButton = styled(Button)`
+    border-radius: 13px !important;
+    background-color: var(--card-text) !important;
+    color: var(--card-background) !important;
+    padding: 15px 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+`
 //Toaster
 
 export const GlobalStyle = createGlobalStyle`

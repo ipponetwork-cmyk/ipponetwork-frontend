@@ -131,7 +131,8 @@ export const BackgroundPanel = styled.section`
   align-items: start;
   color: white;
   background: #000000;
-  min-height: 300px;
+  // min-height: 300px;
+  min-height:100%;
   text-align: center;
 
   @media (min-width: 769px) {
@@ -167,15 +168,36 @@ export const Headline = styled.h1`
 `;
 
 
+// export const LoginCard = styled.section`
+//   background: #ffffff;
+//   // border-radius: 32px 32px 0 0;
+//   padding: 36px 24px 40px;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 20px;
+//   margin-top: -32px;
+//   box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
+
+//   @media (min-width: 769px) {
+//     margin-top: 0;
+//     border-radius: 0;
+//     width: 450px;
+//     flex-shrink: 0;
+//     justify-content: center;
+//     box-shadow: -10px 0 25px rgba(0,0,0,0.05);
+//   }
+// `;
 export const LoginCard = styled.section`
   background: #ffffff;
-  // border-radius: 32px 32px 0 0;
   padding: 36px 24px 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   margin-top: -32px;
   box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
+  overflow: hidden;        /* ← add this */
+  width: 100%;             /* ← add this */
+  box-sizing: border-box;  /* ← add this */
 
   @media (min-width: 769px) {
     margin-top: 0;
@@ -186,7 +208,6 @@ export const LoginCard = styled.section`
     box-shadow: -10px 0 25px rgba(0,0,0,0.05);
   }
 `;
-
 export const CardHeader = styled.h2`
   margin: 0;
   font-family: 'Maven Pro', sans-serif;
@@ -310,11 +331,27 @@ export const Buttons = styled.button`
   }
 `;
 
+// export const OtpWrapper = styled.div`
+//   display: flex;
+//   gap: 6px;
+//   justify-content: center;
+//   margin: 8px 0;
+// `;
 export const OtpWrapper = styled.div`
   display: flex;
   gap: 6px;
   justify-content: center;
   margin: 8px 0;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const PageWrappers = styled.main`
@@ -554,8 +591,8 @@ export const OtpInput = styled.input`
   background: #f8f9fa;
 
   @media (min-width: 375px) {
-    width: 55px;
-    height: 55px;
+    width: 40px;
+    height: 40px;
     font-size: 1.5rem;
   }
 
@@ -2028,15 +2065,15 @@ export const DraftStatus = styled.button`
   gap: 6px;
   justify-content:center;
   font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 10px;
+  font-weight: bold;
+  font-size: 13px;
   line-height: 15px;
   letter-spacing: 1px;
   vertical-align: middle;
   text-transform: uppercase;
   background: none;
   border:none;
-  color: #444;
+  color: black;
 `;
 
 

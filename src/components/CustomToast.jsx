@@ -1,5 +1,5 @@
 // import styled from 'styled-components';
-// import { IoCheckmark, } from 'react-icons/io5';
+// import { IoCheckmark, IoClose, IoInformationCircle } from 'react-icons/io5';
 
 // const Wrapper = styled.div`
 //     display: flex;
@@ -14,7 +14,11 @@
 //     width: 36px;
 //     height: 36px;
 //     min-width: 36px;
-//     background: #2a2a2a;
+//     background: ${({ type }) =>
+//         type === 'success' ? '#1a472a' :
+//             type === 'error' ? '#4a1a1a' :
+//                 type === 'info' ? '#1a2a4a' :
+//                     '#2a2a2a'};
 //     border-radius: 8px;
 //     display: flex;
 //     align-items: center;
@@ -41,39 +45,30 @@
 //     font-family: 'Sora', sans-serif;
 // `;
 
-// const CloseBtn = styled.button`
-//     background: none;
-//     border: none;
-//     cursor: pointer;
-//     padding: 4px;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     color: #666666;
-//     margin-left: auto;
-
-//     &:hover {
-//         color: #ffffff;
+// const getIcon = (type) => {
+//     switch (type) {
+//         case 'success': return <IoCheckmark size={18} color="#4caf50" />;
+//         case 'error': return <IoClose size={18} color="#f44336" />;
+//         case 'info': return <IoInformationCircle size={18} color="#2196f3" />;
+//         default: return <IoCheckmark size={18} color="#ffffff" />;
 //     }
-// `;
+// };
 
-// const CustomToast = ({ title, subtitle, }) => (
+// const CustomToast = ({ title, subtitle, type }) => (
 //     <Wrapper>
-//         <IconBox>
-//             <IoCheckmark size={18} color="#ffffff" />
+//         <IconBox type={type}>
+//             {getIcon(type)}
 //         </IconBox>
 //         <TextBox>
 //             <Title>{title}</Title>
 //             {subtitle && <Subtitle>{subtitle}</Subtitle>}
 //         </TextBox>
-//         {/* <CloseBtn onClick={closeToast}>
-//             <IoClose size={18} />
-//         </CloseBtn> */}
 //     </Wrapper>
 // );
 
 // export default CustomToast;
 
+// CustomToast.js
 import styled from 'styled-components';
 import { IoCheckmark, IoClose, IoInformationCircle } from 'react-icons/io5';
 
@@ -92,9 +87,9 @@ const IconBox = styled.div`
     min-width: 36px;
     background: ${({ type }) =>
         type === 'success' ? '#1a472a' :
-            type === 'error' ? '#4a1a1a' :
-                type === 'info' ? '#1a2a4a' :
-                    '#2a2a2a'};
+        type === 'error'   ? '#4a1a1a' :
+        type === 'info'    ? '#1a2a4a' :
+        '#2a2a2a'};
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -124,9 +119,9 @@ const Subtitle = styled.span`
 const getIcon = (type) => {
     switch (type) {
         case 'success': return <IoCheckmark size={18} color="#4caf50" />;
-        case 'error': return <IoClose size={18} color="#f44336" />;
-        case 'info': return <IoInformationCircle size={18} color="#2196f3" />;
-        default: return <IoCheckmark size={18} color="#ffffff" />;
+        case 'error':   return <IoClose size={18} color="#f44336" />;
+        case 'info':    return <IoInformationCircle size={18} color="#2196f3" />;
+        default:        return <IoCheckmark size={18} color="#ffffff" />;
     }
 };
 

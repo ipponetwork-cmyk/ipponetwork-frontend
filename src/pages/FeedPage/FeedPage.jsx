@@ -43,15 +43,15 @@ import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
-import { getDomainName } from '../../utils/domainUtils';
-import { useDispatch } from 'react-redux';
-import { showToast } from '../../redux/actions';
+import { getDomainName, getDomainShortName } from '../../utils/domainUtils';
+// import { useDispatch } from 'react-redux';
+// import { showToast } from '../../redux/actions';
 import { transformPost } from '../../utils/transformPost';
 
 
 const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     console.log(post, "post in feed item")
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
     const [color, setColor] = useState(
@@ -94,12 +94,12 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const captionText = getDynamicText(post.captionObj, dynamicLanguage, post.captionEn || '');
     const titleText = getDynamicText(post.titleObj, dynamicLanguage, post.titleEn || 'Post Title');
     const handleEnquiryClick = async () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            dispatch(showToast('Login to continue', 'info'));
-            setTimeout(() => navigate('/login'), 1500);
-            return;
-        }
+        // const token = localStorage.getItem('authToken');
+        // if (!token) {
+        //     dispatch(showToast('Login to continue', 'info'));
+        //     setTimeout(() => navigate('/login'), 1500);
+        //     return;
+        // }
         try {
             await postAPI.increaseEnquiryCount(post._id);
             if (onEnquiryUpdate) {
@@ -187,7 +187,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                             }}
                         >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span>Enquiry</span>
+                                <span>Enquire</span>
                                 <IoIosArrowForward size={18} />
                             </div>
                         </SlideActionButton>
@@ -255,7 +255,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                     {post.type !== 'text' && <CaptionText>{captionText}</CaptionText>}
                 </PostCaption>
                 <PostTime>{post.time}</PostTime>
-                <EnquiryButton onClick={handleEnquiryClick}>Enquiry</EnquiryButton>
+                <EnquiryButton onClick={handleEnquiryClick}>Enquire</EnquiryButton>
 
                 <PostFooter>
                     <ActionBar>
@@ -290,7 +290,7 @@ const FeedPage = () => {
         try {
             setLoading(true);
 
-            const domain = getDomainName();
+            const domain = getDomainShortName();
             console.log(domain, "DOMDOMAIN")
             const response = await postAPI.getPostsByDomain(domain);
 
@@ -310,7 +310,7 @@ const FeedPage = () => {
 
     useEffect(() => {
         fetchPosts();
-    }, [fetchPosts, dynamicLanguage]);
+    }, [fetchPosts]);
 
     useEffect(() => {
         const handleStorage = () => {

@@ -16,8 +16,8 @@ import { postAPI } from '../../services/postAPI';
 import SharePostDialog from '../../components/SharePostDialog';
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
-import { useDispatch } from 'react-redux';
-import { showToast } from '../../redux/actions';
+// import { useDispatch } from 'react-redux';
+// import { showToast } from '../../redux/actions';
 
 const FooterBar = ({ enquirycount, onShare }) => (
     <DetailFooter>
@@ -37,7 +37,7 @@ const FeedDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const postId = location.state?.postId;
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeSlide, setActiveSlide] = useState(0);
@@ -48,27 +48,22 @@ const FeedDetail = () => {
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
     const handleEnquiryClick = async () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            dispatch(showToast('Sign in to continue', 'info'));
-            setTimeout(() => navigate('/login'), 1500);
-            return;
-        }
-
         try {
             await postAPI.increaseEnquiryCount(post._id);
-            setEnquiryCount(prev => prev + 1);
 
+            // Safely extract action type
             let rawActionType = typeof post.calltoaction === 'string'
                 ? post.calltoaction
                 : (post.calltoaction?.type || post.calltoactiontype || '');
             let actionType = String(rawActionType).toLowerCase().replace(/[^a-z]/g, '');
 
-            const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber;
-            const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || 'Hi, I am interested in your post';
-            const cNumber = post.callnumber || post.calltoaction?.callnumber;
-            const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl;
+            // Safely extract target values
+            const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber || post.calltoaction?.number || post.number;
+            const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || post.calltoaction?.message || 'Hi, I am interested in your post';
+            const cNumber = post.callnumber || post.calltoaction?.callnumber || post.calltoaction?.number || post.number;
+            const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl || post.externallinkurl || post.calltoaction?.url;
 
+            // Infer actionType if not explicitly provided
             if (!actionType) {
                 if (waNumber) actionType = 'whatsapp';
                 else if (cNumber) actionType = 'call';
@@ -80,26 +75,24 @@ const FeedDetail = () => {
             } else if (actionType.includes('call') && cNumber) {
                 window.location.href = `tel:${cNumber}`;
             } else if (actionType.includes('external') && extLink) {
-                let finalUrl = extLink;
-                if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-                    finalUrl = 'https://' + finalUrl;
-                }
+                const finalUrl = extLink.startsWith('http://') || extLink.startsWith('https://')
+                    ? extLink
+                    : 'https://' + extLink;
                 window.open(finalUrl, '_blank');
             } else {
-                alert('Action not configured for this post');
+                alert('Action not configured for this post (Missing data or unknown type: ' + actionType + ')');
             }
 
         } catch (err) {
             console.error('Enquiry error:', err);
         }
     };
-
     useEffect(() => {
+        if (!postId) {
+            navigate('/feed');
+            return;
+        }
         const fetchPost = async () => {
-            if (!postId) {
-                navigate('/feed');
-                return;
-            }
             try {
                 setLoading(true);
                 const response = await postAPI.getPostById(postId);
@@ -217,7 +210,7 @@ const FeedDetail = () => {
                         {isLastImage && (
                             <DetailSlideActionButton onClick={handleEnquiryClick}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                    <span>Enquiry</span>
+                                    <span>Enquire</span>
                                     <IoIosArrowForward size={18} />
                                 </div>
                             </DetailSlideActionButton>
@@ -233,7 +226,7 @@ const FeedDetail = () => {
                         </UserRow>
                         <DetailCaption>{captionText}</DetailCaption>
                         <DetailTime>{titleText}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquire</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>
@@ -264,7 +257,7 @@ const FeedDetail = () => {
                         </UserRow>
                         <DetailCaption>{captionText}</DetailCaption>
                         <DetailTime>{post.time}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquire</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>
@@ -291,7 +284,7 @@ const FeedDetail = () => {
                             </DetailUserInfo>
                         </UserRow>
                         <DetailTime>{post.time}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
+                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquire</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>

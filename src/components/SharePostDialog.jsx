@@ -12,17 +12,12 @@ import { MdContentCopy } from 'react-icons/md'
 import { MdClose } from 'react-icons/md'
 import { useState } from 'react'
 // import useTheme from '../context/useTheme'
-import {StyledDialog, StyledDialogTitle, StyledDialogContent, StyledDialogActions, StyledTextField, LinkBox, CopyButton} from '../css/index'
+import { StyledDialog, StyledDialogTitle, StyledDialogContent, StyledDialogActions, StyledTextField, LinkBox, CopyButton } from '../css/index'
 function SharePostDialog({ open, onClose, postId = '123' }) {
   const [copied, setCopied] = useState(false)
   const getDomainName = () => {
     const host = window.location.hostname;
     console.log(host, "host1234");
-
-    if (host === 'localhost') {
-      return 'ippomani.com';
-    }
-
     const parts = host.split('.');
     const index = parts.findIndex(part => part.startsWith('ippo'));
 

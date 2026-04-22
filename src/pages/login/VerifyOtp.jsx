@@ -16,11 +16,14 @@ import bgImage from '../../assets/Background-ippo.png';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useState } from 'react';
 import { authAPI } from '../../services/api';
+import { showToast } from '../../redux/actions';
+import { useDispatch } from 'react-redux';
+import { getDomainShortName } from '../../utils/domainUtils';
 
 function VerifyOtp() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-
+    const dispatch = useDispatch();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
 
@@ -83,6 +86,7 @@ function VerifyOtp() {
                     navigate(`/profilepage`);
                 } else {
                     navigate('/feed');
+                    dispatch(showToast('Login Successfull', 'success'));
                 }
             } else {
                 console.log("elseBlock")
@@ -91,6 +95,7 @@ function VerifyOtp() {
 
         } catch (error) {
             console.log("catchBlock", error.message)
+            dispatch(showToast('OTP verification failed.', 'error'));
             console.error(error.message);
         } finally {
             console.log("finallyBlock")
@@ -109,7 +114,7 @@ function VerifyOtp() {
 
         return domain ?? parts[0];
     };
-    const domainName = getDomainName();
+    const domainName = getDomainShortName();
     return (
         <PageWrapper>
             <BackgroundPanel $bgImage={bgImage}>

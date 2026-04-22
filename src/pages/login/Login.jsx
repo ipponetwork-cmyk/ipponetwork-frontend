@@ -23,6 +23,7 @@ import { auth } from '../../firebase';
 import PwaInstallPrompt from '../../components/PwaInstallPrompt';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import bgImage from '../../assets/Background-ippo.png';
+import { getDomainShortName } from '../../utils/domainUtils';
 
 function Login() {
     const navigate = useNavigate();
@@ -144,7 +145,7 @@ function Login() {
 
         return domain ?? parts[0];
     };
-    const domainName = getDomainName();
+    const domainName = getDomainShortName();
     console.log(domainName, "domainName123Login")
     return (
         <>

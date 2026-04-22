@@ -241,17 +241,36 @@ const CreatePost = () => {
         setSelected(nextUnit);
         if (!on && freeTtl) {
             setCount(calculateCountFromSeconds(freeTtl.seconds, nextUnit));
+        } else if (nextUnit === 'Minutes') {
+            setCount('60');
+        } else {
+            setCount('1');
         }
     };
 
+    // const handleToggle = () => {
+    //     const nextOn = !on;
+    //     setOn(nextOn);
+    //     if (nextOn) {
+    //         loadTimeToLive();
+    //         if (!count) setCount('1');
+    //     } else if (freeTtl) {
+    //         setCount(calculateCountFromSeconds(freeTtl.seconds, selected));
+    //     }
+    // };
     const handleToggle = () => {
         const nextOn = !on;
         setOn(nextOn);
         if (nextOn) {
             loadTimeToLive();
             if (!count) setCount('1');
-        } else if (freeTtl) {
-            setCount(calculateCountFromSeconds(freeTtl.seconds, selected));
+        } else {
+            setSelected('Minutes');
+            if (freeTtl) {
+                setCount(calculateCountFromSeconds(freeTtl.seconds, 'Minutes'));
+            } else {
+                setCount('60');
+            }
         }
     };
 
@@ -286,7 +305,11 @@ const CreatePost = () => {
         const isfreeornot = !on;
         // const currentTtl = isfreeornot ? freeTtl : costTtl;
         const posttype = import.meta.env.VITE_POST_TYPE || 'FEED';
-        const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
+        // const totalseconds = isfreeornot ? (freeTtl?.seconds || 0) : derivedSeconds;
+        const freeSeconds = freeTtl?.seconds || 0;
+        const totalseconds = isfreeornot
+            ? freeSeconds
+            : Math.max(0, derivedSeconds - freeSeconds);
 
         // CTA Validation
         if (!selectedAction) {
@@ -374,8 +397,13 @@ const CreatePost = () => {
     const isFreeMode = !on && Boolean(freeTtl);
     const isCostMode = on && Boolean(costTtl);
     const derivedSeconds = calculateSeconds(count, selected);
-    const derivedCredits = isCostMode ? calculateCredits(derivedSeconds, costTtl.unit) : 0;
-
+    // const derivedCredits = isCostMode ? calculateCredits(derivedSeconds, costTtl.unit) : 0;
+    const adjustedSeconds = isCostMode
+        ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
+        : 0;
+    const derivedCredits = isCostMode
+        ? calculateCredits(adjustedSeconds, costTtl.unit)
+        : 0;
 
     const getEndTimeLabel = (seconds) => {
         if (!seconds) return t('todayTime') || 'Today';

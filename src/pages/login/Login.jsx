@@ -195,9 +195,9 @@ function Login() {
 
                     {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
 
-                    <Button onClick={handleNext} disabled={loading}>
+                    <Buttons onClick={handleNext} disabled={loading}>
                         {loading ? "Sending OTP..." : "Next"}
-                    </Button>
+                    </Buttons>
                 </LoginCard>
             </PageWrapper>
             <PwaInstallPrompt message="Install the app for faster access and offline support." />

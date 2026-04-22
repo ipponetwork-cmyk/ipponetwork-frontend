@@ -1984,7 +1984,7 @@ export const BodyInput = styled.textarea`
   letter-spacing: 0;
   vertical-align: middle;
 
-  color: var(-card-text);
+  color: var(--card-text);
   resize: none;
   min-height: 220px;
   caret-color: #5b8dee;
@@ -2314,6 +2314,7 @@ export const InfoHeader = styled.div`
   gap: 15px;
   margin-bottom: 8px;
   align-items: center;
+  color:var(--card--text)
 `
 
 export const InfoLabel = styled.span`

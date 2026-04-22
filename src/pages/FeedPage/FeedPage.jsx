@@ -44,76 +44,14 @@ import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
+import { useDispatch } from 'react-redux';
+import { showToast } from '../../redux/actions';
+import { transformPost } from '../../utils/transformPost';
 
-const getLangString = (field, defaultStr = '') => {
-    if (!field) return defaultStr;
-    if (typeof field === 'string') return field;
-
-    if (field.en) {
-        const enVal = field.en;
-        if (typeof enVal === 'string') return enVal;
-        return Object.values(enVal)[0] || defaultStr;
-    }
-    if (field.ta) {
-        const taVal = field.ta;
-        if (typeof taVal === 'string') return taVal;
-        return Object.values(taVal)[0] || defaultStr;
-    }
-
-    const extract = Object.values(field)[0];
-    return typeof extract === 'string' ? extract : defaultStr;
-};
-
-const transformPost = (apiPost) => {
-    console.log(apiPost, "API POST TRANSFORM")
-    const attachments = apiPost.attachment || [];
-    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.m4v'];
-    const videoFile = attachments.find(url =>
-        videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
-    );
-    const imageFiles = attachments.filter(url =>
-        !videoExtensions.some(ext => url.toLowerCase().endsWith(ext)) &&
-        !url.toLowerCase().endsWith('.pdf')
-    );
-
-    let type = 'text';
-    if (videoFile) {
-        type = 'video';
-    } else if (imageFiles.length > 0) {
-        type = 'image';
-    }
-
-    return {
-        id: apiPost._id,
-        _id: apiPost._id,
-        type,
-        username: apiPost.createdusername || 'User',
-        location: apiPost.listofdomain?.[0] || 'Location',
-        attachment: apiPost.attachment,
-        images: imageFiles,
-        video: videoFile,
-        titleObj: apiPost.title,
-        captionObj: apiPost.description,
-        titleEn: getLangString(apiPost.title?.en, 'Post Title'),
-        titleTa: getLangString(apiPost.title?.ta, 'Post Title'),
-        captionUser: apiPost.createdusername || 'user',
-        captionEn: getLangString(apiPost.description?.en, ''),
-        captionTa: getLangString(apiPost.description?.ta, ''),
-        time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
-        enquirycount: apiPost.enquirycount || 0,
-        // Call-to-action details
-        calltoaction: apiPost.calltoaction,
-        calltoactiontype: apiPost.calltoactiontype,
-        whatsappnumber: apiPost.whatsappnumber,
-        whatsappmessage: apiPost.whatsappmessage,
-        callnumber: apiPost.callnumber,
-        calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
-        createduserid: apiPost.createduserid,
-    };
-};
 
 const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     console.log(post, "post in feed item")
+    const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
     const [color, setColor] = useState(
@@ -156,6 +94,12 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const captionText = getDynamicText(post.captionObj, dynamicLanguage, post.captionEn || '');
     const titleText = getDynamicText(post.titleObj, dynamicLanguage, post.titleEn || 'Post Title');
     const handleEnquiryClick = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            dispatch(showToast('Login to continue', 'info'));
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         try {
             await postAPI.increaseEnquiryCount(post._id);
             if (onEnquiryUpdate) {
@@ -226,7 +170,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
-                    onClick={() => navigate('/feed-detail', { state: { post } })}
+                    // onClick={() => navigate('/feed-detail', { state: { post } })}
+                    onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
                     style={{ cursor: 'pointer' }}
                 >
                     <SliderTrack activeSlide={activeSlide}>
@@ -263,7 +208,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
         if (post.type === 'text') {
             return (
                 <TextContentBox
-                    onClick={() => navigate('/feed-detail', { state: { post } })}
+                    // onClick={() => navigate('/feed-detail', { state: { post } })}
+                    onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
                     style={{ cursor: 'pointer' }}
                 >
                     <TextContentTitle>{titleText}</TextContentTitle>
@@ -315,11 +261,6 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                     <ActionBar>
                         <EnquiryBadge>
                             <GrSearchAdvanced size={16} />
-                            {/* <SearchIcon size="20px" /> */}
-                            {/* <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill={color === "theme1" ? "#ffffff" : "#000000"} d="M13.9148 13.5018L11.9123 11.4992L13.7433 9.66817C13.9557 9.45642 14.0443 9.15425 13.9796 8.85908C13.9143 8.56508 13.706 8.32883 13.4243 8.22675L8.19292 6.32392C7.6545 6.12558 7.06883 6.25683 6.664 6.66225C6.25917 7.06708 6.1285 7.65333 6.3245 8.19117L8.22792 13.4225C8.33 13.7048 8.56625 13.9131 8.862 13.9784C8.92383 13.9918 8.98742 13.9988 9.04983 13.9988C9.28317 13.9988 9.50308 13.9078 9.66875 13.7427L11.5004 11.9111L13.503 13.9137C13.5602 13.9708 13.6348 13.9988 13.7095 13.9988C13.7842 13.9988 13.8588 13.9702 13.916 13.9137C14.0298 13.7999 14.0298 13.615 13.916 13.5013L13.9148 13.5018ZM9.25633 13.3309C9.18575 13.4015 9.08192 13.4312 8.98683 13.4097C8.88883 13.3881 8.81008 13.3192 8.77625 13.2247L6.87283 7.99283C6.75558 7.67025 6.83375 7.31908 7.077 7.07583C7.245 6.90783 7.46433 6.81917 7.69008 6.81917C7.79158 6.81917 7.89425 6.83667 7.994 6.87342L13.2265 8.77625C13.3204 8.81067 13.3893 8.88883 13.4108 8.98625C13.4324 9.08483 13.4033 9.18575 13.3327 9.25575L9.2575 13.3309H9.25633ZM6.41667 11.3517C6.42542 11.5121 6.30175 11.6497 6.14075 11.6579C6.03867 11.6637 5.93658 11.6661 5.83392 11.6661C2.61683 11.6667 0 9.04983 0 5.83333C0 2.61683 2.61683 0 5.83333 0C9.04983 0 11.6667 2.61683 11.6667 5.83333C11.6667 5.93658 11.6643 6.03867 11.6585 6.14017C11.6503 6.30058 11.5162 6.43183 11.3523 6.41608C11.1918 6.40733 11.0682 6.27025 11.0763 6.10983C11.081 6.01825 11.0833 5.92667 11.0833 5.83333C11.0833 2.93825 8.72842 0.583333 5.83333 0.583333C2.93825 0.583333 0.583333 2.93825 0.583333 5.83333C0.583333 8.72842 2.93825 11.0833 5.83333 11.0833C5.92608 11.0833 6.01767 11.081 6.10983 11.0763C6.27142 11.0588 6.4085 11.1912 6.41608 11.3523L6.41667 11.3517ZM2.91667 5.83333C2.91667 7.2415 3.92 8.44783 5.3025 8.70158C5.46117 8.73075 5.56617 8.883 5.537 9.04108C5.51075 9.18167 5.38825 9.28025 5.25058 9.28025C5.23308 9.28025 5.215 9.2785 5.1975 9.27558C3.53733 8.97108 2.33333 7.52325 2.33333 5.83333C2.33333 3.90308 3.90308 2.33333 5.83333 2.33333C7.52325 2.33333 8.97108 3.53733 9.27558 5.1975C9.30475 5.35558 9.19975 5.50783 9.04108 5.537C8.88475 5.56267 8.73133 5.46117 8.70158 5.3025C8.44783 3.92 7.2415 2.91667 5.83333 2.91667C4.22508 2.91667 2.91667 4.22508 2.91667 5.83333Z" />
-                            </svg> */}
-
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 

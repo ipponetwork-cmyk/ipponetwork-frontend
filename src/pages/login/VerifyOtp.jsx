@@ -135,9 +135,9 @@ function VerifyOtp() {
                     ))}
                 </OtpWrapper>
 
-                <Button onClick={handleVerify}>
+                <Buttons onClick={handleVerify}>
                     {loading ? "Verifying..." : "Verify"}
-                </Button>
+                </Buttons>
             </LoginCard>
         </PageWrapper>
     );

@@ -11,6 +11,14 @@ export const postAPI = {
     }
   },
 
+  getPostById: async (postId) => {
+    try {
+        const response = await apiClient.get(`/post/viewpost/${postId}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+},
   // Create a new post
   createPost: async (postData) => {
     try {

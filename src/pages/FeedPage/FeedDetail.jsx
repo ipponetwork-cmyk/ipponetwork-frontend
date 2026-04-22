@@ -1,24 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-    DetailWrapper, HeroImage, BackButton, OverlayContent, UserRow,
+    DetailWrapper, BackButton, OverlayContent, UserRow,
     DetailAvatar, DetailUserInfo, DetailUserName, DetailUserLocation,
     DetailCaption, DetailTime, DetailEnquiryButton,
     PostMedia, SliderTrack, SliderImage, CarouselDots, Dot,
     TextContentTitle, TextContentBody,
-    DetailFooter, ActionBar, EnquiryBadge, EnquiryText, IconButton, CountText,
-    DetailSlideActionButton,
-    VideoWrapper, PostVideo,
-    UserAvatarFallback,
+    DetailFooter, ActionBar, EnquiryBadge, EnquiryText, IconButton,
+    DetailSlideActionButton, VideoWrapper, PostVideo,
 } from '../../css/index';
-import { FaUser } from "react-icons/fa";
 import { IoArrowBack } from 'react-icons/io5';
-import { useState, useRef } from 'react';
 import { RiSearchEyeLine } from "react-icons/ri";
 import { IoIosArrowForward, IoIosShareAlt } from "react-icons/io";
 import { postAPI } from '../../services/postAPI';
 import SharePostDialog from '../../components/SharePostDialog';
 import { getDynamicText } from '../../utils/languageUtils';
+import Loader from '../../components/Loader';
+import { useDispatch } from 'react-redux';
+import { showToast } from '../../redux/actions';
 
 const FooterBar = ({ enquirycount, onShare }) => (
     <DetailFooter>
@@ -29,7 +28,6 @@ const FooterBar = ({ enquirycount, onShare }) => (
             </EnquiryBadge>
             <IconButton onClick={onShare}>
                 <IoIosShareAlt size={20} />
-                {/* <CountText>Share</CountText> */}
             </IconButton>
         </ActionBar>
     </DetailFooter>
@@ -38,52 +36,55 @@ const FooterBar = ({ enquirycount, onShare }) => (
 const FeedDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const post = location.state?.post;
-    console.log(post, "POST7834")
+    const postId = location.state?.postId;
+    const dispatch = useDispatch();
+    const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [activeSlide, setActiveSlide] = useState(0);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
-    const [enquiryCount, setEnquiryCount] = useState(post?.enquirycount || 0);
+    const [enquiryCount, setEnquiryCount] = useState(0);
+    const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
-    const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
-    const captionText = getDynamicText(post?.captionObj, dynamicLanguage, post?.captionEn || '');
-    const titleText = getDynamicText(post?.titleObj, dynamicLanguage, post?.titleEn || 'Post Title');
-    useEffect(() => {
-        const handleStorage = () => {
-            const storedLanguage = localStorage.getItem('language') || 'en';
-            if (storedLanguage !== dynamicLanguage) {
-                setDynamicLanguage(storedLanguage);
-            }
-        };
-
-        window.addEventListener('storage', handleStorage);
-        const interval = setInterval(handleStorage, 500);
-
-        return () => {
-            window.removeEventListener('storage', handleStorage);
-            clearInterval(interval);
-        };
-    }, [dynamicLanguage]);
-    if (!post) { navigate('/home'); return null; }
     const handleEnquiryClick = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            dispatch(showToast('Sign in to continue', 'info'));
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
+
         try {
             await postAPI.increaseEnquiryCount(post._id);
             setEnquiryCount(prev => prev + 1);
-            const actionType = post.calltoaction?.type || '';
 
-            console.log('actionType:', actionType);
-            console.log('post:', post);
+            let rawActionType = typeof post.calltoaction === 'string'
+                ? post.calltoaction
+                : (post.calltoaction?.type || post.calltoactiontype || '');
+            let actionType = String(rawActionType).toLowerCase().replace(/[^a-z]/g, '');
 
-            if (actionType === 'whatsapp' && post.whatsappnumber) {
-                const message = post.whatsappmessage || 'Hi, I am interested in your post';
-                window.open(`https://wa.me/${post.whatsappnumber}?text=${encodeURIComponent(message)}`, '_blank');
+            const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber;
+            const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || 'Hi, I am interested in your post';
+            const cNumber = post.callnumber || post.calltoaction?.callnumber;
+            const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl;
 
-            } else if (actionType === 'call' && post.callnumber) {
-                window.location.href = `tel:${post.callnumber}`;
+            if (!actionType) {
+                if (waNumber) actionType = 'whatsapp';
+                else if (cNumber) actionType = 'call';
+                else if (extLink) actionType = 'externallink';
+            }
 
-            } else if (actionType === 'externallink' && post.calltoaction?.externallinkurl) {
-                window.open(post.calltoaction.externallinkurl, '_blank');
-
+            if (actionType.includes('whatsapp') && waNumber) {
+                window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`, '_blank');
+            } else if (actionType.includes('call') && cNumber) {
+                window.location.href = `tel:${cNumber}`;
+            } else if (actionType.includes('external') && extLink) {
+                let finalUrl = extLink;
+                if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+                    finalUrl = 'https://' + finalUrl;
+                }
+                window.open(finalUrl, '_blank');
             } else {
                 alert('Action not configured for this post');
             }
@@ -92,6 +93,87 @@ const FeedDetail = () => {
             console.error('Enquiry error:', err);
         }
     };
+
+    useEffect(() => {
+        const fetchPost = async () => {
+            if (!postId) {
+                navigate('/feed');
+                return;
+            }
+            try {
+                setLoading(true);
+                const response = await postAPI.getPostById(postId);
+                if (response.success && response.data) {
+                    const apiPost = response.data;
+                    const attachments = apiPost.attachment || [];
+                    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.m4v'];
+                    const videoFile = attachments.find(url =>
+                        videoExtensions.some(ext => url.toLowerCase().endsWith(ext))
+                    );
+                    const imageFiles = attachments.filter(url =>
+                        !videoExtensions.some(ext => url.toLowerCase().endsWith(ext)) &&
+                        !url.toLowerCase().endsWith('.pdf')
+                    );
+
+                    let type = 'text';
+                    if (videoFile) type = 'video';
+                    else if (imageFiles.length > 0) type = 'image';
+
+                    const mapped = {
+                        id: apiPost._id,
+                        _id: apiPost._id,
+                        type,
+                        username: apiPost.createdusername || 'User',
+                        location: apiPost.listofdomain?.[0] || 'Location',
+                        images: imageFiles,
+                        video: videoFile,
+                        // titleEn: getLangString(apiPost.title, 'Post Title'),
+                        // titleTa: apiPost.title?.ta || '',
+                        // captionEn: getLangString(apiPost.description, ''),
+                        // captionTa: apiPost.description?.ta || '',
+                        titleObj: apiPost.title,
+                        captionObj: apiPost.description,
+                        time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
+                        enquirycount: apiPost.enquirycount || 0,
+                        whatsappnumber: apiPost.calltoaction?.whatsappnumber,
+                        whatsappmessage: apiPost.calltoaction?.whatsappmessage,
+                        callnumber: apiPost.calltoaction?.callnumber,
+                        calltoactiontype: apiPost.calltoaction?.type,
+                        createduserid: apiPost.createduserid,
+                        shareurl: apiPost.shareurl,
+                    };
+
+                    setPost(mapped);
+                    setEnquiryCount(mapped.enquirycount);
+                }
+            } catch (err) {
+                console.error('Failed to fetch post:', err);
+                navigate('/feed');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPost();
+    }, [postId, navigate]);
+
+    useEffect(() => {
+        const handleStorage = () => {
+            const storedLanguage = localStorage.getItem('language') || 'en';
+            if (storedLanguage !== dynamicLanguage) {
+                setDynamicLanguage(storedLanguage);
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        const interval = setInterval(handleStorage, 500);
+        return () => {
+            window.removeEventListener('storage', handleStorage);
+            clearInterval(interval);
+        };
+    }, [dynamicLanguage]);
+
+    const captionText = getDynamicText(post?.captionObj, dynamicLanguage, post?.captionEn || '');
+    const titleText = getDynamicText(post?.titleObj, dynamicLanguage, post?.titleEn || 'Post Title');
 
     const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
     const handleTouchMove = (e) => { touchEndX.current = e.touches[0].clientX; };
@@ -104,13 +186,12 @@ const FeedDetail = () => {
         touchEndX.current = null;
     };
 
-    const isLastImage = post.type === 'image' && activeSlide === post.images?.length - 1;
+    const isLastImage = post?.type === 'image' && activeSlide === post.images?.length - 1;
 
-    const handleShare = () => {
-        setShareDialogOpen(true);
-    };
-
-    // --- IMAGE ---
+    // All hooks above — safe to return conditionally now
+    if (loading) return <div style={{ textAlign: 'center' }}><Loader /></div>;
+    if (!post) return null;
+    console.log(post, "POST DATA IN DETAIL")
     if (post.type === 'image') {
         return (
             <>
@@ -144,40 +225,23 @@ const FeedDetail = () => {
                     </PostMedia>
                     <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
                         <UserRow>
-                            {/* <DetailAvatar src={post.attachment} alt={post.attachment} /> */}
-                            {/* {post?.attachment ? (
-                                <DetailAvatar
-                                    src={post.attachment}
-                                    alt="attachment"
-                                />
-                            ) : (
-                                <UserAvatarFallback>
-                                    <FaUser />
-                                </UserAvatarFallback>
-                            )} */}
-                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
+                            <DetailAvatar src={post.images} alt="user" />
                             <DetailUserInfo>
-                                <DetailUserName>{post.createduserid ? post.createduserid?.name : post.username}</DetailUserName>
-                                <DetailUserLocation>{post.createduserid ? post.createduserid?.username : post.username}</DetailUserLocation>
+                                <DetailUserName>{post.username}</DetailUserName>
+                                <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
-                        {/* {post.title && <TextContentTitle>{post.title}</TextContentTitle>} */}
                         <DetailCaption>{captionText}</DetailCaption>
                         <DetailTime>{titleText}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
-                        <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
+                        <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>
-                <SharePostDialog
-                    open={shareDialogOpen}
-                    onClose={() => setShareDialogOpen(false)}
-                    postId={post.id}
-                />
+                <SharePostDialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)} postId={post.id} />
             </>
         );
     }
 
-    // --- VIDEO ---
     if (post.type === 'video') {
         return (
             <>
@@ -192,28 +256,23 @@ const FeedDetail = () => {
                     </VideoWrapper>
                     <OverlayContent>
                         <UserRow>
-                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
+                            <DetailAvatar src={post.createduserid?.photo} alt="user" />
                             <DetailUserInfo>
-                                <DetailUserName>{post.createduserid ? post.createduserid?.name : post.username}</DetailUserName>
-                                <DetailUserLocation>{post.createduserid ? post.createduserid?.username : post.username}</DetailUserLocation>
+                                <DetailUserName>{post.createduserid?.name || post.username}</DetailUserName>
+                                <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
-                        <DetailCaption>{post.caption}</DetailCaption>
+                        <DetailCaption>{captionText}</DetailCaption>
                         <DetailTime>{post.time}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
-                        <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
+                        <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>
-                <SharePostDialog
-                    open={shareDialogOpen}
-                    onClose={() => setShareDialogOpen(false)}
-                    postId={post.id}
-                />
+                <SharePostDialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)} postId={post.id} />
             </>
         );
     }
 
-    // --- TEXT ---
     if (post.type === 'text') {
         return (
             <>
@@ -225,7 +284,7 @@ const FeedDetail = () => {
                         {titleText && <TextContentTitle style={{ marginTop: "40px" }}>{titleText}</TextContentTitle>}
                         <TextContentBody>{captionText}</TextContentBody>
                         <UserRow>
-                            <DetailAvatar src={post.createduserid?.photo} alt={post.createduserid?.photo} />
+                            <DetailAvatar src={post.createduserid?.photo} alt="user" />
                             <DetailUserInfo>
                                 <DetailUserName>{post.username}</DetailUserName>
                                 <DetailUserLocation>{post.location}</DetailUserLocation>
@@ -233,17 +292,14 @@ const FeedDetail = () => {
                         </UserRow>
                         <DetailTime>{post.time}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquiry</DetailEnquiryButton>
-                        <FooterBar enquirycount={enquiryCount} onShare={handleShare} />
+                        <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>
                 </DetailWrapper>
-                <SharePostDialog
-                    open={shareDialogOpen}
-                    onClose={() => setShareDialogOpen(false)}
-                    postId={post.id}
-                />
+                <SharePostDialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)} postId={post.id} />
             </>
         );
     }
+
     return null;
 };
 

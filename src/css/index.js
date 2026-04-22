@@ -788,7 +788,7 @@ export const PostTime = styled.p`
 `;
 
 export const EnquiryButton = styled.button`
-    width: 380px;
+    width: 100%;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -806,7 +806,7 @@ export const EnquiryButton = styled.button`
 `;
 
 export const PublishButton = styled.button`
-   width: 380px;
+   width: 100%;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -1929,7 +1929,7 @@ export const pulse = keyframes`
 //     box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
 //   }
 // `;
-  export const PhoneFrame = styled.div`
+export const PhoneFrame = styled.div`
       width: 380px;
       background: var(--card-background);
       border-radius: 24px;
@@ -2734,28 +2734,28 @@ export const StyledSelect = styled(Select)`
 `;
 
 export const selectMenuProps = {
-    PaperProps: {
-        sx: {
-            background: 'var(--card-background)',
-            border: '1px solid var(--card-text)',
-            borderRadius: '14px',
-            mt: 1,
-            '& .MuiMenuItem-root': {
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--card-text)',
-                justifyContent: 'center',
-                '&.Mui-selected': {
-                    background: 'var(--card-background)',
-                    color: 'var(--card-text)',
-                },
-                '&:hover': {
-                    background: 'var(--card-background)',
-                    color: 'var(--card-text)',
-                },
-            },
+  PaperProps: {
+    sx: {
+      background: 'var(--card-background)',
+      border: '1px solid var(--card-text)',
+      borderRadius: '14px',
+      mt: 1,
+      '& .MuiMenuItem-root': {
+        fontSize: '13px',
+        fontWeight: 500,
+        color: 'var(--card-text)',
+        justifyContent: 'center',
+        '&.Mui-selected': {
+          background: 'var(--card-background)',
+          color: 'var(--card-text)',
         },
+        '&:hover': {
+          background: 'var(--card-background)',
+          color: 'var(--card-text)',
+        },
+      },
     },
+  },
 };
 export const ActionButtonHeaderIcon = styled.div`
   width: 40px;

@@ -43,7 +43,7 @@ import { FaUser } from "react-icons/fa";
 import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
-import { getDomainName, getDomainShortName } from '../../utils/domainUtils';
+import { getDomainName } from '../../utils/domainUtils';
 // import { useDispatch } from 'react-redux';
 // import { showToast } from '../../redux/actions';
 import { transformPost } from '../../utils/transformPost';

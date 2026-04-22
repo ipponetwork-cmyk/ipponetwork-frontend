@@ -281,7 +281,7 @@ function Navbar() {
       await signOut(auth);
       localStorage.clear();
       setOpen(false);
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.error('Logout error', error);
     }
@@ -294,13 +294,6 @@ function Navbar() {
 
   const languages = ['English', 'Tamil'];
   const displayLanguage = language === 'ta' ? 'Tamil' : 'English';
-
-  const getDomainName = () => {
-    const host = window.location.hostname;
-    const parts = host.split('.');
-    const domain = parts.find(part => part.startsWith('ippo'));
-    return domain ?? parts[0];
-  };
 
   const domainName = getDomainShortName();
 

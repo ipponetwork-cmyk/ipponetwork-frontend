@@ -167,7 +167,7 @@ function ProfilePage() {
         // const userId = id;
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userId = user?._id || user?.id;
-
+        console.log(user, "Huefiub")
         try {
             const profileData = {
                 name: data.name,

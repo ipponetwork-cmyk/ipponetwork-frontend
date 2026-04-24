@@ -17,12 +17,14 @@ function AppRoutes() {
       <Route path="/feed" element={<MainLayout />}>
         <Route index element={<FeedPage />} />
       </Route>
+      <Route path="/feed-detail/:postId" element={<MainLayout />}>
+        <Route index element={<FeedDetail />} />
+      </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/verifyotp" element={<VerifyOtp />} />
       <Route element={<PrivateRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/profilepage" element={<ProfilePage />} />
-          <Route path="/feed-detail" element={<FeedDetail />} />
           <Route path="/createfeed" element={<CreateFeed />} />
           <Route path="/create-post" element={<CreatePost />} />
         </Route>

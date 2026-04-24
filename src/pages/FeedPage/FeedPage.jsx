@@ -44,12 +44,14 @@ import { GrSearchAdvanced } from "react-icons/gr";
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../redux/actions';
 import { transformPost } from '../../utils/transformPost';
 
 
 const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
+    const currentUser = useSelector((state) => state.profileDetails);
+    console.log(currentUser, "currentUser12321")
     console.log(post, "post in feed item")
     const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
@@ -170,8 +172,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
-                    // onClick={() => navigate('/feed-detail', { state: { post } })}
-                    onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
+                    // onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
+                    onClick={() => navigate(`/feed-detail/${post._id}`)}
                     style={{ cursor: 'pointer' }}
                 >
                     <SliderTrack activeSlide={activeSlide}>
@@ -208,8 +210,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
         if (post.type === 'text') {
             return (
                 <TextContentBox
-                    // onClick={() => navigate('/feed-detail', { state: { post } })}
-                    onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
+                    // onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
+                    onClick={() => navigate(`/feed-detail/${post._id}`)}
                     style={{ cursor: 'pointer' }}
                 >
                     <TextContentTitle>{titleText}</TextContentTitle>
@@ -290,7 +292,10 @@ const FeedPage = () => {
         try {
             setLoading(true);
 
-            const domain = getDomainName();
+            let domain = getDomainName();
+            if (domain === "localhost") {
+                domain = "ippomani.com"
+            }
             console.log(domain, "DOMDOMAIN")
             const response = await postAPI.getPostsByDomain(domain);
 

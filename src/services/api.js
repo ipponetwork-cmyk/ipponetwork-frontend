@@ -14,12 +14,12 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     // Don't set Content-Type for FormData - let axios/browser handle it
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     }
-    
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -36,11 +36,11 @@ apiClient.interceptors.response.use(
       data: error.response?.data,
       url: error.config?.url,
     });
-    
+
     if (error.response && error.response.status === 401) {
       // Clear storage and redirect to login
       localStorage.clear();
-      window.location.href = '/';
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -53,7 +53,7 @@ export const authAPI = {
       const response = await apiClient.post('/user/getuserprofilebymobileno', {
         mobileno,
       });
-      console.log(response,"response12223")
+      console.log(response, "response12223")
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -82,6 +82,7 @@ export const authAPI = {
 
   // Get time to live pricing and duration data for a domain
   getTimeToLive: async (domain) => {
+    console.log(domain, "domain from getTimeToLive")
     try {
       const response = await apiClient.post('/post/gettimetolive', { domain });
       return response.data;
@@ -94,6 +95,7 @@ export const authAPI = {
   createPost: async (postData) => {
     try {
       const response = await apiClient.post('/post/createpost', postData);
+      console.log(response, "response5678")
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

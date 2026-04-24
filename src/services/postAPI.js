@@ -1,24 +1,15 @@
 import apiClient from './apiClient';
 
 export const postAPI = {
-  // Get time to live pricing and duration data for a domain
-  getTimeToLive: async (domain) => {
+
+  getPostById: async (postId) => {
     try {
-      const response = await apiClient.post('/post/gettimetolive', { domain });
+      const response = await apiClient.get(`/post/viewpost/${postId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   },
-
-  getPostById: async (postId) => {
-    try {
-        const response = await apiClient.get(`/post/viewpost/${postId}`);
-        return response.data;
-    } catch (error) {
-        throw error.response?.data || error.message;
-    }
-},
   // Create a new post
   createPost: async (postData) => {
     try {

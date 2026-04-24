@@ -1889,7 +1889,8 @@ export const CreatePostWrapper = styled.div`
     justify-content: center;
     width: 100%;
     margin-top: 20px;
-    // padding: 0 16px;        
+    overflow-x: hidden;
+    box-sizing: border-box;        
 
     @media (max-width: 320px) {
         margin-top: 12px;
@@ -1936,7 +1937,9 @@ export const pulse = keyframes`
 //   }
 // `;
 export const PhoneFrame = styled.div`
-      width: 380px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
       background: var(--card-background);
       border-radius: 24px;
       overflow: hidden;
@@ -2612,7 +2615,9 @@ export const ActionButtonWrapper = styled.div`
 `;
 
 export const ActionButtonDropdown = styled.button`
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
   background: var(--card-background);
   border: 1px solid var(--card-text);
   border-radius: 12px;
@@ -2737,9 +2742,11 @@ export const ActionButtonContent = styled.div`
   padding: 20px 25px;
   margin-top: 12px;
   font-family: 'Sora', sans-serif;
-  width: 320px;
-  html[data-theme='dark'] & {
-    box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  // html[data-theme='dark'] & {
+    // box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
   }
 `;
 

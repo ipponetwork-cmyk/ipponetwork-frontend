@@ -165,7 +165,43 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 </VideoWrapper>
             );
         }
-
+        if (post.type === 'pdf' && post.pdf) {
+            return (
+                <div
+                    onClick={() => window.open(post.pdf, '_blank')}
+                    style={{
+                        cursor: 'pointer',
+                        margin: '10px 0',
+                        padding: '16px',
+                        background: '#1e1e22',
+                        borderRadius: '12px',
+                        border: '1px solid #333',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '14px',
+                    }}
+                >
+                    <MdPictureAsPdf size={48} color="#ff4444" style={{ flexShrink: 0 }} />
+                    <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <p style={{
+                            margin: '0 0 4px 0',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            color: '#f0f0f0',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {post.pdf.split('/').pop() || 'Document.pdf'}
+                        </p>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#888' }}>
+                            Tap to open PDF
+                        </p>
+                    </div>
+                    <IoIosArrowForward size={20} color="#888" style={{ flexShrink: 0 }} />
+                </div>
+            );
+        }
         if (post.type === 'image' && post.images?.length > 0) {
             return (
                 <PostMedia

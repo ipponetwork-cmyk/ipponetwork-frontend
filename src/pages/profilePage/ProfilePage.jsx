@@ -364,6 +364,7 @@ function ProfilePage() {
 
     const [avatar, setAvatar] = useState(null);
     const [files, setFiles] = useState({});
+    const [dobFocused, setDobFocused] = useState(false);
     // const [photoError, setPhotoError] = useState('');
 
     const {
@@ -626,9 +627,12 @@ function ProfilePage() {
 
                     <DateWrapper>
                         <DateInput
-                            type="date"
+                            type={dobFocused || watch('dob') ? 'date' : 'text'}
+                            placeholder="Select Date of Birth"
+                            onFocus={() => setDobFocused(true)}
                             {...register('dob', {
                                 required: 'Date of birth is required',
+                                onBlur: () => setDobFocused(false),
                                 validate: (value) => {
                                     const today = new Date();
                                     const dob = new Date(value);

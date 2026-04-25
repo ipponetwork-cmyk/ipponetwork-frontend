@@ -283,9 +283,22 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     );
 };
 const FeedPage = () => {
+    const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        const userData = localStorage.getItem('user');
+        if (token && userData) {
+            const user = JSON.parse(userData);
+            if (!user.username || !user.name) {
+                navigate('/profilepage');
+            }
+        }
+    }, [navigate]);
+
     console.log(posts, "postPage1232")
     const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
     const fetchPosts = useCallback(async () => {

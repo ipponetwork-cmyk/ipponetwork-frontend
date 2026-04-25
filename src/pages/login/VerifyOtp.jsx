@@ -82,11 +82,11 @@ function VerifyOtp() {
 
                 const userId = response.data?._id || response.data?.id || phone;
                 console.log(userId, "userId123")
-                if (response.isNewUser) {
+                if (response.isNewUser || !response.data?.username || !response.data?.name) {
                     navigate(`/profilepage`);
                 } else {
                     navigate('/feed');
-                    dispatch(showToast('Login Successfull', 'success'));
+                    dispatch(showToast('Login Successful', 'success'));
                 }
             } else {
                 console.log("elseBlock")

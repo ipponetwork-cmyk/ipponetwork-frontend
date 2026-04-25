@@ -12,7 +12,8 @@ import {
     ActionButtonContent, ActionButtonHeader, ActionButtonHeaderLeft, ActionButtonHeaderIcon, ActionButtonHeaderInfo, ActionButtonHeaderTitle, ActionButtonHeaderSubtitle, ActionButtonHeaderChevron,
     ActionInputField, ActionInputLabel, ActionInputContainer, ActionPhonePrefix, ActionInput, ActionTextarea, ActionLinkInputContainer, ActionLinkIcon, Action, PublishButton,
     StyledSelect,
-    selectMenuProps
+    selectMenuProps,
+    EnquiryButton
 } from '../../css/index';
 import { useState, useEffect } from 'react';
 import Select from '@mui/material/Select';
@@ -21,8 +22,8 @@ import { MdInsertPhoto } from "react-icons/md";
 import { IoMdAttach } from "react-icons/io";
 import { useTranslation } from '../../hooks/useTranslation';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { createPost } from '../../redux/createPostActions';
+import { useDispatch, useSelector } from 'react-redux';
+// import { createPost } from '../../redux/createPostActions';
 import { authAPI } from '../../services/api';
 import { CiCalendar } from "react-icons/ci";
 import { BsWhatsapp } from "react-icons/bs";
@@ -37,8 +38,10 @@ import {
 import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
 import Loader from '../../components/Loader';
-import { getDomainName } from '../../utils/domainUtils';
+import { getDomainName, getDomainPassingName } from '../../utils/domainUtils';
 import { compressImage } from '../../utils/imageUtils';
+import { POST_STATUS } from '../../constants/constants';
+
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -75,15 +78,18 @@ const CreatePost = () => {
     const [isDraftSaved, setIsDraftSaved] = useState(false);
     const [showActionDropdown, setShowActionDropdown] = useState(false)
     const [selectedAction, setSelectedAction] = useState('')
-    // const [callPhone, setCallPhone] = useState('')
     const [whatsappPhone, setWhatsappPhone] = useState('')
     const [whatsappMessage, setWhatsappMessage] = useState('')
     const [externalLink, setExternalLink] = useState('')
-
-    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    console.log(currentUser, "currentUser123")
-    const createduserid = currentUser?._id || currentUser?.id || '';
-    const createdusername = currentUser?.username || currentUser?.name || '';
+    const currentUser = useSelector((state) => state.profileDetails);
+    console.log(currentUser?.data, "currentUser123")
+    const currentUserData = localStorage.getItem('user');
+    const user = JSON.parse(currentUserData);
+    console.log(user, "user");
+    const createduserid = user?._id || user?.id;
+    const createdusername = user?.username;
+    const domainPassing = getDomainPassingName()
+    console.log(domainPassing, "domainPassing")
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
     const handleMediaUpload = async (e) => {
@@ -139,11 +145,11 @@ const CreatePost = () => {
         const file = e.target.files[0];
         if (file) setUploadedPdf({ file, url: URL.createObjectURL(file), name: file.name });
     };
-    const unitSeconds = {
+    const [unitSeconds, setUnitSeconds] = useState({
         Minutes: 60,
         Hours: 3600,
         Days: 86400,
-    };
+    })
 
     const formatCount = (value) => {
         if (value === undefined || value === null || Number.isNaN(value)) return '0';
@@ -161,33 +167,94 @@ const CreatePost = () => {
         return num * unitSeconds[unit];
     };
 
-    const calculateCredits = (seconds, costPerSecond) => {
-        if (!seconds || !costPerSecond) return 0;
-        return Number((seconds * costPerSecond).toFixed(2));
-    };
+    // const calculateCredits = (seconds, costPerSecond) => {
+    //     if (!seconds || !costPerSecond) return 0;
+    //     return Number((seconds * costPerSecond).toFixed(2));
+    // };
 
     useEffect(() => {
         setIsDraftSaved(false);
     }, [title, description, selectedDomains, selectedAction, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
 
-    const loadTimeToLive = async (domain = 'ippochennai') => {
+    // const loadTimeToLive = async (domain = 'ippochennai') => {
+    //     try {
+    //         const response = await authAPI.getTimeToLive(domain);
+    //         const items = Array.isArray(response) ? response : response.data || [];
+    //         console.log(items, "items123")
+    //         // Find items by type only to capture the dynamic posttype and seconds from API
+
+    //         const freeItem = items.find(item => item.type === FREE_TYPE);
+    //         const costItem = items.find(item => item.type === COST_TYPE);
+    //         console.log(costItem, "costItem123")
+    //         setFreeTtl(freeItem || null);
+    //         setCostTtl(costItem || null);
+
+    //         if (!on && freeItem) {
+    //             setCount(calculateCountFromSeconds(freeItem.seconds, selected));
+    //         }
+    //         if (on && costItem && !count) {
+    //             setCount('1');
+    //         }
+    //     } catch (error) {
+    //         console.error('Failed to load time to live', error);
+    //     }
+    // };
+
+    // const loadTimeToLive = async (domain = domainPassing) => {
+    //     try {
+    //         const response = await authAPI.getTimeToLive(domain);
+    //         const items = Array.isArray(response) ? response : response.data || [];
+
+    //         const freeItem = items.find(item => item.type === FREE_TYPE);
+    //         const costItem = items.find(item => item.type === COST_TYPE);
+
+    //         setFreeTtl(freeItem || null);
+    //         setCostTtl(costItem || null);
+
+    //         if (freeItem?.seconds) {
+    //             const freeSeconds = freeItem.seconds; // 3600
+
+    //             setUnitSeconds({
+    //                 Minutes: freeSeconds,                  // 3600 * 1 = 3600s per "minute unit"
+    //                 Hours: freeSeconds * 60,               // 3600 * 60
+    //                 Days: freeSeconds * 1440,              // 3600 * 1440
+    //             });
+
+    //             // Show count as: unit * seconds (free)
+    //             const freeDisplayCount = freeItem.unit * freeItem.seconds; // 0 * 3600 = 0
+    //             // Fallback: show how many "units" fit → freeSeconds / 60
+    //             setCount(String(freeDisplayCount || freeSeconds / 60));
+    //         }
+
+    //         if (costItem?.seconds) {
+    //             // Cost display: unit * seconds → 0.01 * 1 = 0.01 credits per second
+    //             const costDisplayCount = costItem.unit * costItem.seconds; // 0.01
+    //             if (on && !count) setCount(String(costDisplayCount));
+    //         }
+
+    //     } catch (error) {
+    //         console.error('Failed to load time to live', error);
+    //     }
+    // };
+
+    const loadTimeToLive = async (domain = domainPassing) => {
         try {
             const response = await authAPI.getTimeToLive(domain);
             const items = Array.isArray(response) ? response : response.data || [];
-            console.log(items, "items123")
-            // Find items by type only to capture the dynamic posttype and seconds from API
 
             const freeItem = items.find(item => item.type === FREE_TYPE);
             const costItem = items.find(item => item.type === COST_TYPE);
-            console.log(costItem, "costItem123")
+
             setFreeTtl(freeItem || null);
             setCostTtl(costItem || null);
 
-            if (!on && freeItem) {
-                setCount(calculateCountFromSeconds(freeItem.seconds, selected));
-            }
-            if (on && costItem && !count) {
-                setCount('1');
+            // Reset to real time units
+            setUnitSeconds({ Minutes: 60, Hours: 3600, Days: 86400 });
+
+            // Default display: show free period in minutes
+            if (!on && freeItem?.seconds) {
+                setCount(String(freeItem.seconds / 60)); // 3600/60 = 60 minutes
+                setSelected('Minutes');
             }
         } catch (error) {
             console.error('Failed to load time to live', error);
@@ -196,10 +263,6 @@ const CreatePost = () => {
 
     useEffect(() => {
         let active = true;
-        // const initialUnit = 'Minutes';
-        // const initialOn = false;
-        // const initialCount = '1';
-
         authAPI.getListOfValuesByType('domain')
             .then((response) => {
                 if (!active) return;
@@ -226,7 +289,7 @@ const CreatePost = () => {
                 console.error('Failed to load domain list', error);
             });
 
-        loadTimeToLive('ippochennai')
+        loadTimeToLive(domainPassing)
             .catch((error) => {
                 console.error('Failed to load time to live', error);
             });
@@ -248,16 +311,6 @@ const CreatePost = () => {
         }
     };
 
-    // const handleToggle = () => {
-    //     const nextOn = !on;
-    //     setOn(nextOn);
-    //     if (nextOn) {
-    //         loadTimeToLive();
-    //         if (!count) setCount('1');
-    //     } else if (freeTtl) {
-    //         setCount(calculateCountFromSeconds(freeTtl.seconds, selected));
-    //     }
-    // };
     const handleToggle = () => {
         const nextOn = !on;
         setOn(nextOn);
@@ -376,7 +429,8 @@ const CreatePost = () => {
 
         try {
             setIsSubmitting(true);
-            await dispatch(createPost(formData));
+            // await dispatch(createPost(formData));
+            await authAPI.createPost(formData);
             setSubmitError('');
 
             if (statusType === 'DRAFT') {
@@ -394,16 +448,35 @@ const CreatePost = () => {
         }
     };
 
+    // const isFreeMode = !on && Boolean(freeTtl);
+    // const isCostMode = on && Boolean(costTtl);
+    // const derivedSeconds = calculateSeconds(count, selected);
+    // const adjustedSeconds = isCostMode
+    //     ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
+    //     : 0;
+    // const derivedCredits = isCostMode
+    //     ? calculateCredits(adjustedSeconds, costTtl.unit * costTtl.seconds)
+    //     : 0;
     const isFreeMode = !on && Boolean(freeTtl);
     const isCostMode = on && Boolean(costTtl);
     const derivedSeconds = calculateSeconds(count, selected);
-    // const derivedCredits = isCostMode ? calculateCredits(derivedSeconds, costTtl.unit) : 0;
-    const adjustedSeconds = isCostMode
-        ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
+
+    const freeSeconds = freeTtl?.seconds || 0;
+
+    // Seconds beyond the free period
+    const billableSeconds = isCostMode
+        ? Math.max(0, derivedSeconds - freeSeconds)
         : 0;
+
+    // Cost per second: unit(0.01) / seconds(1) = 0.01 per second
+    const costPerSecond = isCostMode
+        ? (costTtl.unit / costTtl.seconds)
+        : 0;
+
     const derivedCredits = isCostMode
-        ? calculateCredits(adjustedSeconds, costTtl.unit)
+        ? Number((billableSeconds * costPerSecond).toFixed(2))
         : 0;
+    const minValue = on ? (selected === 'Minutes' ? 60 : 1) : 0;
 
     const getEndTimeLabel = (seconds) => {
         if (!seconds) return t('todayTime') || 'Today';
@@ -626,10 +699,6 @@ const CreatePost = () => {
                         <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
-                        {/* <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
-                            {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
-                            <PulseDot />
-                        </DraftStatus> */}
                     </Toolbar>
                 </PhoneFrame>
                 <Card>
@@ -649,18 +718,28 @@ const CreatePost = () => {
                     <PeriodSection>
                         <PeriodLabel>{t('selectPeriod')}</PeriodLabel>
                         <CounterRow>
-                            <CountBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Math.max(0, Number(v || '0') - 1)))}>−</CountBtn>
+                            <CountBtn
+                                disabled={!on || Number(count) <= minValue}
+                                onClick={() => setCount(v => formatCount(Math.max(minValue, Number(v || '0') - 1)))}
+                            >
+                                −
+                            </CountBtn>
                             <CountValue
                                 type="number"
                                 value={count}
-                                min="0"
-                                disabled={isFreeMode}
+                                min={minValue}
+                                disabled={!on}
                                 onChange={handleCountChange}
+                                onBlur={() => {
+                                    if (on && Number(count) < minValue) {
+                                        setCount(String(minValue));
+                                    }
+                                }}
                             />
-                            <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
+                            <CountAddBtn disabled={!on} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
                         <UnitRow>
-                            {isFreeMode ? (
+                            {!on ? (
                                 <UnitText>Minutes</UnitText>
                             ) : (
                                 <StyledSelect
@@ -681,7 +760,7 @@ const CreatePost = () => {
                     <Grid>
                         <InfoCard>
                             <InfoHeader>
-                                <CiCalendar fontSize={20} />
+                                <CreditIcon />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
                             <InfoValue>{endsInValue}</InfoValue>
@@ -893,14 +972,17 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
-                <div style={{ marginTop: "12px" }}>
-                    <DraftStatus onClick={() => handleCreatePost("DRAFT")}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
+                    <DraftStatus onClick={() => handleCreatePost(POST_STATUS.DRAFT)}>
                         {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
                     </DraftStatus>
                 </div>
-                <PublishButton onClick={() => handleCreatePost("SUBMITTED")} disabled={isSubmitting}>
-                    {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
-                </PublishButton>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px", width: "100%", maxWidth: "400px" }}>
+                    <EnquiryButton onClick={() => handleCreatePost(POST_STATUS.SUBMITTED)} disabled={isSubmitting}>
+                        {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}
+                    </EnquiryButton>
+                </div>
+
             </CreatePostWrapper>
         </>
     );

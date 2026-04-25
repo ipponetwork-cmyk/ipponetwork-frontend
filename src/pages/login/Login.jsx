@@ -116,35 +116,6 @@ function Login() {
             setLoading(false);
         }
     };
-    // const getDomainName = () => {
-    //     const host = window.location.hostname;
-
-    //     if (host === 'localhost') {
-    //         return 'ippomadurai';
-    //     }
-
-    //     const parts = host.split('.');
-
-    //     // Handle cases like multitenant.ippochennai.com
-    //     if (parts.length >= 3) {
-    //         return parts[1];
-    //     }
-
-    //     // Handle cases like ippomadurai.com
-    //     return parts[0];
-    // };
-    const getDomainName = () => {
-        const host = window.location.hostname;
-
-        if (host === 'localhost') {
-            return 'ippomadurai';
-        }
-
-        const parts = host.split('.');
-        const domain = parts.find(part => part.startsWith('ippo'));
-
-        return domain ?? parts[0];
-    };
     const domainName = getDomainShortName();
     console.log(domainName, "domainName123Login")
     return (
@@ -153,7 +124,7 @@ function Login() {
                 <BackgroundPanel $bgImage={bgImage}>
                     {/* <Logo>{t('appName')}</Logo> */}
                     <Logo>{domainName}</Logo>
-                    <Headline>{t('headline')}Dev</Headline>
+                    <Headline>{t('headline')}</Headline>
                 </BackgroundPanel>
 
                 <LoginCard>

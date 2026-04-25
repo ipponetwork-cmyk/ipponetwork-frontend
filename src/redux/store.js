@@ -1,14 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import reducer from './reducer'
-import toastReducer from './toastReducer'
-import apiReducer from './apiReducer'
+import ippoReducer from './reducer'
 
 const store = configureStore({
-  reducer: {
-    counter: reducer,
-    toast: toastReducer,
-    api: apiReducer,
-  },
+  reducer: ippoReducer,
 })
 
 export default store

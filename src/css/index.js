@@ -115,28 +115,33 @@ export const PageWrapper = styled.main`
   display: flex;
   flex-direction: column;
   background: white;
+  overflow-x: hidden;
 
   @media (min-width: 769px) {
     flex-direction: row;
     align-items: stretch;
+    overflow: hidden;
   }
 `;
 
 export const BackgroundPanel = styled.section`
-  flex: 1;
-  // padding: 40px 20px;
+  flex-shrink: 0;
+  padding: 40px 20px 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: start;
   color: white;
   background: #000000;
-  // min-height: 300px;
-  min-height:100%;
+  min-height: 220px;      
   text-align: center;
+  overflow: hidden;
+  word-break: break-word;
 
   @media (min-width: 769px) {
+    flex: 1;
     min-height: 100vh;
+    padding: 40px 20px;
   }
 `;
 
@@ -163,30 +168,16 @@ export const Headline = styled.h1`
   letter-spacing: -2.4px;
   vertical-align: middle;
   color: #ffffff;
-  padding:12px;
+  padding: 12px;
   text-align: start;
+
+  /* Add these */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: 100%;
 `;
 
-
-// export const LoginCard = styled.section`
-//   background: #ffffff;
-//   // border-radius: 32px 32px 0 0;
-//   padding: 36px 24px 40px;
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
-//   margin-top: -32px;
-//   box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
-
-//   @media (min-width: 769px) {
-//     margin-top: 0;
-//     border-radius: 0;
-//     width: 450px;
-//     flex-shrink: 0;
-//     justify-content: center;
-//     box-shadow: -10px 0 25px rgba(0,0,0,0.05);
-//   }
-// `;
 export const LoginCard = styled.section`
   background: #ffffff;
   padding: 36px 24px 40px;
@@ -331,29 +322,44 @@ export const Buttons = styled.button`
   }
 `;
 
+
 // export const OtpWrapper = styled.div`
 //   display: flex;
 //   gap: 6px;
 //   justify-content: center;
 //   margin: 8px 0;
+//   width: 100%;
+//   flex-wrap: nowrap;
+//   overflow-x: auto;
+//   padding-bottom: 4px;
+
+//   /* Hide scrollbar but keep functionality */
+//   scrollbar-width: none;
+//   &::-webkit-scrollbar {
+//     display: none;
+//   }
 // `;
 export const OtpWrapper = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
   justify-content: center;
-  margin: 8px 0;
   width: 100%;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  padding-bottom: 4px;
+`;
+export const OtpInput = styled.input`
+  width: clamp(32px, 12vw, 48px);   /* shrinks on small screens */
+  height: clamp(36px, 12vw, 48px);
+  text-align: center;
+  font-size: clamp(14px, 4vw, 18px);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  flex-shrink: 1;                    /* allows boxes to shrink */
 
-  /* Hide scrollbar but keep functionality */
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
+  &:focus {
+    border-color: #FFC201;
   }
 `;
-
 export const PageWrappers = styled.main`
     min-height: 50vh;
     display: flex;
@@ -578,30 +584,30 @@ export const ContinueButton = styled.button`
     }
 `;
 
-export const OtpInput = styled.input`
-  width: 45px;
-  height: 45px;
-  border-radius: 9px;
-  border: 1px solid #e0e0e0;
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111111;
-  outline: none;
-  background: #f8f9fa;
+// export const OtpInput = styled.input`
+//   width: 45px;
+//   height: 45px;
+//   border-radius: 9px;
+//   border: 1px solid #e0e0e0;
+//   text-align: center;
+//   font-size: 1.25rem;
+//   font-weight: 700;
+//   color: #111111;
+//   outline: none;
+//   background: #f8f9fa;
 
-  @media (min-width: 375px) {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-  }
+//   @media (min-width: 375px) {
+//     width: 40px;
+//     height: 40px;
+//     font-size: 1.5rem;
+//   }
 
-  &:focus {
-    border-color: #111111;
-    background: #ffffff;
-    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.05);
-  }
-`;
+//   &:focus {
+//     border-color: #111111;
+//     background: #ffffff;
+//     box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.05);
+//   }
+// `;
 export const LangToggle = styled.div`
   display: flex;
   gap: 8px;
@@ -788,7 +794,7 @@ export const PostTime = styled.p`
 `;
 
 export const EnquiryButton = styled.button`
-    width: 380px;
+    width: 100%;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -806,7 +812,7 @@ export const EnquiryButton = styled.button`
 `;
 
 export const PublishButton = styled.button`
-   width: 380px;
+    width: 100%;
     background-color: var(--button-bg);
     color: var(--button-text);
     border: none;
@@ -1045,8 +1051,8 @@ export const SlideActionButton = styled.button`
     width:100%;
     bottom: 0px;
     transform: translateX(-50%);
-    background:black;
-    color: #fff;
+    background:var(--button-bg);
+    color: var(--card-text);
     border: none;
     padding: 16px 18px;
     font-weight: 600;
@@ -1069,8 +1075,8 @@ export const DetailSlideActionButton = styled.button`
     width: 100%;
     bottom: 0;
     transform: none;
-    background: #111111;
-    color: #ffffff;
+    background:var(--card-background);
+    color: var(--card-text);
     border: none;
     padding: 14px 14px;
     font-weight: 700;
@@ -1883,7 +1889,8 @@ export const CreatePostWrapper = styled.div`
     justify-content: center;
     width: 100%;
     margin-top: 20px;
-    // padding: 0 16px;        
+    overflow-x: hidden;
+    box-sizing: border-box;        
 
     @media (max-width: 320px) {
         margin-top: 12px;
@@ -1929,8 +1936,10 @@ export const pulse = keyframes`
 //     box-shadow: 0 42px 90px rgba(0, 0, 0, 0.72), 0 12px 28px rgba(0, 0, 0, 0.35);
 //   }
 // `;
-  export const PhoneFrame = styled.div`
-      width: 380px;
+export const PhoneFrame = styled.div`
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
       background: var(--card-background);
       border-radius: 24px;
       overflow: hidden;
@@ -2091,7 +2100,7 @@ export const fadeIn = keyframes`
   to   { opacity: 1; transform: translateY(0); }
 `
 export const Card = styled.div`
-    width: 380px;
+    width: 100%;
     background:var(--card-background);
     border-radius: 28px;
     overflow: hidden;
@@ -2189,7 +2198,7 @@ export const BannerSub = styled.span`
   line-height: 100%;
   letter-spacing: 0;
   color: var(--card-text);
-  margin-top: 2px;
+  margin-top: 10px;
 `;
 
 
@@ -2258,6 +2267,11 @@ export const CountBtn = styled.button`
 
   &:hover  { background: #252528; }
   &:active { transform: scale(0.93); }
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #555;
+  }
 `
 export const CountAddBtn = styled.button`
   width: 52px;
@@ -2277,6 +2291,11 @@ export const CountAddBtn = styled.button`
 
   // &:hover  { background: #252528; }
   // &:active { transform: scale(0.93); }
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #555;
+  }
 `
 
 export const CountValue = styled.input`
@@ -2296,6 +2315,11 @@ export const CountValue = styled.input`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `
 
@@ -2390,23 +2414,54 @@ export const InfoSub = styled.div`
   color: #444;
 `;
 
+// export const ChooseDomain = styled.div`
+//   display: flex;
+//   align-items: center;
+//   flex-direction: column;
+//   text-align: left;
+//   align-items: center;
+//   margin-top:20px;
+// `;
+
+// export const DomainCard = styled.div`
+//   width: 380px;
+//   background: var(--card-background);
+//   border-radius: 20px;
+//   border: 1px solid var(--card-text);
+//   padding: 15px 0px;
+//   margin-top: 20px;
+//   font-family: 'Sora', sans-serif;
+//   html[data-theme='dark'] & {
+//     box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+//   }
+// `;
+// export const ChooseDomain = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;       /* matches Action */
+//   width: 100%;
+// `;
 export const ChooseDomain = styled.div`
   display: flex;
-  align-items: center;
   flex-direction: column;
-  text-align: left;
-  align-items: flex-start;
-  margin-top:20px;
+  align-items: start;
+  // padding: 0 16px;        
+  box-sizing: border-box;
+  width:100%;
+  max-width:400px;
+  margin-top:20px
 `;
-
 export const DomainCard = styled.div`
-  width: 380px;
+  width: 100%;  
+  max-width:400px;               
   background: var(--card-background);
   border-radius: 20px;
   border: 1px solid var(--card-text);
   padding: 15px 0px;
   margin-top: 20px;
   font-family: 'Sora', sans-serif;
+  box-sizing: border-box;        /* prevents overflow */
+
   html[data-theme='dark'] & {
     box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
   }
@@ -2461,9 +2516,8 @@ export const TitleText = styled.div`
   font-size: 24px;
   line-height: 36px;
   letter-spacing: -1.5px;
-  vertical-align: middle;
   color:var(--text);
-
+  text-align:start;
   html[data-theme='dark'] & {
     color: #f0f0f0;
   }
@@ -2539,17 +2593,19 @@ export const DomainCheckbox = styled.div`
 
 export const Action = styled.div`
   display: flex;
-  align-items: center;
+  align-items: start;
   flex-direction: column;
   text-align: left;
-  align-items: flex-start;
-  // margin-top:20px;
+  width: 100%;
+  max-width:400px;
 `;
 
 export const ActionButtonSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width:100%;
+  align-items: start;
   margin-top: 20px;
 `;
 
@@ -2574,7 +2630,9 @@ export const ActionButtonWrapper = styled.div`
 `;
 
 export const ActionButtonDropdown = styled.button`
-  width: 380px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
   background: var(--card-background);
   border: 1px solid var(--card-text);
   border-radius: 12px;
@@ -2618,6 +2676,7 @@ export const ActionButtonList = styled.div`
   border-radius: 20px;
   overflow: hidden;
   animation: ${fadeIn} 0.2s ease;
+  width:100%
 `;
 
 export const ActionButtonItem = styled.div`
@@ -2698,9 +2757,11 @@ export const ActionButtonContent = styled.div`
   padding: 20px 25px;
   margin-top: 12px;
   font-family: 'Sora', sans-serif;
-  width: 320px;
-  html[data-theme='dark'] & {
-    box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  // html[data-theme='dark'] & {
+    // box-shadow: 0 26px 72px rgba(0, 0, 0, 0.72), 0 12px 30px rgba(0, 0, 0, 0.40);
   }
 `;
 
@@ -2734,28 +2795,28 @@ export const StyledSelect = styled(Select)`
 `;
 
 export const selectMenuProps = {
-    PaperProps: {
-        sx: {
-            background: 'var(--card-background)',
-            border: '1px solid var(--card-text)',
-            borderRadius: '14px',
-            mt: 1,
-            '& .MuiMenuItem-root': {
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--card-text)',
-                justifyContent: 'center',
-                '&.Mui-selected': {
-                    background: 'var(--card-background)',
-                    color: 'var(--card-text)',
-                },
-                '&:hover': {
-                    background: 'var(--card-background)',
-                    color: 'var(--card-text)',
-                },
-            },
+  PaperProps: {
+    sx: {
+      background: 'var(--card-background)',
+      border: '1px solid var(--card-text)',
+      borderRadius: '14px',
+      mt: 1,
+      '& .MuiMenuItem-root': {
+        fontSize: '13px',
+        fontWeight: 500,
+        color: 'var(--card-text)',
+        justifyContent: 'center',
+        '&.Mui-selected': {
+          background: 'var(--card-background)',
+          color: 'var(--card-text)',
         },
+        '&:hover': {
+          background: 'var(--card-background)',
+          color: 'var(--card-text)',
+        },
+      },
     },
+  },
 };
 export const ActionButtonHeaderIcon = styled.div`
   width: 40px;

@@ -1,10 +1,5 @@
 export const getDomainName = () => {
     const host = window.location.hostname;
-
-    if (host === 'localhost') {
-        return 'ippomani.com';
-    }
-
     const parts = host.split('.');
     const index = parts.findIndex(part => part.startsWith('ippo'));
 
@@ -23,3 +18,8 @@ export const getDomainShortName = () => {
     return 'ippo' + afterIppo.charAt(0).toUpperCase() + afterIppo.slice(1); // e.g. "ippoMani"
 };
 
+export const getDomainPassingName = () => {
+    const fullDomain = getDomainName();
+    const short = fullDomain.split('.')[0]; // e.g. "ippomani"
+    return short
+};

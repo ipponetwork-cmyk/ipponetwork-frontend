@@ -1,17 +1,37 @@
-import { INCREMENT, DECREMENT, RESET } from './actionTypes'
+import { SHOW_TOAST, SET_PROFILE } from './actionTypes'
 
 const initialState = {
-  count: 0,
+  toast: {
+    message: null,
+    type: 'info',
+    toastId: null,
+  },
+  profileDetails: {
+    name: '',
+    username: '',
+    dob: '',
+    emailid: '',
+    photo: '',
+    mobile: ''
+  },
 }
 
-export default function reducer(state = initialState, action) {
+export default function ippoReducer(state = initialState, action) {
   switch (action.type) {
-    case INCREMENT:
-      return { ...state, count: state.count + 1 }
-    case DECREMENT:
-      return { ...state, count: state.count - 1 }
-    case RESET:
-      return { ...state, count: 0 }
+    case SHOW_TOAST:
+      return {
+        ...state,
+        toast: {
+          message: action.payload.message,
+          type: action.payload.type,
+          toastId: action.payload.toastId,
+        },
+      }
+    case SET_PROFILE:
+      return {
+        ...state,
+        profileDetails: action.payload,
+      }
     default:
       return state
   }

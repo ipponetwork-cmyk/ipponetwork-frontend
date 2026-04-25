@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     DetailWrapper, BackButton, OverlayContent, UserRow,
     DetailAvatar, DetailUserInfo, DetailUserName, DetailUserLocation,
@@ -8,6 +8,7 @@ import {
     TextContentTitle, TextContentBody,
     DetailFooter, ActionBar, EnquiryBadge, EnquiryText, IconButton,
     DetailSlideActionButton, VideoWrapper, PostVideo,
+    UserAvatarFallback,
 } from '../../css/index';
 import { IoArrowBack } from 'react-icons/io5';
 import { RiSearchEyeLine } from "react-icons/ri";
@@ -16,8 +17,10 @@ import { postAPI } from '../../services/postAPI';
 import SharePostDialog from '../../components/SharePostDialog';
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
-// import { useDispatch } from 'react-redux';
-// import { showToast } from '../../redux/actions';
+import { FaUser } from 'react-icons/fa';
+import { showToast } from '../../redux/actions';
+import { useDispatch } from 'react-redux';
+
 
 const FooterBar = ({ enquirycount, onShare }) => (
     <DetailFooter>
@@ -35,19 +38,23 @@ const FooterBar = ({ enquirycount, onShare }) => (
 
 const FeedDetail = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const postId = location.state?.postId;
-    // const dispatch = useDispatch();
+    const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeSlide, setActiveSlide] = useState(0);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [enquiryCount, setEnquiryCount] = useState(0);
     const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
-
+    const dispatch = useDispatch();
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
     const handleEnquiryClick = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            dispatch(showToast('Login to continue', 'info'));
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         try {
             await postAPI.increaseEnquiryCount(post._id);
 
@@ -96,6 +103,7 @@ const FeedDetail = () => {
             try {
                 setLoading(true);
                 const response = await postAPI.getPostById(postId);
+                console.log(response, "POST RESPONSE1223")
                 if (response.success && response.data) {
                     const apiPost = response.data;
                     const attachments = apiPost.attachment || [];
@@ -120,10 +128,6 @@ const FeedDetail = () => {
                         location: apiPost.listofdomain?.[0] || 'Location',
                         images: imageFiles,
                         video: videoFile,
-                        // titleEn: getLangString(apiPost.title, 'Post Title'),
-                        // titleTa: apiPost.title?.ta || '',
-                        // captionEn: getLangString(apiPost.description, ''),
-                        // captionTa: apiPost.description?.ta || '',
                         titleObj: apiPost.title,
                         captionObj: apiPost.description,
                         time: new Date(apiPost.createdtimestamp).toLocaleDateString(),
@@ -134,6 +138,7 @@ const FeedDetail = () => {
                         calltoactiontype: apiPost.calltoaction?.type,
                         createduserid: apiPost.createduserid,
                         shareurl: apiPost.shareurl,
+                        profilepicture: apiPost.photo,
                     };
 
                     setPost(mapped);
@@ -218,7 +223,13 @@ const FeedDetail = () => {
                     </PostMedia>
                     <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
                         <UserRow>
-                            <DetailAvatar src={post.images} alt="user" />
+                            {post?.createduserid?.photo ? (
+                                <DetailAvatar src={post.createduserid.photo} alt="user" />
+                            ) : (
+                                <UserAvatarFallback>
+                                    <FaUser />
+                                </UserAvatarFallback>
+                            )}
                             <DetailUserInfo>
                                 <DetailUserName>{post.username}</DetailUserName>
                                 <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>

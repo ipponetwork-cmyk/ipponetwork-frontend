@@ -18,6 +18,8 @@ import SharePostDialog from '../../components/SharePostDialog';
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { FaUser } from 'react-icons/fa';
+import { showToast } from '../../redux/actions';
+import { useDispatch } from 'react-redux';
 
 
 const FooterBar = ({ enquirycount, onShare }) => (
@@ -43,10 +45,16 @@ const FeedDetail = () => {
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [enquiryCount, setEnquiryCount] = useState(0);
     const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
-
+    const dispatch = useDispatch();
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
     const handleEnquiryClick = async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            dispatch(showToast('Login to continue', 'info'));
+            setTimeout(() => navigate('/login'), 1500);
+            return;
+        }
         try {
             await postAPI.increaseEnquiryCount(post._id);
 

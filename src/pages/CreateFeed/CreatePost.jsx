@@ -41,6 +41,7 @@ import Loader from '../../components/Loader';
 import { getDomainName, getDomainPassingName } from '../../utils/domainUtils';
 import { compressImage } from '../../utils/imageUtils';
 import { POST_STATUS } from '../../constants/constants';
+
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
         stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -235,6 +236,7 @@ const CreatePost = () => {
             console.error('Failed to load time to live', error);
         }
     };
+
     useEffect(() => {
         let active = true;
         authAPI.getListOfValuesByType('domain')

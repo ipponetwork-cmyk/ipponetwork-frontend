@@ -1051,8 +1051,8 @@ export const SlideActionButton = styled.button`
     width:100%;
     bottom: 0px;
     transform: translateX(-50%);
-    background:black;
-    color: #fff;
+    background:var(--button-bg);
+    color: var(--card-text);
     border: none;
     padding: 16px 18px;
     font-weight: 600;
@@ -1075,8 +1075,8 @@ export const DetailSlideActionButton = styled.button`
     width: 100%;
     bottom: 0;
     transform: none;
-    background: #111111;
-    color: #ffffff;
+    background:var(--card-background);
+    color: var(--card-text);
     border: none;
     padding: 14px 14px;
     font-weight: 700;

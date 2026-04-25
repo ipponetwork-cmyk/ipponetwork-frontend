@@ -33,9 +33,9 @@ import { IoGlobeOutline, IoTerminalOutline, IoSettingsOutline } from "react-icon
 import {
     IoChevronDownOutline,
     IoCheckmarkOutline,
-    IoLinkOutline
+    IoLinkOutline,
+    IoSearchOutline
 } from "react-icons/io5";
-import { IoCallSharp } from "react-icons/io5";
 import { showToast } from '../../redux/actions';
 import Loader from '../../components/Loader';
 import { getDomainName, getDomainPassingName } from '../../utils/domainUtils';
@@ -95,7 +95,11 @@ const CreatePost = () => {
     const handleMediaUpload = async (e) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
-
+        if (uploadedPdf) {
+            dispatch(showToast('Cannot upload images/video when a PDF is already attached', 'error'));
+            e.target.value = '';
+            return;
+        }
         const newImages = [];
         let newVideo = null;
 
@@ -143,7 +147,16 @@ const CreatePost = () => {
 
     const handlePdfUpload = (e) => {
         const file = e.target.files[0];
-        if (file) setUploadedPdf({ file, url: URL.createObjectURL(file), name: file.name });
+        if (!file) return;
+
+        if (uploadedImages.length > 0 || uploadedVideo) {
+            dispatch(showToast('Cannot upload PDF when images or video are already attached', 'error'));
+            e.target.value = '';
+            return;
+        }
+
+        setUploadedPdf({ file, url: URL.createObjectURL(file), name: file.name });
+        e.target.value = '';
     };
     const [unitSeconds, setUnitSeconds] = useState({
         Minutes: 60,
@@ -272,7 +285,7 @@ const CreatePost = () => {
                         id: item._id,
                         name: item.value || item.name,
                         value: item.value || item.name,
-                        icon: <IoGlobeOutline fontSize={18} color="#777" />,
+                        icon: <IoGlobeOutline fontSize={18} color="#ffffff" />,
                     }))
                     : [];
                 setDomains(mapped);
@@ -375,9 +388,10 @@ const CreatePost = () => {
                 dispatch(showToast('Please enter a valid 10-digit WhatsApp number', 'error'));
                 return;
             }
-        } else if (selectedAction === 'link') {
-            if (!externalLink || !externalLink.startsWith('http')) {
-                dispatch(showToast('Please enter a valid URL (starting with http:// or https://)', 'error'));
+        }
+        else if (selectedAction === 'link') {
+            if (!externalLink) {
+                dispatch(showToast('Please enter a URL', 'error'));
                 return;
             }
         }
@@ -404,14 +418,19 @@ const CreatePost = () => {
             formData.append('calltoactionexternallinkurl', externalLink);
         }
 
+        if (uploadedPdf && (uploadedImages.length > 0 || uploadedVideo)) {
+            dispatch(showToast('Cannot combine PDF with images or video', 'error'));
+            return;
+        }
+
         uploadedImages.forEach(image => {
-            formData.append('attachment', image.file);
+            formData.append('attachment', image.file, image.name);
         });
         if (uploadedPdf?.file) {
-            formData.append('attachment', uploadedPdf.file);
+            formData.append('attachment', uploadedPdf.file, uploadedPdf.name);
         }
         if (uploadedVideo?.file) {
-            formData.append('attachment', uploadedVideo.file);
+            formData.append('attachment', uploadedVideo.file, uploadedVideo.name);
         }
 
         // Log FormData contents for debugging
@@ -684,6 +703,7 @@ const CreatePost = () => {
                             multiple
                             style={{ display: 'none' }}
                             onChange={handleMediaUpload}
+                            disabled={!!uploadedPdf}
                         />
                         <input
                             id="pdf-upload"
@@ -691,12 +711,29 @@ const CreatePost = () => {
                             accept=".pdf"
                             style={{ display: 'none' }}
                             onChange={handlePdfUpload}
+                            disabled={uploadedImages.length > 0 || !!uploadedVideo}
                         />
 
-                        <ToolButton title={t('addMedia')} as="label" htmlFor="media-upload" style={{ cursor: 'pointer' }}>
+                        <ToolButton
+                            title={t('addMedia')}
+                            as="label"
+                            htmlFor={!uploadedPdf ? "media-upload" : ""}
+                            style={{
+                                cursor: !uploadedPdf ? 'pointer' : 'not-allowed',
+                                opacity: !uploadedPdf ? 1 : 0.5
+                            }}
+                        >
                             <MdInsertPhoto fontSize={30} />
                         </ToolButton>
-                        <ToolButton title={t('attachFile')} as="label" htmlFor="pdf-upload" style={{ cursor: 'pointer' }}>
+                        <ToolButton
+                            title={t('attachFile')}
+                            as="label"
+                            htmlFor={!(uploadedImages.length > 0 || uploadedVideo) ? "pdf-upload" : ""}
+                            style={{
+                                cursor: !(uploadedImages.length > 0 || uploadedVideo) ? 'pointer' : 'not-allowed',
+                                opacity: !(uploadedImages.length > 0 || uploadedVideo) ? 1 : 0.5
+                            }}
+                        >
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
                     </Toolbar>
@@ -782,10 +819,7 @@ const CreatePost = () => {
                     <DomainCard>
                         <DomainSearch onClick={() => setShowDomainDropdown(!showDomainDropdown)}>
                             <SearchIcon>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="11" cy="11" r="7" />
-                                    <path d="M21 21l-4.35-4.35" />
-                                </svg>
+                                <IoSearchOutline size={18} color="#777" />
                             </SearchIcon>
                             <DomainInput
                                 type="text"

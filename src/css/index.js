@@ -1393,6 +1393,7 @@ export const DrawerFooter = styled.div`
   padding: 18px 16px 24px;
   background: transparent;
   box-sizing: border-box;
+  margin-bottom:20px;
 `;
 
 export const DrawerLanguageSection = styled.div`

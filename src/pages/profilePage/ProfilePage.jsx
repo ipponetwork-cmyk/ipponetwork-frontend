@@ -169,7 +169,7 @@ function ProfilePage() {
             dispatch(showToast('Profile created successfully', 'success'));
             navigate('/feed');
         } catch (error) {
-            dispatch(showToast(error.message || 'Failed to create profile', 'error'));
+            dispatch(showToast(error.message, 'error'));
         }
     };
     return (

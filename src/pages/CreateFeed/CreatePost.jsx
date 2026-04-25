@@ -167,10 +167,10 @@ const CreatePost = () => {
         return num * unitSeconds[unit];
     };
 
-    const calculateCredits = (seconds, costPerSecond) => {
-        if (!seconds || !costPerSecond) return 0;
-        return Number((seconds * costPerSecond).toFixed(2));
-    };
+    // const calculateCredits = (seconds, costPerSecond) => {
+    //     if (!seconds || !costPerSecond) return 0;
+    //     return Number((seconds * costPerSecond).toFixed(2));
+    // };
 
     useEffect(() => {
         setIsDraftSaved(false);
@@ -200,6 +200,43 @@ const CreatePost = () => {
     //     }
     // };
 
+    // const loadTimeToLive = async (domain = domainPassing) => {
+    //     try {
+    //         const response = await authAPI.getTimeToLive(domain);
+    //         const items = Array.isArray(response) ? response : response.data || [];
+
+    //         const freeItem = items.find(item => item.type === FREE_TYPE);
+    //         const costItem = items.find(item => item.type === COST_TYPE);
+
+    //         setFreeTtl(freeItem || null);
+    //         setCostTtl(costItem || null);
+
+    //         if (freeItem?.seconds) {
+    //             const freeSeconds = freeItem.seconds; // 3600
+
+    //             setUnitSeconds({
+    //                 Minutes: freeSeconds,                  // 3600 * 1 = 3600s per "minute unit"
+    //                 Hours: freeSeconds * 60,               // 3600 * 60
+    //                 Days: freeSeconds * 1440,              // 3600 * 1440
+    //             });
+
+    //             // Show count as: unit * seconds (free)
+    //             const freeDisplayCount = freeItem.unit * freeItem.seconds; // 0 * 3600 = 0
+    //             // Fallback: show how many "units" fit → freeSeconds / 60
+    //             setCount(String(freeDisplayCount || freeSeconds / 60));
+    //         }
+
+    //         if (costItem?.seconds) {
+    //             // Cost display: unit * seconds → 0.01 * 1 = 0.01 credits per second
+    //             const costDisplayCount = costItem.unit * costItem.seconds; // 0.01
+    //             if (on && !count) setCount(String(costDisplayCount));
+    //         }
+
+    //     } catch (error) {
+    //         console.error('Failed to load time to live', error);
+    //     }
+    // };
+
     const loadTimeToLive = async (domain = domainPassing) => {
         try {
             const response = await authAPI.getTimeToLive(domain);
@@ -211,27 +248,14 @@ const CreatePost = () => {
             setFreeTtl(freeItem || null);
             setCostTtl(costItem || null);
 
-            if (freeItem?.seconds) {
-                const freeSeconds = freeItem.seconds; // 3600
+            // Reset to real time units
+            setUnitSeconds({ Minutes: 60, Hours: 3600, Days: 86400 });
 
-                setUnitSeconds({
-                    Minutes: freeSeconds,                  // 3600 * 1 = 3600s per "minute unit"
-                    Hours: freeSeconds * 60,               // 3600 * 60
-                    Days: freeSeconds * 1440,              // 3600 * 1440
-                });
-
-                // Show count as: unit * seconds (free)
-                const freeDisplayCount = freeItem.unit * freeItem.seconds; // 0 * 3600 = 0
-                // Fallback: show how many "units" fit → freeSeconds / 60
-                setCount(String(freeDisplayCount || freeSeconds / 60));
+            // Default display: show free period in minutes
+            if (!on && freeItem?.seconds) {
+                setCount(String(freeItem.seconds / 60)); // 3600/60 = 60 minutes
+                setSelected('Minutes');
             }
-
-            if (costItem?.seconds) {
-                // Cost display: unit * seconds → 0.01 * 1 = 0.01 credits per second
-                const costDisplayCount = costItem.unit * costItem.seconds; // 0.01
-                if (on && !count) setCount(String(costDisplayCount));
-            }
-
         } catch (error) {
             console.error('Failed to load time to live', error);
         }
@@ -424,19 +448,35 @@ const CreatePost = () => {
         }
     };
 
+    // const isFreeMode = !on && Boolean(freeTtl);
+    // const isCostMode = on && Boolean(costTtl);
+    // const derivedSeconds = calculateSeconds(count, selected);
+    // const adjustedSeconds = isCostMode
+    //     ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
+    //     : 0;
+    // const derivedCredits = isCostMode
+    //     ? calculateCredits(adjustedSeconds, costTtl.unit * costTtl.seconds)
+    //     : 0;
     const isFreeMode = !on && Boolean(freeTtl);
     const isCostMode = on && Boolean(costTtl);
     const derivedSeconds = calculateSeconds(count, selected);
-    // const derivedCredits = isCostMode ? calculateCredits(derivedSeconds, costTtl.unit) : 0;
-    const adjustedSeconds = isCostMode
-        ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
+
+    const freeSeconds = freeTtl?.seconds || 0;
+
+    // Seconds beyond the free period
+    const billableSeconds = isCostMode
+        ? Math.max(0, derivedSeconds - freeSeconds)
         : 0;
-    // const derivedCredits = isCostMode
-    //     ? calculateCredits(adjustedSeconds, costTtl.unit)
-    //     : 0;
+
+    // Cost per second: unit(0.01) / seconds(1) = 0.01 per second
+    const costPerSecond = isCostMode
+        ? (costTtl.unit / costTtl.seconds)
+        : 0;
+
     const derivedCredits = isCostMode
-        ? calculateCredits(adjustedSeconds, costTtl.unit * costTtl.seconds) // unit(0.01) * seconds(1) = 0.01 per second
+        ? Number((billableSeconds * costPerSecond).toFixed(2))
         : 0;
+    const minValue = on ? (selected === 'Minutes' ? 60 : 1) : 0;
 
     const getEndTimeLabel = (seconds) => {
         if (!seconds) return t('todayTime') || 'Today';
@@ -678,18 +718,28 @@ const CreatePost = () => {
                     <PeriodSection>
                         <PeriodLabel>{t('selectPeriod')}</PeriodLabel>
                         <CounterRow>
-                            <CountBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Math.max(0, Number(v || '0') - 1)))}>−</CountBtn>
+                            <CountBtn
+                                disabled={!on || Number(count) <= minValue}
+                                onClick={() => setCount(v => formatCount(Math.max(minValue, Number(v || '0') - 1)))}
+                            >
+                                −
+                            </CountBtn>
                             <CountValue
                                 type="number"
                                 value={count}
-                                min="0"
-                                disabled={isFreeMode}
+                                min={minValue}
+                                disabled={!on}
                                 onChange={handleCountChange}
+                                onBlur={() => {
+                                    if (on && Number(count) < minValue) {
+                                        setCount(String(minValue));
+                                    }
+                                }}
                             />
-                            <CountAddBtn disabled={isFreeMode} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
+                            <CountAddBtn disabled={!on} onClick={() => setCount(v => formatCount(Number(v || '0') + 1))}>+</CountAddBtn>
                         </CounterRow>
                         <UnitRow>
-                            {isFreeMode ? (
+                            {!on ? (
                                 <UnitText>Minutes</UnitText>
                             ) : (
                                 <StyledSelect

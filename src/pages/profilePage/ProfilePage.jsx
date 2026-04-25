@@ -169,6 +169,7 @@ function ProfilePage() {
             dispatch(showToast('Profile created successfully', 'success'));
             navigate('/feed');
         } catch (error) {
+            console.log(error, "error22")
             dispatch(showToast(error.message, 'error'));
         }
     };

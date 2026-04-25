@@ -2267,6 +2267,11 @@ export const CountBtn = styled.button`
 
   &:hover  { background: #252528; }
   &:active { transform: scale(0.93); }
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #555;
+  }
 `
 export const CountAddBtn = styled.button`
   width: 52px;
@@ -2286,6 +2291,11 @@ export const CountAddBtn = styled.button`
 
   // &:hover  { background: #252528; }
   // &:active { transform: scale(0.93); }
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: #555;
+  }
 `
 
 export const CountValue = styled.input`
@@ -2305,6 +2315,11 @@ export const CountValue = styled.input`
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `
 

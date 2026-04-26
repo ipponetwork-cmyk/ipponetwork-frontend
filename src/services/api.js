@@ -92,13 +92,27 @@ export const authAPI = {
   },
 
   // Create a new post
+  // createPost: async (postData) => {
+  //   try {
+  //     const response = await apiClient.post('/post/createpost', postData);
+  //     console.log(response, "response5678")
+  //     return response.data;
+  //   } catch (error) {
+  //     throw error.response?.data || error.message;
+  //   }
+  // },
   createPost: async (postData) => {
     try {
       const response = await apiClient.post('/post/createpost', postData);
-      console.log(response, "response5678")
+      console.log(response, "response5678");
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      const status = error.response?.status;
+      const message =
+        status === 413
+          ? 'File size too large. Please upload a smaller file.'
+          : error.response?.data?.message || error.message || 'Something went wrong';
+      throw { message, status };
     }
   },
 

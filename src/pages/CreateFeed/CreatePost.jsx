@@ -457,12 +457,14 @@ const CreatePost = () => {
             } else {
                 navigate('/feed');
             }
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error creating post:', error);
-            const errorMsg = error?.message || error?.data?.message;
+            const errorMsg = error?.message || 'Something went wrong';  
             dispatch(showToast(errorMsg, 'error'));
             setSubmitError(errorMsg);
-        } finally {
+        }
+        finally {
             setIsSubmitting(false);
         }
     };

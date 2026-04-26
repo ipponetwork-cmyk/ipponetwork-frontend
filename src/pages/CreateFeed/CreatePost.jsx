@@ -122,7 +122,7 @@ const CreatePost = () => {
                 }
             } else if (file.type.startsWith('video/')) {
                 if (file.size > 50 * 1024 * 1024) {
-                    dispatch(showToast('Video size should be less than 50MB', 'error'));
+                    dispatch(showToast('Video size is too large. Please upload a video smaller Size', 'error'));
                 } else {
                     newVideo = {
                         file,

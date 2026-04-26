@@ -161,7 +161,7 @@ export const Logo = styled.span`
 export const Headline = styled.h1`
   margin: 0;
   font-family: 'Maven Pro', sans-serif;
-  font-size: 48px;
+  font-size: 45px;
   font-weight: 700;
   font-style: normal;
   line-height: 60px;

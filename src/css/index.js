@@ -2052,7 +2052,7 @@ export const Toolbar = styled.div`
 export const ToolButton = styled.button`
   background: none;
   border: none;
-  color: #555;
+  color:var(--card-text);
   cursor: pointer;
   padding: 8px;
   border-radius: 10px;
@@ -2217,7 +2217,7 @@ export const ToggleThumb = styled.div`
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background:var(--card-background);
+  background:#FFFFFF;
   position: absolute;
   top: 3px;
   left: ${({ $on }) => ($on ? '21px' : '3px')};
@@ -2375,7 +2375,7 @@ export const InfoHeader = styled.div`
   gap: 15px;
   margin-bottom: 8px;
   align-items: center;
-  color:var(--card--text)
+  color:var(--card-text)
 `
 
 export const InfoLabel = styled.span`
@@ -2410,7 +2410,6 @@ export const InfoSub = styled.div`
   line-height: 16px;
   letter-spacing: 0;
   vertical-align: middle;
-
   color: #444;
 `;
 
@@ -2703,7 +2702,7 @@ export const ActionButtonItemIcon = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #2a2a2e;
+  background: var(--card-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2822,7 +2821,7 @@ export const ActionButtonHeaderIcon = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #2a2a2e;
+  background: var(--card-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2880,76 +2879,87 @@ export const ActionInputLabel = styled.label`
 export const ActionInputContainer = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--card-background);
+  align-items: stretch;
+  background: #2a2a2e;
+  border-radius: 10px;
+  overflow: hidden;
 `;
 
 export const ActionPhonePrefix = styled.span`
   font-family: 'Maven Pro', sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--card-text);
-  background: var(--card-background);
-  padding: 10px 12px;
-  border-radius: 10px;
-  min-width: 50px;
-  text-align: center;
-  border: 1px solid var(--card-text);
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background-color: #666666;
+  }
 `;
 
 export const ActionInput = styled.input`
   flex: 1;
-  background: var(--card-background);
-  border: 1px solid var(--card-text);
+  background: transparent;
+  border: none;
   outline: none;
-  color: var(--card-text);
+  color: #ffffff;
   font-family: 'Maven Pro', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  padding: 14px 12px;
-  border-radius: 10px;
+  padding: 14px 16px;
 
   &::placeholder {
-    color: #555;
+    color: #888888;
   }
 `;
 
 export const ActionTextarea = styled.textarea`
-  background: var(--card-background);
-  border: 1px solid var(--card-text);
+  background: #2a2a2e;
+  border: none;
   outline: none;
-  color: var(--card-text);
+  color: #ffffff;
   font-family: 'Maven Pro', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  padding: 10px 12px;
+  padding: 14px 16px;
   border-radius: 10px;
   resize: none;
-  min-height: 80px;
+  min-height: 100px;
 
   &::placeholder {
-    color: #555;
+    color: #888888;
   }
 `;
 
 export const ActionLinkInputContainer = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: stretch;
+  background: var(--card-background);
+  border-radius: 10px;
+  border: 1px solid var(--card-text);
+  overflow: hidden;
 `;
 
 export const ActionLinkIcon = styled.div`
   width: 40px;
-  height: 40px;
-  background: var(--card-background);
-  border-radius: 10px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--card-text);
   font-size: 16px;
+  padding-left: 8px;
 `;
 
 

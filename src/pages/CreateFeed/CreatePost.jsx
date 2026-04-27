@@ -41,6 +41,7 @@ import Loader from '../../components/Loader';
 import { getDomainName, getDomainPassingName } from '../../utils/domainUtils';
 import { compressImage } from '../../utils/imageUtils';
 import { POST_STATUS } from '../../constants/constants';
+import { ScheduleIcon, CalendarIcon, ImageIcon, LinkIcon, WhatsAppIcon } from '../../components/InteractiveIcon';
 
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -76,6 +77,7 @@ const CreatePost = () => {
     console.log(submitError, "submitError")
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDraftSaved, setIsDraftSaved] = useState(false);
+    console.log(isDraftSaved, "isDraftSaved")
     const [showActionDropdown, setShowActionDropdown] = useState(false)
     const [selectedAction, setSelectedAction] = useState('')
     const [whatsappPhone, setWhatsappPhone] = useState('')
@@ -188,67 +190,6 @@ const CreatePost = () => {
     useEffect(() => {
         setIsDraftSaved(false);
     }, [title, description, selectedDomains, selectedAction, whatsappPhone, whatsappMessage, externalLink, count, selected, on, uploadedImages, uploadedVideo, uploadedPdf]);
-
-    // const loadTimeToLive = async (domain = 'ippochennai') => {
-    //     try {
-    //         const response = await authAPI.getTimeToLive(domain);
-    //         const items = Array.isArray(response) ? response : response.data || [];
-    //         console.log(items, "items123")
-    //         // Find items by type only to capture the dynamic posttype and seconds from API
-
-    //         const freeItem = items.find(item => item.type === FREE_TYPE);
-    //         const costItem = items.find(item => item.type === COST_TYPE);
-    //         console.log(costItem, "costItem123")
-    //         setFreeTtl(freeItem || null);
-    //         setCostTtl(costItem || null);
-
-    //         if (!on && freeItem) {
-    //             setCount(calculateCountFromSeconds(freeItem.seconds, selected));
-    //         }
-    //         if (on && costItem && !count) {
-    //             setCount('1');
-    //         }
-    //     } catch (error) {
-    //         console.error('Failed to load time to live', error);
-    //     }
-    // };
-
-    // const loadTimeToLive = async (domain = domainPassing) => {
-    //     try {
-    //         const response = await authAPI.getTimeToLive(domain);
-    //         const items = Array.isArray(response) ? response : response.data || [];
-
-    //         const freeItem = items.find(item => item.type === FREE_TYPE);
-    //         const costItem = items.find(item => item.type === COST_TYPE);
-
-    //         setFreeTtl(freeItem || null);
-    //         setCostTtl(costItem || null);
-
-    //         if (freeItem?.seconds) {
-    //             const freeSeconds = freeItem.seconds; // 3600
-
-    //             setUnitSeconds({
-    //                 Minutes: freeSeconds,                  // 3600 * 1 = 3600s per "minute unit"
-    //                 Hours: freeSeconds * 60,               // 3600 * 60
-    //                 Days: freeSeconds * 1440,              // 3600 * 1440
-    //             });
-
-    //             // Show count as: unit * seconds (free)
-    //             const freeDisplayCount = freeItem.unit * freeItem.seconds; // 0 * 3600 = 0
-    //             // Fallback: show how many "units" fit → freeSeconds / 60
-    //             setCount(String(freeDisplayCount || freeSeconds / 60));
-    //         }
-
-    //         if (costItem?.seconds) {
-    //             // Cost display: unit * seconds → 0.01 * 1 = 0.01 credits per second
-    //             const costDisplayCount = costItem.unit * costItem.seconds; // 0.01
-    //             if (on && !count) setCount(String(costDisplayCount));
-    //         }
-
-    //     } catch (error) {
-    //         console.error('Failed to load time to live', error);
-    //     }
-    // };
 
     const loadTimeToLive = async (domain = domainPassing) => {
         try {
@@ -469,15 +410,6 @@ const CreatePost = () => {
         }
     };
 
-    // const isFreeMode = !on && Boolean(freeTtl);
-    // const isCostMode = on && Boolean(costTtl);
-    // const derivedSeconds = calculateSeconds(count, selected);
-    // const adjustedSeconds = isCostMode
-    //     ? Math.max(0, derivedSeconds - (freeTtl?.seconds || 0))
-    //     : 0;
-    // const derivedCredits = isCostMode
-    //     ? calculateCredits(adjustedSeconds, costTtl.unit * costTtl.seconds)
-    //     : 0;
     const isFreeMode = !on && Boolean(freeTtl);
     const isCostMode = on && Boolean(costTtl);
     const derivedSeconds = calculateSeconds(count, selected);
@@ -541,8 +473,8 @@ const CreatePost = () => {
 
 
     const actionMethods = [
-        { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <BsWhatsapp fontSize={18} color="#f0f0f0" /> },
-        { id: 'link', title: t('externalLink'), description: t('visitMoreDetails'), icon: <MdOutlineOpenInNew fontSize={18} color="#f0f0f0" /> }
+        { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <WhatsAppIcon fontSize={18} /> },
+        { id: 'link', title: t('externalLink'), description: t('visitMoreDetails'), icon: <LinkIcon fontSize={18} /> }
     ]
 
     const getSelectedAction = () => actionMethods.find(m => m.id === selectedAction)
@@ -725,7 +657,7 @@ const CreatePost = () => {
                                 opacity: !uploadedPdf ? 1 : 0.5
                             }}
                         >
-                            <MdInsertPhoto fontSize={30} />
+                            <ImageIcon size={30} />
                         </ToolButton>
                         <ToolButton
                             title={t('attachFile')}
@@ -738,6 +670,7 @@ const CreatePost = () => {
                         >
                             <IoMdAttach fontSize={30} />
                         </ToolButton>
+
                     </Toolbar>
                 </PhoneFrame>
                 <Card>
@@ -799,7 +732,7 @@ const CreatePost = () => {
                     <Grid>
                         <InfoCard>
                             <InfoHeader>
-                                <CreditIcon />
+                                <CalendarIcon size={22} style={{ display: 'block', flexShrink: 0 }} />
                                 <InfoLabel>{t('endsIn')}</InfoLabel>
                             </InfoHeader>
                             <InfoValue>{endsInValue}</InfoValue>
@@ -808,7 +741,8 @@ const CreatePost = () => {
 
                         <InfoCard>
                             <InfoHeader>
-                                <CreditIcon />
+                                {/* <CreditIcon /> */}
+                                <ScheduleIcon size={22} style={{ display: 'block', flexShrink: 0 }} />
                                 <InfoLabel>{t('credits')}</InfoLabel>
                             </InfoHeader>
                             <InfoValue>{isFreeMode ? '-' : derivedCredits}</InfoValue>
@@ -1008,11 +942,11 @@ const CreatePost = () => {
                     </ActionButtonSection>
 
                 </Action>
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
+                {/* <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
                     <DraftStatus onClick={() => handleCreatePost(POST_STATUS.DRAFT)}>
                         {isDraftSaved ? (t('draftSaved') || 'Draft Saved') : (t('save Draft') || 'Save Draft')}
                     </DraftStatus>
-                </div>
+                </div> */}
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px", width: "100%", maxWidth: "400px" }}>
                     <EnquiryButton onClick={() => handleCreatePost(POST_STATUS.SUBMITTED)} disabled={isSubmitting}>
                         {isSubmitting ? t('publishing') || 'Publishing...' : t('publish')}

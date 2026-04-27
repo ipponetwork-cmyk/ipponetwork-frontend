@@ -40,6 +40,7 @@ import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';
 import { FaUser } from "react-icons/fa";    
+import { InteractiveIcon  } from '../../components/InteractiveIcon'
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
@@ -325,7 +326,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
-                            {/* <E */}
+                            <InteractiveIcon size={20} style={{ display: 'block', flexShrink: 0 }} />
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 

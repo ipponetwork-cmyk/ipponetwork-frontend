@@ -67,18 +67,10 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
     const handleTouchMove = (e) => { touchEndX.current = e.touches[0].clientX; };
 
-    const handleTouchEnd = () => {
-        if (!touchStartX.current || !touchEndX.current) return;
-        const diff = touchStartX.current - touchEndX.current;
-        if (diff > 50 && activeSlide < post.images?.length - 1) setActiveSlide((p) => p + 1);
-        else if (diff < -50 && activeSlide > 0) setActiveSlide((p) => p - 1);
-        touchStartX.current = null;
-        touchEndX.current = null;
-    };
     useEffect(() => {
         const handleTheme = () => {
             const themeChange = localStorage.getItem('themeName');
-            const themeColor = themeChange === 'theme2' ? 'white' : 'black';  // ← fixed colors
+            const themeColor = themeChange === 'theme2' ? 'white' : 'black';
             setColor(themeColor);
         };
 
@@ -92,6 +84,57 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
             clearInterval(interval);
         };
     }, []);
+
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        if (post.type !== 'video' || !videoRef.current) return;
+
+        const currentVideo = videoRef.current;
+        const options = {
+            root: null,
+            threshold: 0.6,
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    post.onVisibilityChange(post._id, true);
+                } else {
+                    post.onVisibilityChange(post._id, false);
+                }
+            });
+        }, options);
+
+        observer.observe(currentVideo);
+
+        return () => {
+            if (currentVideo) {
+                observer.unobserve(currentVideo);
+            }
+        };
+    }, [post.type, post._id, post.onVisibilityChange, post]);
+
+    useEffect(() => {
+        if (!videoRef.current) return;
+        
+        // Only play if post is active AND video slide is active
+        // (Video is always at index 0 in the current implementation)
+        if (post.isActive && activeSlide === 0) {
+            videoRef.current.play().catch((err) => console.log('Auto-play blocked:', err));
+        } else {
+            videoRef.current.pause();
+        }
+    }, [post.isActive, activeSlide]);
+
+    const handleTouchEnd = (mediaCount) => {
+        if (!touchStartX.current || !touchEndX.current) return;
+        const diff = touchStartX.current - touchEndX.current;
+        if (diff > 50 && activeSlide < mediaCount - 1) setActiveSlide((p) => p + 1);
+        else if (diff < -50 && activeSlide > 0) setActiveSlide((p) => p - 1);
+        touchStartX.current = null;
+        touchEndX.current = null;
+    };
 
     const captionText = getDynamicText(post.captionObj, dynamicLanguage, post.captionEn || '');
     const titleText = getDynamicText(post.titleObj, dynamicLanguage, post.titleEn || 'Post Title');
@@ -156,15 +199,62 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const shortCaption = words.slice(0, maxWords).join(' ');
     console.log(post, "POSTPOST")
     const renderMedia = () => {
-        if (post.type === 'video') {
+        const mediaList = [];
+        if (post.video) mediaList.push({ type: 'video', url: post.video });
+        if (post.images && post.images.length > 0) {
+            post.images.forEach(img => mediaList.push({ type: 'image', url: img }));
+        }
+
+        if (mediaList.length > 0) {
             return (
-                <VideoWrapper>
-                    <PostVideo autoPlay muted loop playsInline controls>
-                        <source src={post.video} type="video/mp4" />
-                    </PostVideo>
-                </VideoWrapper>
+                <PostMedia
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={() => handleTouchEnd(mediaList.length)}
+                    onClick={() => navigate(`/feed-detail/${post._id}`)}
+                    style={{ cursor: 'pointer' }}
+                >
+                    <SliderTrack activeSlide={activeSlide}>
+                        {mediaList.map((item, i) => (
+                            item.type === 'video' ? (
+                                <VideoWrapper key={i} style={{ minWidth: '100%' }}>
+                                    <PostVideo ref={videoRef} loop playsInline controls>
+                                        <source src={item.url} type="video/mp4" />
+                                    </PostVideo>
+                                </VideoWrapper>
+                            ) : (
+                                <SliderImage key={i} src={item.url} alt={`slide-${i}`} />
+                            )
+                        ))}
+                    </SliderTrack>
+                    {mediaList[activeSlide]?.type === 'image' && activeSlide === mediaList.length - 1 && (
+                        <SlideActionButton
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleEnquiryClick();
+                            }}
+                        >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                <span>Enquire</span>
+                                <IoIosArrowForward size={18} />
+                            </div>
+                        </SlideActionButton>
+                    )}
+                    {mediaList.length > 1 && (
+                        <CarouselDots>
+                            {mediaList.map((_, i) => (
+                                <Dot
+                                    key={i}
+                                    active={i === activeSlide}
+                                    onClick={(e) => { e.stopPropagation(); setActiveSlide(i); }}
+                                />
+                            ))}
+                        </CarouselDots>
+                    )}
+                </PostMedia>
             );
         }
+
         if (post.type === 'pdf' && post.pdf) {
             return (
                 <div
@@ -200,46 +290,6 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                     </div>
                     <IoIosArrowForward size={20} color="#888" style={{ flexShrink: 0 }} />
                 </div>
-            );
-        }
-        if (post.type === 'image' && post.images?.length > 0) {
-            return (
-                <PostMedia
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    // onClick={() => navigate('/feed-detail', { state: { postId: post._id } })}
-                    onClick={() => navigate(`/feed-detail/${post._id}`)}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <SliderTrack activeSlide={activeSlide}>
-                        {post.images.map((img, i) => (
-                            <SliderImage key={i} src={img} alt={`slide-${i}`} />
-                        ))}
-                    </SliderTrack>
-                    {activeSlide === post.images.length - 1 && (
-                        <SlideActionButton
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleEnquiryClick();
-                            }}
-                        >
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span>Enquire</span>
-                                <IoIosArrowForward size={18} />
-                            </div>
-                        </SlideActionButton>
-                    )}
-                    <CarouselDots>
-                        {post.images.map((_, i) => (
-                            <Dot
-                                key={i}
-                                active={i === activeSlide}
-                                onClick={(e) => { e.stopPropagation(); setActiveSlide(i); }}
-                            />
-                        ))}
-                    </CarouselDots>
-                </PostMedia>
             );
         }
 
@@ -323,6 +373,19 @@ const FeedPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [visibleVideoIds, setVisibleVideoIds] = useState(new Set());
+
+    const handleVisibilityChange = useCallback((id, isVisible) => {
+        setVisibleVideoIds(prev => {
+            const newSet = new Set(prev);
+            if (isVisible) newSet.add(id);
+            else newSet.delete(id);
+            return newSet;
+        });
+    }, []);
+
+    // Determine the active video ID (first visible one in the posts array)
+    const activeVideoId = posts.find(p => p.type === 'video' && visibleVideoIds.has(p._id))?._id;
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -392,7 +455,16 @@ const FeedPage = () => {
                     <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>Error: {error}</div>
                 ) : posts.length > 0 ? (
                     posts.map((post) => (
-                        <FeedItem key={post._id} post={post} onEnquiryUpdate={fetchPosts} dynamicLanguage={dynamicLanguage} />
+                        <FeedItem
+                            key={post._id}
+                            post={{
+                                ...post,
+                                isActive: post._id === activeVideoId,
+                                onVisibilityChange: handleVisibilityChange
+                            }}
+                            onEnquiryUpdate={fetchPosts}
+                            dynamicLanguage={dynamicLanguage}
+                        />
                     ))
                 ) : (
                     <div style={{ padding: '20px', textAlign: 'center' }}>No posts available</div>

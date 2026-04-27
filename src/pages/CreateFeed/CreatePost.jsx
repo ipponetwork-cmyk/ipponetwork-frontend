@@ -460,7 +460,7 @@ const CreatePost = () => {
         }
         catch (error) {
             console.error('Error creating post:', error);
-            const errorMsg = error?.message || 'Something went wrong';  
+            const errorMsg = error?.message || 'Something went wrong';
             dispatch(showToast(errorMsg, 'error'));
             setSubmitError(errorMsg);
         }
@@ -579,7 +579,6 @@ const CreatePost = () => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
-                        {/* Video Preview */}
                         {uploadedVideo && (
                             <div style={{
                                 position: 'relative',
@@ -615,7 +614,6 @@ const CreatePost = () => {
                             </div>
                         )}
 
-                        {/* Images Preview */}
                         {uploadedImages.length > 0 && (
                             <div style={{ marginTop: '10px' }}>
                                 <div style={{

@@ -175,22 +175,29 @@ const FeedDetail = () => {
 
     const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
     const handleTouchMove = (e) => { touchEndX.current = e.touches[0].clientX; };
-    const handleTouchEnd = () => {
+    const handleTouchEnd = (mediaCount) => {
         if (!touchStartX.current || !touchEndX.current) return;
         const diff = touchStartX.current - touchEndX.current;
-        if (diff > 50 && activeSlide < post.images.length - 1) setActiveSlide(p => p + 1);
+        if (diff > 50 && activeSlide < mediaCount - 1) setActiveSlide(p => p + 1);
         else if (diff < -50 && activeSlide > 0) setActiveSlide(p => p - 1);
         touchStartX.current = null;
         touchEndX.current = null;
     };
 
-    const isLastImage = post?.type === 'image' && activeSlide === post.images?.length - 1;
+    // const isLastImage = post?.type === 'image' && activeSlide === post.images?.length - 1;
 
     // All hooks above — safe to return conditionally now
     if (loading) return <div style={{ textAlign: 'center' }}><Loader /></div>;
     if (!post) return null;
     console.log(post, "POST DATA IN DETAIL")
-    if (post.type === 'image') {
+    const mediaList = [];
+    if (post.video) mediaList.push({ type: 'video', url: post.video });
+    if (post.images && post.images.length > 0) {
+        post.images.forEach(img => mediaList.push({ type: 'image', url: img }));
+    }
+
+    if (mediaList.length > 0) {
+        const isLastSlide = activeSlide === mediaList.length - 1;
         return (
             <>
                 <DetailWrapper>
@@ -200,19 +207,29 @@ const FeedDetail = () => {
                     <PostMedia
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
+                        onTouchEnd={() => handleTouchEnd(mediaList.length)}
                     >
                         <SliderTrack activeSlide={activeSlide}>
-                            {post.images.map((img, i) => (
-                                <SliderImage key={i} src={img} alt={`slide-${i}`} />
+                            {mediaList.map((item, i) => (
+                                item.type === 'video' ? (
+                                    <VideoWrapper key={i} style={{ minWidth: '100%' }}>
+                                        <PostVideo autoPlay muted loop playsInline controls>
+                                            <source src={item.url} type="video/mp4" />
+                                        </PostVideo>
+                                    </VideoWrapper>
+                                ) : (
+                                    <SliderImage key={i} src={item.url} alt={`slide-${i}`} />
+                                )
                             ))}
                         </SliderTrack>
-                        <CarouselDots>
-                            {post.images.map((_, i) => (
-                                <Dot key={i} active={i === activeSlide} onClick={() => setActiveSlide(i)} />
-                            ))}
-                        </CarouselDots>
-                        {isLastImage && (
+                        {mediaList.length > 1 && (
+                            <CarouselDots>
+                                {mediaList.map((_, i) => (
+                                    <Dot key={i} active={i === activeSlide} onClick={() => setActiveSlide(i)} />
+                                ))}
+                            </CarouselDots>
+                        )}
+                        {mediaList[activeSlide]?.type === 'image' && isLastSlide && (
                             <DetailSlideActionButton onClick={handleEnquiryClick}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
                                     <span>Enquire</span>
@@ -221,7 +238,7 @@ const FeedDetail = () => {
                             </DetailSlideActionButton>
                         )}
                     </PostMedia>
-                    <OverlayContent style={{ paddingBottom: isLastImage ? '110px' : undefined }}>
+                    <OverlayContent style={{ paddingBottom: isLastSlide ? '110px' : undefined }}>
                         <UserRow>
                             {post?.createduserid?.photo ? (
                                 <DetailAvatar src={post.createduserid.photo} alt="user" />
@@ -231,43 +248,12 @@ const FeedDetail = () => {
                                 </UserAvatarFallback>
                             )}
                             <DetailUserInfo>
-                                <DetailUserName>{post.username}</DetailUserName>
-                                <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>
-                            </DetailUserInfo>
-                        </UserRow>
-                        <DetailCaption>{captionText}</DetailCaption>
-                        <DetailTime>{titleText}</DetailTime>
-                        <DetailEnquiryButton onClick={handleEnquiryClick}>Enquire</DetailEnquiryButton>
-                        <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
-                    </OverlayContent>
-                </DetailWrapper>
-                <SharePostDialog open={shareDialogOpen} onClose={() => setShareDialogOpen(false)} postId={post.id} />
-            </>
-        );
-    }
-
-    if (post.type === 'video') {
-        return (
-            <>
-                <DetailWrapper>
-                    <BackButton onClick={() => navigate(-1)}>
-                        <IoArrowBack size={20} color="#ffffff" />
-                    </BackButton>
-                    <VideoWrapper>
-                        <PostVideo autoPlay muted loop playsInline controls>
-                            <source src={post.video} type="video/mp4" />
-                        </PostVideo>
-                    </VideoWrapper>
-                    <OverlayContent>
-                        <UserRow>
-                            <DetailAvatar src={post.createduserid?.photo} alt="user" />
-                            <DetailUserInfo>
                                 <DetailUserName>{post.createduserid?.name || post.username}</DetailUserName>
                                 <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
                         <DetailCaption>{captionText}</DetailCaption>
-                        <DetailTime>{post.time}</DetailTime>
+                        <DetailTime>{post.type === 'image' ? titleText : post.time}</DetailTime>
                         <DetailEnquiryButton onClick={handleEnquiryClick}>Enquire</DetailEnquiryButton>
                         <FooterBar enquirycount={enquiryCount} onShare={() => setShareDialogOpen(true)} />
                     </OverlayContent>

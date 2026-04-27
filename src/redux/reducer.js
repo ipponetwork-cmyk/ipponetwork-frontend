@@ -1,4 +1,4 @@
-import { SHOW_TOAST, SET_PROFILE } from './actionTypes'
+import { SHOW_TOAST, SET_PROFILE, FEED_DATA } from './actionTypes'
 
 const initialState = {
   toast: {
@@ -14,6 +14,8 @@ const initialState = {
     photo: '',
     mobile: ''
   },
+
+  feedData: []
 }
 
 export default function ippoReducer(state = initialState, action) {
@@ -31,6 +33,11 @@ export default function ippoReducer(state = initialState, action) {
       return {
         ...state,
         profileDetails: action.payload,
+      }
+    case FEED_DATA:
+      return {
+        ...state,
+        feedData: action.payload,
       }
     default:
       return state

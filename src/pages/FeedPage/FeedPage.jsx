@@ -38,9 +38,9 @@ import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
 import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
+import InteractiveIcon from '../../components/InteractiveIcon';
 import { postAPI } from '../../services/postAPI';
-import { FaUser } from "react-icons/fa";
-import { GrSearchAdvanced } from "react-icons/gr";
+import { FaUser } from "react-icons/fa";    
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
@@ -56,34 +56,12 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
-    const [color, setColor] = useState(
-        () => localStorage.getItem('themeName')
-    );
-    console.log(color, "colo123r")
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const navigate = useNavigate();
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
     const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
     const handleTouchMove = (e) => { touchEndX.current = e.touches[0].clientX; };
-
-    useEffect(() => {
-        const handleTheme = () => {
-            const themeChange = localStorage.getItem('themeName');
-            const themeColor = themeChange === 'theme2' ? 'white' : 'black';
-            setColor(themeColor);
-        };
-
-        handleTheme();  // run on mount
-
-        window.addEventListener('storage', handleTheme);
-        const interval = setInterval(handleTheme, 300);  // catch same-tab changes
-
-        return () => {
-            window.removeEventListener('storage', handleTheme);
-            clearInterval(interval);
-        };
-    }, []);
 
     const videoRef = useRef(null);
 
@@ -348,7 +326,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
-                            <GrSearchAdvanced size={16} />
+                            <InteractiveIcon size={20} style={{ display: 'block', flexShrink: 0 }} />
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 
@@ -368,6 +346,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
         </FeedPost>
     );
 };
+
+
 const FeedPage = () => {
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);

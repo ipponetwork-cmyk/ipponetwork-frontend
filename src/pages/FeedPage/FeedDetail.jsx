@@ -248,8 +248,8 @@ const FeedDetail = () => {
                                 </UserAvatarFallback>
                             )}
                             <DetailUserInfo>
-                                <DetailUserName>{post.createduserid?.name || post.username}</DetailUserName>
-                                <DetailUserLocation>{post.createduserid?.username || post.username}</DetailUserLocation>
+                                <DetailUserName>{post?.createduserid?.name}</DetailUserName>
+                                <DetailUserLocation>{post.createduserid?.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
                         <DetailCaption>{captionText}</DetailCaption>
@@ -276,8 +276,8 @@ const FeedDetail = () => {
                         <UserRow>
                             <DetailAvatar src={post.createduserid?.photo} alt="user" />
                             <DetailUserInfo>
-                                <DetailUserName>{post.username}</DetailUserName>
-                                <DetailUserLocation>{post.location}</DetailUserLocation>
+                                <DetailUserName>{post?.createduserid?.name}</DetailUserName>
+                                <DetailUserLocation>{post?.createduserid?.username}</DetailUserLocation>
                             </DetailUserInfo>
                         </UserRow>
                         <DetailTime>{post.time}</DetailTime>

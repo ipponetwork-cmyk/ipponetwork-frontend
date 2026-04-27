@@ -117,7 +117,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
 
     useEffect(() => {
         if (!videoRef.current) return;
-        
+
         // Only play if post is active AND video slide is active
         // (Video is always at index 0 in the current implementation)
         if (post.isActive && activeSlide === 0) {
@@ -348,7 +348,8 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
-                            <GrSearchAdvanced size={16} />
+                            {/* <GrSearchAdvanced size={16} /> */}
+                            <i className="fi fi-ts-interactive"></i>
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 

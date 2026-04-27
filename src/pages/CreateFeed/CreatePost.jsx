@@ -399,9 +399,9 @@ const CreatePost = () => {
         const status = statusType; const formData = new FormData();
         formData.append('title', title.trim());
         formData.append('description', description.trim());
-        selectedDomainValues.forEach(domain => formData.append('listofdomain', domain));
+        selectedDomainValues.forEach(domain => formData.append('createdbydomain', domain));
         formData.append('isfreeornot', String(isfreeornot));
-        formData.append('createdbydomain', JSON.stringify(createdbydomain));
+        formData.append('listofdomain', JSON.stringify(createdbydomain));
         formData.append('totalseconds', String(totalseconds));
         formData.append('calltoaction', selectedAction);
         formData.append('calltoactiontype', selectedAction === 'link' ? 'externallink' : selectedAction);
@@ -579,6 +579,7 @@ const CreatePost = () => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
+                        {/* Video Preview */}
                         {uploadedVideo && (
                             <div style={{
                                 position: 'relative',
@@ -614,6 +615,7 @@ const CreatePost = () => {
                             </div>
                         )}
 
+                        {/* Images Preview */}
                         {uploadedImages.length > 0 && (
                             <div style={{ marginTop: '10px' }}>
                                 <div style={{

@@ -93,7 +93,7 @@ export const MenuButton = styled.button`
 
 export const BrandTitle = styled.h1`
   margin: 0;
-  font-family: 'Lilita One', cursive;
+  font-family: 'Comic Sans MS', cursive;
   font-size: 24px;
   font-weight: 400;
   font-style: normal;
@@ -114,7 +114,7 @@ export const PageWrapper = styled.main`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: white;
+  background:var(--card-text);
   overflow-x: hidden;
 
   @media (min-width: 769px) {
@@ -132,7 +132,7 @@ export const BackgroundPanel = styled.section`
   justify-content: center;
   align-items: start;
   color: white;
-  background: #000000;
+  background:var(--card-background);
   min-height: 220px;      
   text-align: center;
   overflow: hidden;
@@ -147,7 +147,7 @@ export const BackgroundPanel = styled.section`
 
 export const Logo = styled.span`
   display: inline-block;
-  font-family: 'Lilita One', cursive;
+  font-family: 'Comic Sans MS', cursive;
   font-size: 48px;
   font-weight: 400;
   font-style: normal;
@@ -167,7 +167,7 @@ export const Headline = styled.h1`
   line-height: 60px;
   letter-spacing: -2.4px;
   vertical-align: middle;
-  color: #ffffff;
+  color:var(--card-text);
   padding: 12px;
   text-align: start;
 
@@ -179,7 +179,7 @@ export const Headline = styled.h1`
 `;
 
 export const LoginCard = styled.section`
-  background: #ffffff;
+  background:var(--card-text);
   padding: 36px 24px 40px;
   display: flex;
   flex-direction: column;
@@ -208,7 +208,7 @@ export const CardHeader = styled.h2`
   line-height: 36px;
   letter-spacing: -0.75px;
   vertical-align: middle;
-  color: #111111;
+  color:var(--card-background);
 `;
 
 
@@ -1219,7 +1219,7 @@ export const DrawerMenu = styled.div`
 `;
 
 export const DrawerLogo = styled.span`
-    font-family: 'Lilita One', cursive;
+    font-family: 'Comic Sans MS', cursive;
     font-size: 20px;
     font-weight: 400;
     color: #ffca22;
@@ -1275,7 +1275,6 @@ export const DrawerLabel = styled.span`
     font-weight: 500;
     line-height: 20px;
     letter-spacing: 0px;
-    
     color: ${({ active }) => (active ? '#f3f4f6' : '#9ca3af')};
     transition: color 0.2s ease;
 `;

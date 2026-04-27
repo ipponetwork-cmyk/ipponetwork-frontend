@@ -169,7 +169,7 @@ function Navbar() {
             <DrawerThemeSection onClick={() => { toggleTheme(); setOpen(false); }}>
               <div>
                 <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
-                <DrawerThemeSubtitle>Toggle Theme</DrawerThemeSubtitle>
+                <DrawerThemeSubtitle>Invert Theme</DrawerThemeSubtitle>
               </div>
               <ToggleSwitch isEnabled={isToggled} />
             </DrawerThemeSection>

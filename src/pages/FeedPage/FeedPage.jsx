@@ -38,7 +38,6 @@ import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
 import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
-import InteractiveIcon from '../../components/InteractiveIcon';
 import { postAPI } from '../../services/postAPI';
 import { FaUser } from "react-icons/fa";    
 import { getDynamicText } from '../../utils/languageUtils';
@@ -326,7 +325,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 <PostFooter>
                     <ActionBar>
                         <EnquiryBadge>
-                            <InteractiveIcon size={20} style={{ display: 'block', flexShrink: 0 }} />
+                            {/* <E */}
                             <EnquiryText>{post.enquirycount}</EnquiryText>
                         </EnquiryBadge>
 

@@ -351,7 +351,7 @@ const CreatePost = () => {
             formData.append('whatsappmessage', whatsappMessage || 'Hi, I am interested in your post');
         }
         else if (selectedAction === 'call') {
-            formData.append('callnumber', '91' + callPhone);
+            formData.append('calltomobilenumber', '91' + callPhone);
         }
         else if (selectedAction === 'link') {
             formData.append('calltoactionexternallinkurl', externalLink);

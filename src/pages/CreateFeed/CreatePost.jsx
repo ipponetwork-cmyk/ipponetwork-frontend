@@ -16,19 +16,15 @@ import {
     EnquiryButton
 } from '../../css/index';
 import { useState, useEffect } from 'react';
-import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { MdInsertPhoto } from "react-icons/md";
 import { IoMdAttach } from "react-icons/io";
 import { useTranslation } from '../../hooks/useTranslation';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, } from 'react-redux';
 // import { createPost } from '../../redux/createPostActions';
 import { authAPI } from '../../services/api';
-import { CiCalendar } from "react-icons/ci";
 import { BsWhatsapp } from "react-icons/bs";
-import { MdOutlineOpenInNew } from "react-icons/md";
-import { IoGlobeOutline, IoTerminalOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoGlobeOutline } from "react-icons/io5";
 // import { IoGlobeOutline, IoTerminalOutline, IoSettingsOutline } from "react-icons/io5";
 import {
     IoChevronDownOutline,
@@ -83,15 +79,12 @@ const CreatePost = () => {
     const [whatsappPhone, setWhatsappPhone] = useState('')
     const [whatsappMessage, setWhatsappMessage] = useState('')
     const [externalLink, setExternalLink] = useState('')
-    const currentUser = useSelector((state) => state.profileDetails);
-    console.log(currentUser?.data, "currentUser123")
+    const [callPhone, setCallPhone] = useState('');
     const currentUserData = localStorage.getItem('user');
     const user = JSON.parse(currentUserData);
-    console.log(user, "user");
     const createduserid = user?._id || user?.id;
     const createdusername = user?.username;
     const domainPassing = getDomainPassingName()
-    console.log(domainPassing, "domainPassing")
     const FREE_TYPE = import.meta.env.VITE_FREE_TYPE;
     const COST_TYPE = import.meta.env.VITE_COST_TYPE;
     const handleMediaUpload = async (e) => {
@@ -181,11 +174,6 @@ const CreatePost = () => {
         const num = Number(value) || 0;
         return num * unitSeconds[unit];
     };
-
-    // const calculateCredits = (seconds, costPerSecond) => {
-    //     if (!seconds || !costPerSecond) return 0;
-    //     return Number((seconds * costPerSecond).toFixed(2));
-    // };
 
     useEffect(() => {
         setIsDraftSaved(false);
@@ -323,6 +311,12 @@ const CreatePost = () => {
             dispatch(showToast('Please select a call to action method', 'error'));
             return;
         }
+        if (selectedAction === 'call') {
+            if (!/^\d{10}$/.test(callPhone)) {
+                dispatch(showToast('Please enter a valid 10-digit phone number', 'error'));
+                return;
+            }
+        }
 
         if (selectedAction === 'whatsapp') {
             if (!/^\d{10}$/.test(whatsappPhone)) {
@@ -355,7 +349,11 @@ const CreatePost = () => {
         if (selectedAction === 'whatsapp') {
             formData.append('whatsappnumber', '91' + whatsappPhone);
             formData.append('whatsappmessage', whatsappMessage || 'Hi, I am interested in your post');
-        } else if (selectedAction === 'link') {
+        }
+        else if (selectedAction === 'call') {
+            formData.append('callnumber', '91' + callPhone);
+        }
+        else if (selectedAction === 'link') {
             formData.append('calltoactionexternallinkurl', externalLink);
         }
 
@@ -473,7 +471,8 @@ const CreatePost = () => {
 
 
     const actionMethods = [
-        { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <WhatsAppIcon fontSize={18} /> },
+        { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <BsWhatsapp size={18} /> },
+        { id: 'call', title: 'Call', description: 'Talk to us Instantly', icon: <WhatsAppIcon fontSize={18} /> },
         { id: 'link', title: t('externalLink'), description: t('visitMoreDetails'), icon: <LinkIcon fontSize={18} /> }
     ]
 
@@ -876,23 +875,21 @@ const CreatePost = () => {
                                         <IoChevronDownOutline size={18} />
                                     </ActionButtonHeaderChevron>
                                 </ActionButtonHeader>
-
                                 {/* CALL */}
-                                {/* {selectedAction === "call" && (
+                                {selectedAction === "call" && (
                                     <ActionInputField>
                                         <ActionInputLabel>{t('enterPhoneNumber')}</ActionInputLabel>
                                         <ActionInputContainer>
                                             <ActionPhonePrefix>+91</ActionPhonePrefix>
                                             <ActionInput
                                                 type="tel"
-                                                placeholder={t('tenDigitNumber')}
+                                                placeholder="10 digit number"
                                                 value={callPhone}
                                                 onChange={(e) => setCallPhone(e.target.value)}
                                             />
                                         </ActionInputContainer>
                                     </ActionInputField>
-                                )} */}
-
+                                )}
                                 {/* WHATSAPP */}
                                 {selectedAction === "whatsapp" && (
                                     <>

@@ -364,8 +364,8 @@ export const PageWrappers = styled.main`
     min-height: 50vh;
     display: flex;
     flex-direction: column;
-    background: #0a0a0a;
-    color: #ffffff;
+    background: var(--card-background);
+    color: var(--card-text);
     border-radius:20px;
     padding:40px 10px;
     margin-top:35px;
@@ -415,7 +415,8 @@ export const CameraButton = styled.div`
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: var(--surface);
+    background: var(--card-text);
+    color: var(--card-background);
     border: 2px solid var(--surface-border);
     display: flex;
     align-items: center;
@@ -433,7 +434,7 @@ export const ProfileImageTitle = styled.p`
   letter-spacing: 0px;
   text-align: center;
   vertical-align: middle;
-  color: #ffffff;
+  color: var(--card-text);
 `;
 
 
@@ -455,7 +456,7 @@ export const ProfileImageSubtitle = styled.p`
 export const ChangePhotoText = styled.span`
     font-size:14px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--card-text);
     cursor: pointer;
 `;
 
@@ -520,12 +521,12 @@ export const SuggestionItem = styled.div`
   }
 `;
 export const FieldInput = styled.input`
-    background: #191c1c;
-    border: 1px solid #2f3336;
+    background:var(--card-background);
+    border: 1px solid var(--card-text);
     border-radius: 10px;
     padding: 18px 16px;
     font-size: 0.95rem;
-    color: #ffffff;
+    color: var(--card-text);
     outline: none;
     width: 100%;
     box-sizing: border-box;
@@ -537,7 +538,7 @@ export const FieldInput = styled.input`
     }
 
     &:focus {
-        border-color: #ffffff;
+        border-color: var(--card-text);
     }
 `;
 
@@ -572,8 +573,8 @@ export const ContinueButton = styled.button`
     height: 68px;
     border: none;
     border-radius: 10px;
-    background: #111111;
-    color: #ffffff;
+    background: var(--card-background);
+    color: var(--card-text);
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
@@ -2253,7 +2254,7 @@ export const CountBtn = styled.button`
   width: 52px;
   height: 52px;
   border-radius: 16px;
-  background: transparent;
+  background: #8C8686;
   border: 1px solid var(--card-text);
   color:var(--card-text);
   font-size: 35px;
@@ -2265,7 +2266,7 @@ export const CountBtn = styled.button`
   transition: background 0.15s, transform 0.1s;
   line-height: 1;
 
-  &:hover  { background: #252528; }
+  &:hover  { background: var(--card-background); }
   &:active { transform: scale(0.93); }
   &:disabled {
     opacity: 0.3;
@@ -2654,10 +2655,6 @@ export const ActionButtonDropdown = styled.button`
   color: var(--card-text);
   transition: border-color 0.2s, background 0.2s;
 
-  &:hover {
-    background: #151519;
-  }
-
   svg {
     width: 18px;
     height: 18px;
@@ -2691,9 +2688,9 @@ export const ActionButtonItem = styled.div`
     border-bottom: none;
   }
 
-  &:hover {
-    background: #151519;
-  }
+  // &:hover {
+  //   background: #151519;
+  // }
 
   // background: ${({ $isSelected }) => ($isSelected ? '#1a3a5c' : 'transparent')};
 `;
@@ -2809,10 +2806,10 @@ export const selectMenuProps = {
           background: 'var(--card-background)',
           color: 'var(--card-text)',
         },
-        '&:hover': {
-          background: 'var(--card-background)',
-          color: 'var(--card-text)',
-        },
+        // '&:hover': {
+        //   background: 'var(--card-background)',
+        //   color: 'var(--card-text)',
+        // },
       },
     },
   },
@@ -2903,13 +2900,13 @@ export const ActionPhonePrefix = styled.span`
     top: 20%;
     bottom: 20%;
     width: 1px;
-    background-color: #666666;
+    background-color: #2a2a2e;
   }
 `;
 
 export const ActionInput = styled.input`
   flex: 1;
-  background: transparent;
+  background: #2a2a2e;
   border: none;
   outline: none;
   color: #ffffff;
@@ -2947,13 +2944,13 @@ export const ActionLinkInputContainer = styled.div`
   align-items: stretch;
   background: var(--card-background);
   border-radius: 10px;
-  border: 1px solid var(--card-text);
+  // border: 1px solid var(--card-text);
   overflow: hidden;
 `;
 
 export const ActionLinkIcon = styled.div`
   width: 40px;
-  background: transparent;
+  background: #2a2a2e;
   display: flex;
   align-items: center;
   justify-content: center;

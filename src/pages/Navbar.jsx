@@ -4,7 +4,7 @@ import { IoClose, IoLogOutOutline } from 'react-icons/io5';
 import { GoHome } from 'react-icons/go';
 import { CiCirclePlus } from "react-icons/ci";
 import { MdLogin } from 'react-icons/md';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, } from 'react-router-dom';
 import useTheme from '../context/useTheme';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
@@ -31,7 +31,6 @@ function Navbar() {
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const navigate = useNavigate();
-  const location = useLocation();
   const { toggleTheme, language, setLanguage, selectedThemeName, themes } = useTheme();
   console.log(selectedThemeName, "toggleThemetoggleTheme")
   const dispatch = useDispatch();
@@ -165,15 +164,13 @@ function Navbar() {
             </DrawerLanguageButtons>
           </DrawerLanguageSection>
 
-          {location.pathname !== '/profilepage' && (
-            <DrawerThemeSection onClick={() => { toggleTheme(); setOpen(false); }}>
-              <div>
-                <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
-                <DrawerThemeSubtitle>Invert Theme</DrawerThemeSubtitle>
-              </div>
-              <ToggleSwitch isEnabled={isToggled} />
-            </DrawerThemeSection>
-          )}
+          <DrawerThemeSection onClick={() => { toggleTheme(); setOpen(false); }}>
+            <div>
+              <div><DrawerThemeLabel>Theme</DrawerThemeLabel></div>
+              <DrawerThemeSubtitle>Invert Theme</DrawerThemeSubtitle>
+            </div>
+            <ToggleSwitch isEnabled={isToggled} />
+          </DrawerThemeSection>
         </DrawerFooter>
       </Drawer>
     </>

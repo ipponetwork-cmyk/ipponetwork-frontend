@@ -39,20 +39,17 @@ import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';
-import { FaUser } from "react-icons/fa";    
-import { InteractiveIcon  } from '../../components/InteractiveIcon'
+import { FaUser } from "react-icons/fa";
+import { InteractiveIcon } from '../../components/InteractiveIcon'
 import { getDynamicText } from '../../utils/languageUtils';
 import Loader from '../../components/Loader';
 import { getDomainName } from '../../utils/domainUtils';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { showToast } from '../../redux/actions';
 import { transformPost } from '../../utils/transformPost';
 
 
 const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
-    const currentUser = useSelector((state) => state.profileDetails);
-    console.log(currentUser, "currentUser12321")
-    console.log(post, "post in feed item")
     const dispatch = useDispatch();
     const [activeSlide, setActiveSlide] = useState(0);
     const [expanded, setExpanded] = useState(false);
@@ -95,7 +92,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
 
     useEffect(() => {
         if (!videoRef.current) return;
-        
+
         // Only play if post is active AND video slide is active
         // (Video is always at index 0 in the current implementation)
         if (post.isActive && activeSlide === 0) {
@@ -175,7 +172,6 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
     const maxWords = 8 * 6;
     const isLong = words.length > maxWords;
     const shortCaption = words.slice(0, maxWords).join(' ');
-    console.log(post, "POSTPOST")
     const renderMedia = () => {
         const mediaList = [];
         if (post.video) mediaList.push({ type: 'video', url: post.video });
@@ -342,6 +338,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
                 open={shareDialogOpen}
                 onClose={() => setShareDialogOpen(false)}
                 postId={post.slug || post.id}
+                shareUrl={post.shareurl}
             />
         </FeedPost>
     );
@@ -378,7 +375,6 @@ const FeedPage = () => {
         }
     }, [navigate]);
 
-    console.log(posts, "postPage1232")
     const [dynamicLanguage, setDynamicLanguage] = useState(() => localStorage.getItem('language') || 'en');
     const fetchPosts = useCallback(async () => {
         try {

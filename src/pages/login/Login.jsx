@@ -117,7 +117,6 @@ function Login() {
         }
     };
     const domainName = getDomainShortName();
-    console.log(domainName, "domainName123Login")
     return (
         <>
             <PageWrapper>

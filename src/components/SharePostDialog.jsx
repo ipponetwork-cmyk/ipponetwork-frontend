@@ -13,28 +13,28 @@ import { MdClose } from 'react-icons/md'
 import { useState } from 'react'
 // import useTheme from '../context/useTheme'
 import { StyledDialog, StyledDialogTitle, StyledDialogContent, StyledDialogActions, StyledTextField, LinkBox, CopyButton } from '../css/index'
-function SharePostDialog({ open, onClose, postId = '123' }) {
+function SharePostDialog({ open, onClose, shareUrl }) {
   const [copied, setCopied] = useState(false)
-  const getDomainName = () => {
-    const host = window.location.hostname;
-    console.log(host, "host1234");
-    const parts = host.split('.');
-    const index = parts.findIndex(part => part.startsWith('ippo'));
+  // const getDomainName = () => {
+  //   const host = window.location.hostname;
+  //   console.log(host, "host1234");
+  //   const parts = host.split('.');
+  //   const index = parts.findIndex(part => part.startsWith('ippo'));
 
-    if (index !== -1) {
-      return `${parts[index]}.${parts[index + 1]}`;
-    }
+  //   if (index !== -1) {
+  //     return `${parts[index]}.${parts[index + 1]}`;
+  //   }
 
-    return `${parts[0]}.${parts[1]}`; // fallback
-  };
-  const domainName = getDomainName();
+  //   return `${parts[0]}.${parts[1]}`; // fallback
+  // };
+  // const domainName = getDomainName();
 
-  const shareLink = `https://${domainName}/post/${postId}`;
+  // const shareLink = `https://${domainName}/post/${postId}`;
 
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareLink)
+      await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
       setTimeout(() => {
         setCopied(false)
@@ -65,7 +65,7 @@ function SharePostDialog({ open, onClose, postId = '123' }) {
         <LinkBox>
           <StyledTextField
             fullWidth
-            value={shareLink}
+            value={shareUrl}
             size="small"
             variant="standard"
             InputProps={{ disableUnderline: true, readOnly: true }}

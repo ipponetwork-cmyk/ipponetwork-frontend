@@ -34,8 +34,6 @@ import {
     UserAvatarFallback
 } from '../../css/index';
 import { IoIosArrowForward } from "react-icons/io";
-import { RiSearchEyeLine } from "react-icons/ri"      // Enquiry
-import { FaRegComment } from "react-icons/fa"          // Comment
 import { IoIosShareAlt } from "react-icons/io";
 import SharePostDialog from '../../components/SharePostDialog';
 import { postAPI } from '../../services/postAPI';

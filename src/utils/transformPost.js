@@ -61,7 +61,7 @@ export const transformPost = (apiPost) => {
         calltoactiontype: apiPost.calltoactiontype,
         whatsappnumber: apiPost.whatsappnumber,
         whatsappmessage: apiPost.whatsappmessage,
-        callnumber: apiPost.callnumber,
+        calltomobilenumber: apiPost.calltomobilenumber,
         calltoactionexternallinkurl: apiPost.calltoactionexternallinkurl,
         createduserid: apiPost.createduserid,
         shareurl: apiPost.shareurl,

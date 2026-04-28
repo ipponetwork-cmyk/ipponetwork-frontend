@@ -67,7 +67,7 @@ const FeedDetail = () => {
             // Safely extract target values
             const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber || post.calltoaction?.number || post.number;
             const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || post.calltoaction?.message || 'Hi, I am interested in your post';
-            const cNumber = post.callnumber || post.calltoaction?.callnumber || post.calltoaction?.number || post.number;
+            const cNumber = post.calltomobilenumber || post.calltoaction?.calltomobilenumber || post.calltoaction?.number || post.number;
             const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl || post.externallinkurl || post.calltoaction?.url;
 
             // Infer actionType if not explicitly provided
@@ -134,7 +134,7 @@ const FeedDetail = () => {
                         enquirycount: apiPost.enquirycount || 0,
                         whatsappnumber: apiPost.calltoaction?.whatsappnumber,
                         whatsappmessage: apiPost.calltoaction?.whatsappmessage,
-                        callnumber: apiPost.calltoaction?.callnumber,
+                        calltomobilenumber: apiPost.calltoaction?.callnumber,
                         calltoactiontype: apiPost.calltoaction?.type,
                         createduserid: apiPost.createduserid,
                         shareurl: apiPost.shareurl,

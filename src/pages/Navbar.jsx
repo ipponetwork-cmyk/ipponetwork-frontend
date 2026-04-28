@@ -32,7 +32,6 @@ function Navbar() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const navigate = useNavigate();
   const { toggleTheme, language, setLanguage, selectedThemeName, themes } = useTheme();
-  console.log(selectedThemeName, "toggleThemetoggleTheme")
   const dispatch = useDispatch();
 
   const isLoggedIn = !!localStorage.getItem('authToken');

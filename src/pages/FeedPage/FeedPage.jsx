@@ -389,7 +389,6 @@ const FeedPage = () => {
 
             if (response.success && response.data) {
                 const transformedPosts = response.data.map(transformPost);
-                console.log(transformedPosts, "transformedPosts")
                 setPosts(transformedPosts);
             } else {
                 setError(response.message || 'Failed to fetch posts');

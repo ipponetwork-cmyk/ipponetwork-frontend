@@ -83,7 +83,7 @@ function VerifyOtp() {
                 const userId = response.data?._id || response.data?.id || phone;
                 console.log(userId, "userId123")
                 if (response.isNewUser || !response.data?.username || !response.data?.name) {
-                    navigate(`/profilepage`);
+                    navigate(`/profilepage`, { replace: true });
                 } else {
                     navigate('/feed');
                     dispatch(showToast('Login Successful', 'success'));

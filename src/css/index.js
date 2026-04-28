@@ -147,7 +147,7 @@ export const BackgroundPanel = styled.section`
 
 export const Logo = styled.span`
   display: inline-block;
-  font-family: 'Comic Sans MS';
+  font-family: 'Comic Sans MS', cursive;
   font-size: 48px;
   font-weight: 400;
   font-style: normal;
@@ -1285,7 +1285,7 @@ export const TextContentBox = styled.div`
     border-left: 5px solid orange;
     margin: 0 0 4px 0;
     padding: 20px 16px;
-    min-height: 160px;
+    // min-height: 160px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

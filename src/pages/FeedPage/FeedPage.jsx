@@ -370,7 +370,7 @@ const FeedPage = () => {
         if (token && userData) {
             const user = JSON.parse(userData);
             if (!user.username || !user.name) {
-                navigate('/profilepage');
+                navigate('/profilepage', { replace: true });
             }
         }
     }, [navigate]);

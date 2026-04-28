@@ -129,29 +129,6 @@ function ProfilePage() {
         return () => clearTimeout(debounced);
     }, [usernameValue, clearErrors, setError]);
 
-    // const onSubmit = async (data) => {
-    //     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    //     const userId = user?._id || user?.id;
-
-    //     try {
-    //         const profileData = {
-    //             name: data.name,
-    //             username: data.username,
-    //             dob: data.dob,
-    //             emailid: data.emailid,
-    //             photo: files.photo,
-    //         };
-
-    //         const response = await authAPI.updateUserProfile(userId, profileData);
-
-    //         dispatch(setProfile(response));
-
-    //         dispatch(showToast('Profile created successfully', 'success'));
-    //         navigate('/feed');
-    //     } catch (error) {
-    //         dispatch(showToast(error.message || 'Failed to create profile', 'error'));
-    //     }
-    // };
     const onSubmit = async (data) => {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userId = user?._id || user?.id;
@@ -181,7 +158,7 @@ function ProfilePage() {
             dispatch(setProfile(updatedUser));
 
             dispatch(showToast('Profile updated successfully', 'success'));
-            navigate('/feed');
+            navigate('/feed', { replace: true });
         } catch (error) {
             console.error('Profile update error:', error);
             const errorMsg = error.response?.data?.message || error.message || 'Failed to update profile';

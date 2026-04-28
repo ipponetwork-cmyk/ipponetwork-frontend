@@ -135,7 +135,7 @@ const FeedItem = ({ post, onEnquiryUpdate, dynamicLanguage }) => {
             // Safely extract target values, trying both root and nested object
             const waNumber = post.whatsappnumber || post.calltoaction?.whatsappnumber || post.calltoaction?.number || post.number;
             const waMessage = post.whatsappmessage || post.calltoaction?.whatsappmessage || post.calltoaction?.message || 'Hi, I am interested in your post';
-            const cNumber = post.callnumber || post.calltoaction?.callnumber || post.calltoaction?.number || post.number;
+            const cNumber = post.calltomobilenumber || post.calltoaction?.calltomobilenumber || post.calltoaction?.number || post.number;
             const extLink = post.calltoaction?.externallinkurl || post.calltoactionexternallinkurl || post.externallinkurl || post.calltoaction?.url;
 
             // If actionType wasn't explicitly provided but we have the data, try to infer it

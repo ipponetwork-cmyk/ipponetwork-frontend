@@ -25,6 +25,7 @@ import { useDispatch, } from 'react-redux';
 import { authAPI } from '../../services/api';
 import { BsWhatsapp } from "react-icons/bs";
 import { IoGlobeOutline } from "react-icons/io5";
+import { IoCallOutline } from "react-icons/io5";
 // import { IoGlobeOutline, IoTerminalOutline, IoSettingsOutline } from "react-icons/io5";
 import {
     IoChevronDownOutline,
@@ -37,7 +38,7 @@ import Loader from '../../components/Loader';
 import { getDomainName, getDomainPassingName } from '../../utils/domainUtils';
 import { compressImage } from '../../utils/imageUtils';
 import { POST_STATUS } from '../../constants/constants';
-import { ScheduleIcon, CalendarIcon, ImageIcon, LinkIcon, WhatsAppIcon } from '../../components/InteractiveIcon';
+import { ScheduleIcon, CalendarIcon, ImageIcon, LinkIcon } from '../../components/InteractiveIcon';
 
 const CreditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -472,7 +473,7 @@ const CreatePost = () => {
 
     const actionMethods = [
         { id: 'whatsapp', title: t('whatsapp'), description: t('sendQuickMessage'), icon: <BsWhatsapp size={18} /> },
-        { id: 'call', title: 'Call', description: 'Talk to us Instantly', icon: <WhatsAppIcon fontSize={18} /> },
+        { id: 'call', title: 'Call', description: 'Talk to us Instantly', icon: <IoCallOutline fontSize={18} /> },
         { id: 'link', title: t('externalLink'), description: t('visitMoreDetails'), icon: <LinkIcon fontSize={18} /> }
     ]
 

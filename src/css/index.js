@@ -147,7 +147,7 @@ export const BackgroundPanel = styled.section`
 
 export const Logo = styled.span`
   display: inline-block;
-  font-family: 'Comic Sans MS', cursive;
+  font-family: 'Comic Sans MS';
   font-size: 48px;
   font-weight: 400;
   font-style: normal;

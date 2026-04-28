@@ -1299,6 +1299,8 @@ export const TextContentBody = styled.p`
     line-height: 1.7;
     white-space: pre-wrap;
     text-align: left;
+    word-break: break-word;      
+    overflow-wrap: break-word;
 `;
 export const TextContentTitle = styled.p`
     margin: 0;
@@ -1311,6 +1313,8 @@ export const TextContentTitle = styled.p`
     vertical-align: middle;
     white-space: pre-wrap;
     text-align: left;
+    word-break: break-word;       
+    overflow-wrap: break-word;
 `;
 
 

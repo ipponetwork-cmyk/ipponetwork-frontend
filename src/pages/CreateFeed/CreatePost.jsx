@@ -389,7 +389,10 @@ const CreatePost = () => {
         try {
             setIsSubmitting(true);
             // await dispatch(createPost(formData));
-            await authAPI.createPost(formData);
+            const result = await authAPI.createPost(formData);
+            console.log(result, "ResultResuklt")
+            const message = result?.message || "Post created successfully"
+            dispatch(showToast(message, 'success'));
             setSubmitError('');
 
             if (statusType === 'DRAFT') {

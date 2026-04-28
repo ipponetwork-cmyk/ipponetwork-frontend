@@ -20,13 +20,14 @@ import Loader from '../../components/Loader';
 import { FaUser } from 'react-icons/fa';
 import { showToast } from '../../redux/actions';
 import { useDispatch } from 'react-redux';
+import { InteractiveIcon } from '../../components/InteractiveIcon';
 
 
 const FooterBar = ({ enquirycount, onShare }) => (
     <DetailFooter>
         <ActionBar>
             <EnquiryBadge>
-                <RiSearchEyeLine size={16} />
+                <InteractiveIcon size={20} style={{ display: 'block', flexShrink: 0 }} />
                 <EnquiryText>{enquirycount}</EnquiryText>
             </EnquiryBadge>
             <IconButton onClick={onShare}>
